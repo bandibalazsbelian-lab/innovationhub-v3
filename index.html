@@ -102,7 +102,7 @@ canvas#gl{position:fixed;inset:0;z-index:0}
 footer{padding:80px 40px 40px;text-align:center;border-top:1px solid rgba(255,255,255,.02)}
 .ft-mark{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:400;letter-spacing:4px;color:rgba(255,255,255,.08);margin-bottom:6px}
 .ft-copy{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.05)}
-#particle-logo{position:fixed;top:12px;left:10px;z-index:60;width:380px;height:340px;pointer-events:auto;cursor:none}
+#particle-logo{position:fixed;top:16px;left:12px;z-index:60;width:300px;height:192px;pointer-events:auto;cursor:none}
 #particle-logo canvas{width:100%;height:100%}
 #ticker{position:fixed;top:0;left:0;right:0;height:22px;background:rgba(2,3,8,.9);border-bottom:1px solid rgba(255,255,255,.02);z-index:50;overflow:hidden;display:flex;align-items:center;backdrop-filter:blur(30px)}
 .tk-s{display:flex;gap:50px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;color:rgba(255,215,0,.15);white-space:nowrap;animation:tkScr 50s linear infinite}
@@ -877,7 +877,7 @@ function initParticleLogo(){
   const canvas=document.getElementById('plc');
   const ctx=canvas.getContext('2d');
   const dpr2=Math.min(devicePixelRatio,2);
-  const cW=Math.floor(380*dpr2),cH=Math.floor(340*dpr2);
+  const cW=Math.floor(300*dpr2),cH=Math.floor(192*dpr2);
   canvas.width=cW;canvas.height=cH;
 
   const img=new Image();img.crossOrigin='anonymous';
@@ -885,57 +885,31 @@ function initParticleLogo(){
     const off=document.createElement('canvas');off.width=cW;off.height=cH;
     const oc=off.getContext('2d');
 
-    // Draw image large — fill 78% of canvas height, centered
-    const imgH=cH*.74;
-    const imgW=imgH*(img.width/img.height);
-    const imgX=(cW-imgW)/2;
-    oc.drawImage(img,imgX,cH*.02,imgW,imgH);
-
-    // Big, bold text below
-    const tY=cH*.9;
-    const fSz=Math.floor(cH*.1);
-    const t1='Innovation',t2='HUB';
-    oc.font=`600 ${fSz}px 'Space Grotesk',sans-serif`;
-    oc.textBaseline='middle';
-    const w1=oc.measureText(t1).width;
-    oc.font=`800 ${Math.floor(fSz*1.1)}px 'Space Grotesk',sans-serif`;
-    const w2=oc.measureText(t2).width;
-    const gap2=4*dpr2;
-    const startX=cW/2-(w1+w2+gap2)/2;
-
-    // "Innovation" — bright white
-    oc.font=`600 ${fSz}px 'Space Grotesk',sans-serif`;
-    oc.fillStyle='rgba(240,245,255,.95)';
-    oc.textAlign='left';
-    oc.fillText(t1,startX,tY);
-
-    // "HUB" — vivid green, bold
-    oc.font=`800 ${Math.floor(fSz*1.1)}px 'Space Grotesk',sans-serif`;
-    oc.fillStyle='rgba(0,240,110,1)';
-    oc.fillText(t2,startX+w1+gap2,tY);
+    // Draw image filling entire canvas (image already contains text)
+    oc.drawImage(img,0,0,cW,cH);
 
     // ── Pixel-faithful sampling — every 2px ──
     const imgData=oc.getImageData(0,0,cW,cH).data;
-    const step=2; // dense: every 2 pixels regardless of DPR
+    const step=2;
     const pts=[];
     for(let y=0;y<cH;y+=step)for(let x=0;x<cW;x+=step){
       const idx=(y*cW+x)*4;
       const r=imgData[idx],g=imgData[idx+1],b=imgData[idx+2],a=imgData[idx+3];
       if(a<15)continue;
       const brightness=r*.299+g*.587+b*.114;
-      // Keep anything with some brightness or decent alpha (captures dark greens, reflections)
-      if(brightness<5&&a<180)continue;
+      // Skip near-black bg pixels but keep dark greens
+      if(brightness<10&&g<20)continue;
       pts.push({
         tx:x,ty:y,x:x+(Math.random()-.5)*cW*.5,y:y+(Math.random()-.5)*cH*.5,
         vx:0,vy:0,
-        sz:Math.max(.5,(.3+brightness/255*.8)*(a/255)),
-        al:Math.min(1,(a/255)*.55+.35),
+        sz:Math.max(.4,(.3+brightness/255*.7)*(a/255)),
+        al:Math.min(1,(a/255)*.5+.35),
         cr:r,cg:g,cb:b,
         phase:Math.random()*6.28
       })}
 
     let mouseIn=false,mxP=0,myP=0;
-    const scR=70*dpr2;
+    const scR=65*dpr2;
     container.addEventListener('mouseenter',()=>{mouseIn=true});
     container.addEventListener('mouseleave',()=>{mouseIn=false});
     container.addEventListener('mousemove',e=>{
@@ -967,7 +941,7 @@ function initParticleLogo(){
         const speed=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
         const distHome=Math.sqrt((p.x-p.tx)**2+(p.y-p.ty)**2);
         const settled=Math.max(0,1-distHome/20);
-        const breathP=.9+.1*Math.sin(t*1.+p.phase);
+        const breathP=.9+.1*Math.sin(t+p.phase);
 
         if(speed>3){
           ctx.globalAlpha=Math.min(1,.3+speed*.035);
@@ -977,11 +951,9 @@ function initParticleLogo(){
           ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*4,0,Math.PI*2);ctx.fill();
         } else {
           const a2=p.al*settled*breathP;
-          // Soft glow halo in particle's own color
           ctx.globalAlpha=a2*.07;
           ctx.fillStyle=`rgb(${p.cr},${p.cg},${p.cb})`;
           ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*2.8,0,Math.PI*2);ctx.fill();
-          // Core pixel — faithful color
           ctx.globalAlpha=a2;
           ctx.fillStyle=`rgb(${p.cr},${p.cg},${p.cb})`;
           ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz,0,Math.PI*2);ctx.fill();
