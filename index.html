@@ -126,13 +126,35 @@ footer{padding:80px 40px 40px;text-align:center;border-top:1px solid rgba(255,25
 .hud-dots{display:flex;gap:4px}
 .hud-d{width:2px;height:2px;background:rgba(255,255,255,.06);border-radius:50%;transition:all .5s}
 .hud-d.on{background:rgba(0,255,136,.5);box-shadow:0 0 4px rgba(0,255,136,.3)}
-#snd{position:fixed;top:30px;right:20px;z-index:50;width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.04);background:transparent;color:rgba(255,255,255,.15);font-size:10px;cursor:none;transition:all .3s;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
-#snd:hover{border-color:rgba(255,255,255,.12);color:rgba(255,255,255,.4)}
+
+/* ─── AUDIO TOGGLE — Animated Visualizer ─── */
+#audio-toggle{position:fixed;top:28px;right:20px;z-index:100;display:flex;align-items:center;gap:10px;padding:6px 14px 6px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.04);background:rgba(3,5,8,.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);cursor:none;transition:all .5s cubic-bezier(.16,1,.3,1);user-select:none}
+#audio-toggle:hover{border-color:rgba(0,255,136,.15);background:rgba(3,5,8,.85)}
+#audio-toggle.on{border-color:rgba(0,255,136,.12)}
+.at-bars{display:flex;align-items:end;gap:2px;height:14px;width:20px}
+.at-bar{width:2px;background:rgba(255,255,255,.12);border-radius:1px;transition:background .4s}
+#audio-toggle.on .at-bar{background:rgba(0,255,136,.5)}
+.at-bar:nth-child(1){height:4px}.at-bar:nth-child(2){height:8px}.at-bar:nth-child(3){height:12px}.at-bar:nth-child(4){height:6px}.at-bar:nth-child(5){height:10px}
+#audio-toggle.on .at-bar{animation:abar .8s ease-in-out infinite alternate}
+#audio-toggle.on .at-bar:nth-child(1){animation-delay:0s}
+#audio-toggle.on .at-bar:nth-child(2){animation-delay:.1s}
+#audio-toggle.on .at-bar:nth-child(3){animation-delay:.2s}
+#audio-toggle.on .at-bar:nth-child(4){animation-delay:.3s}
+#audio-toggle.on .at-bar:nth-child(5){animation-delay:.15s}
+@keyframes abar{0%{height:3px}100%{height:14px}}
+.at-label{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.12);transition:color .4s;text-transform:uppercase}
+#audio-toggle.on .at-label{color:rgba(0,255,136,.35)}
+
 #toasts{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:4px}
 .toast{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:rgba(0,255,136,.4);background:rgba(3,5,8,.9);border:1px solid rgba(0,255,136,.08);backdrop-filter:blur(10px);padding:8px 14px;border-radius:2px;transform:translateX(30px);opacity:0;animation:tin .6s cubic-bezier(.16,1,.3,1) forwards}
 @keyframes tin{to{transform:none;opacity:1}}
 .toast.out{animation:tout .3s ease forwards}
 @keyframes tout{to{transform:translateX(30px);opacity:0}}
+
+/* IDLE GLITCH */
+.hero-t.glitch{animation:hglitch .12s linear 3}
+@keyframes hglitch{0%{text-shadow:2px 0 #0ff,-2px 0 #f0a}25%{text-shadow:-2px 2px #0f0,2px -2px #f0f}50%{text-shadow:1px -1px #ff0,-1px 1px #0ff}75%{text-shadow:-1px 0 #f0a,1px 0 #0f0}100%{text-shadow:none}}
+
 @media(max-width:1000px){.pil-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.pil-grid{grid-template-columns:1fr}.st-row{flex-direction:column}.st-cell{border-right:none;border-bottom:1px solid rgba(255,255,255,.03)}.st-cell:last-child{border-bottom:none}.soc-row{gap:24px}.soc-item canvas{width:70px;height:70px}#cursor{display:none}html,body{cursor:auto}}
 </style>
@@ -142,7 +164,12 @@ footer{padding:80px 40px 40px;text-align:center;border-top:1px solid rgba(255,25
 <div id="preloader"><div class="pl-logo">INNOVATIONHUB</div><div class="pl-bar"><div class="pl-fill" id="pl-fill"></div></div><div class="pl-pct" id="pl-pct">0</div></div>
 <canvas id="gl"></canvas>
 <div id="ticker"><div class="tk-s"><span>ÖTÖSLOTTÓ 7·14·28·35·42 — JACKPOT 2.4 MRD FT</span><span>HATOSLOTTÓ 3·11·19·27·38·44 — 890M FT</span><span>SKANDINÁV 5·12·22·31·35 — 45M SEK</span><span>ÖTÖSLOTTÓ 7·14·28·35·42 — JACKPOT 2.4 MRD FT</span><span>HATOSLOTTÓ 3·11·19·27·38·44 — 890M FT</span></div></div>
-<button id="snd">✧</button>
+
+<div id="audio-toggle" role="button" tabindex="0" aria-label="Toggle sound">
+<div class="at-bars"><div class="at-bar"></div><div class="at-bar"></div><div class="at-bar"></div><div class="at-bar"></div><div class="at-bar"></div></div>
+<span class="at-label">Sound</span>
+</div>
+
 <div id="hud"><div class="hud-row"><div class="hud-lbl">EXPLORED</div><div class="hud-dots" id="hdots"></div><div class="hud-pct" id="hpct">0%</div></div></div>
 <div id="toasts"></div>
 <div id="content">
@@ -171,31 +198,92 @@ import{RGBELoader}from'three/addons/loaders/RGBELoader.js';
 /* ═══ CURSOR ═══ */
 const cursorEl=document.getElementById('cursor'),cursorBall=document.getElementById('cursor-ball');
 let curX=innerWidth/2,curY=innerHeight/2,curVX=0,curVY=0,curDX=innerWidth/2,curDY=innerHeight/2;
-document.addEventListener('mousemove',e=>{curDX=e.clientX;curDY=e.clientY});
+document.addEventListener('mousemove',e=>{curDX=e.clientX;curDY=e.clientY;idleTime=0;idlePhase=0});
 (function uc(){curVX+=(curDX-curX)*.15;curVY+=(curDY-curY)*.15;curVX*=.7;curVY*=.7;curX+=curVX;curY+=curVY;cursorEl.style.left=curX+'px';cursorEl.style.top=curY+'px';requestAnimationFrame(uc)})();
-document.addEventListener('mouseover',e=>{const t=e.target;cursorEl.classList.toggle('hover',!!(t.closest&&(t.closest('a')||t.closest('button')||t.closest('.p-card')||t.closest('.st-cell'))))});
+document.addEventListener('mouseover',e=>{const t=e.target;cursorEl.classList.toggle('hover',!!(t.closest&&(t.closest('a')||t.closest('button')||t.closest('.p-card')||t.closest('.st-cell')||t.closest('#audio-toggle'))))});
+document.addEventListener('keydown',()=>{idleTime=0;idlePhase=0});
+document.addEventListener('scroll',()=>{idleTime=0;idlePhase=0},{passive:true});
 
-/* ═══ AUDIO — Zimmer Pad + Hover ═══ */
+/* ═══════════════════════════════════════════════════
+   AUDIO ENGINE — Interstellar-grade Organ Pad
+   6-layer additive synthesis: deep bass, organ mids,
+   string shimmer, ghost harmonics, wind texture,
+   sub-bass heartbeat pulse. All with LFO swells.
+   ═══════════════════════════════════════════════════ */
 const AC=window.AudioContext||window.webkitAudioContext;
 const au={c:null,m:null,mut:true,ok:false,
-init(){if(this.ok)return;this.c=new AC();this.m=this.c.createGain();this.m.gain.value=0;this.m.connect(this.c.destination);this.ok=true},
-toggle(){this.init();if(this.c.state==='suspended')this.c.resume();this.mut=!this.mut;this.m.gain.setTargetAtTime(this.mut?0:.12,this.c.currentTime,.08);if(!this.mut)this._zimmer();return this.mut},
+init(){if(this.ok)return;this.c=new AC();
+  this.comp2=this.c.createDynamicsCompressor();this.comp2.threshold.value=-24;this.comp2.knee.value=12;this.comp2.ratio.value=4;this.comp2.connect(this.c.destination);
+  this.m=this.c.createGain();this.m.gain.value=0;this.m.connect(this.comp2);
+  // Delay for reverb-like tail
+  this.dly=this.c.createDelay(.5);this.dly.delayTime.value=.35;
+  this.dlyG=this.c.createGain();this.dlyG.gain.value=.15;
+  this.dlyFb=this.c.createGain();this.dlyFb.gain.value=.3;
+  const dlyF=this.c.createBiquadFilter();dlyF.type='lowpass';dlyF.frequency.value=1200;
+  this.dly.connect(dlyF);dlyF.connect(this.dlyG);this.dlyG.connect(this.m);
+  dlyF.connect(this.dlyFb);this.dlyFb.connect(this.dly);
+  this.ok=true},
+toggle(){this.init();if(this.c.state==='suspended')this.c.resume();this.mut=!this.mut;
+  this.m.gain.cancelScheduledValues(this.c.currentTime);
+  this.m.gain.setTargetAtTime(this.mut?0:.25,this.c.currentTime,this.mut?.3:1.5);
+  if(!this.mut)this._zimmer();
+  document.getElementById('audio-toggle').classList.toggle('on',!this.mut);
+  return this.mut},
 _g(v){const g=this.c.createGain();g.gain.value=v;g.connect(this.m);return g},
+_gD(v){const g=this.c.createGain();g.gain.value=v;g.connect(this.m);g.connect(this.dly);return g},
 _o(t,f){const o=this.c.createOscillator();o.type=t;o.frequency.value=f;return o},
 hover(){if(!this.ok||this.mut)return;const t=this.c.currentTime;
-const g=this._g(0);const o=this._o('sine',800+Math.random()*400);
-o.frequency.exponentialRampToValueAtTime(1200+Math.random()*300,t+.15);
-g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.012,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+.4);
-o.connect(g);o.start(t);o.stop(t+.5)},
+  const g=this._g(0);const o=this._o('sine',800+Math.random()*400);
+  o.frequency.exponentialRampToValueAtTime(1200+Math.random()*300,t+.15);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.015,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+.4);
+  o.connect(g);o.start(t);o.stop(t+.5)},
 play(s){if(!this.ok||this.mut)return;const t=this.c.currentTime;try{
-if(s==='whoosh'){const g=this._g(.04);const buf=this.c.createBuffer(1,this.c.sampleRate*.35,this.c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.sin(Math.PI*i/d.length);const n=this.c.createBufferSource();n.buffer=buf;const f=this.c.createBiquadFilter();f.type='bandpass';f.frequency.value=1800;f.frequency.exponentialRampToValueAtTime(200,t+.35);n.connect(f);f.connect(g);g.gain.exponentialRampToValueAtTime(.001,t+.35);n.start(t)}
-else if(s==='chime'){[523,659,784,1047].forEach((fr,i)=>{const g=this._g(.03);const o=this._o('sine',fr);g.gain.setValueAtTime(0,t+i*.1);g.gain.linearRampToValueAtTime(.03,t+i*.1+.01);g.gain.exponentialRampToValueAtTime(.001,t+i*.1+.8);o.connect(g);o.start(t+i*.1);o.stop(t+i*.1+.8)})}
+  if(s==='whoosh'){const g=this._gD(.06);const buf=this.c.createBuffer(1,this.c.sampleRate*.4,this.c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(Math.sin(Math.PI*i/d.length),1.5);const n=this.c.createBufferSource();n.buffer=buf;const f=this.c.createBiquadFilter();f.type='bandpass';f.frequency.value=2000;f.Q.value=.8;f.frequency.exponentialRampToValueAtTime(150,t+.4);n.connect(f);f.connect(g);g.gain.exponentialRampToValueAtTime(.001,t+.4);n.start(t)}
+  else if(s==='chime'){[523,659,784,1047,1319].forEach((fr,i)=>{const g=this._gD(.025);const o=this._o('sine',fr);g.gain.setValueAtTime(0,t+i*.12);g.gain.linearRampToValueAtTime(.025,t+i*.12+.02);g.gain.exponentialRampToValueAtTime(.0005,t+i*.12+1.2);o.connect(g);o.start(t+i*.12);o.stop(t+i*.12+1.3)})}
+  else if(s==='ping'){const g=this._gD(.018);const o=this._o('sine',1047+Math.random()*500);g.gain.setValueAtTime(.018,t);g.gain.exponentialRampToValueAtTime(.0001,t+1.8);o.connect(g);o.start(t);o.stop(t+2)}
 }catch(e){}},
-_zim:false,_zimmer(){if(this._zim)return;this._zim=true;
-[32.7,65.41].forEach(f=>{const g=this._g(.008);const o=this._o('sine',f);const l=this._o('sine',.02+Math.random()*.01);const lg=this.c.createGain();lg.gain.value=.4;l.connect(lg);lg.connect(o.frequency);o.connect(g);l.start();o.start()});
-[130.81,196,261.63].forEach((f,i)=>{const g=this._g(.004);const o=this._o('sine',f);o.connect(g);o.start();const g2=this._g(.002);const o2=this._o('sine',f*2);o2.connect(g2);o2.start();const g3=this._g(.001);const o3=this._o('sine',f*3);o3.connect(g3);o3.start();const l=this._o('sine',.015+i*.008);const lg=this.c.createGain();lg.gain.value=.003;l.connect(lg);lg.connect(g.gain);l.start()});
-[523.25,659.25,783.99].forEach((f,i)=>{const g=this._g(.001);const o=this._o('sine',f);const v=this._o('sine',4+Math.random()*2);const vg=this.c.createGain();vg.gain.value=.8;v.connect(vg);vg.connect(o.frequency);o.connect(g);v.start();o.start()});
-const nG=this._g(.003);const nBuf=this.c.createBuffer(1,this.c.sampleRate*4,this.c.sampleRate);const nD=nBuf.getChannelData(0);for(let i=0;i<nD.length;i++)nD[i]=Math.random()*2-1;const nS=this.c.createBufferSource();nS.buffer=nBuf;nS.loop=true;const nF=this.c.createBiquadFilter();nF.type='bandpass';nF.frequency.value=400;nF.Q.value=.5;nS.connect(nF);nF.connect(nG);nS.start()}};
+_zim:false,
+_zimmer(){if(this._zim)return;this._zim=true;const c=this.c;
+  // ─── Layer 1: Deep organ bass C1+C2 with slow LFO swell ───
+  [32.7,65.41].forEach((f,i)=>{
+    const g=this._gD(.02);const o=this._o('sine',f);
+    const lfo=this._o('sine',.035+i*.01);const lg=c.createGain();lg.gain.value=.01;
+    lfo.connect(lg);lg.connect(g.gain);
+    const sub=this._o('sine',f/2);const sg=this._g(.007);sub.connect(sg);sub.start();
+    o.connect(g);lfo.start();o.start()});
+  // ─── Layer 2: Organ mids C3/G3/C4 with harmonics + tremolo ───
+  [130.81,196,261.63].forEach((f,i)=>{
+    const g=this._gD(.008);const o=this._o('sine',f);o.connect(g);o.start();
+    [2,3,4].forEach(h=>{const gh=this._gD(.008/h);const oh=this._o('sine',f*h);oh.connect(gh);oh.start()});
+    const tr=this._o('sine',.02+i*.012);const tg=c.createGain();tg.gain.value=.004;
+    tr.connect(tg);tg.connect(g.gain);tr.start()});
+  // ─── Layer 3: High strings C5/E5/G5 with vibrato + amplitude swell ───
+  [523.25,659.25,783.99].forEach((f,i)=>{
+    const g=this._gD(.004);const o=this._o('sine',f);
+    const vib=this._o('sine',4.5+Math.random()*1.5);const vg=c.createGain();vg.gain.value=1.2;
+    vib.connect(vg);vg.connect(o.frequency);
+    const sw=this._o('sine',.025+i*.008);const sg=c.createGain();sg.gain.value=.003;
+    sw.connect(sg);sg.connect(g.gain);
+    o.connect(g);vib.start();sw.start();o.start()});
+  // ─── Layer 4: Ghost harmonics (barely audible high shimmer) ───
+  [1046.5,1318.5,1568].forEach((f,i)=>{
+    const g=this._gD(.0012);const o=this._o('sine',f);
+    const l=this._o('sine',.01+i*.005);const lg=c.createGain();lg.gain.value=.001;
+    l.connect(lg);lg.connect(g.gain);o.connect(g);l.start();o.start()});
+  // ─── Layer 5: Wind breath (filtered noise with LFO sweep) ───
+  const wG=this._g(.007);const wB=c.createBuffer(1,c.sampleRate*6,c.sampleRate);
+  const wD=wB.getChannelData(0);for(let i=0;i<wD.length;i++)wD[i]=(Math.random()*2-1)*Math.sin(Math.PI*i/wD.length);
+  const wS=c.createBufferSource();wS.buffer=wB;wS.loop=true;
+  const wF=c.createBiquadFilter();wF.type='bandpass';wF.frequency.value=350;wF.Q.value=.4;
+  const wL=this._o('sine',.06);const wLG=c.createGain();wLG.gain.value=150;
+  wL.connect(wLG);wLG.connect(wF.frequency);wS.connect(wF);wF.connect(wG);wL.start();wS.start();
+  // ─── Layer 6: Sub-bass heartbeat pulse ───
+  const pulse=()=>{if(this.mut)return;const t=c.currentTime;
+    const pg=this._g(0);const po=this._o('sine',40);
+    pg.gain.setValueAtTime(0,t);pg.gain.linearRampToValueAtTime(.015,t+.3);pg.gain.exponentialRampToValueAtTime(.0001,t+4);
+    po.connect(pg);po.start(t);po.stop(t+4.5);
+    setTimeout(pulse,8000+Math.random()*12000)};
+  setTimeout(pulse,5000)}};
 
 /* ═══ GAMIFICATION ═══ */
 const gm={ex:new Set(),tot:10,
@@ -235,7 +323,7 @@ for(let i=0;i<3;i++){const y2=-10+((frame*.3+i*30)%40)-10;ctx.strokeStyle=c+(.15
 ctx.restore();requestAnimationFrame(draw)}draw()})}
 
 /* ═══════════════════════════════════════════
-   THREE.JS — Cinema Base from previous version
+   THREE.JS — Cinema Base
    ═══════════════════════════════════════════ */
 const cv=document.getElementById('gl'),W=()=>innerWidth,H=()=>innerHeight,dpr=Math.min(devicePixelRatio,2);
 const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});
@@ -248,25 +336,27 @@ scene.add(new THREE.AmbientLight(0x080c18,.6));
 const kL=new THREE.PointLight(0x00ff88,2,80,1.5);kL.position.set(5,10,15);scene.add(kL);
 const fL=new THREE.PointLight(0x00e5ff,.8,60,1.5);fL.position.set(-12,-5,8);scene.add(fL);
 const rL=new THREE.PointLight(0xff00aa,.5,50,2);rL.position.set(12,3,-15);scene.add(rL);
-const wL=new THREE.PointLight(0xffffff,.3,40,2);wL.position.set(0,15,0);scene.add(wL);
+const wL2=new THREE.PointLight(0xffffff,.3,40,2);wL2.position.set(0,15,0);scene.add(wL2);
 
-// Post
+// Post-processing
 const comp=new EffectComposer(renderer);comp.addPass(new RenderPass(scene,cam));
 comp.addPass(new UnrealBloomPass(new THREE.Vector2(W(),H()),.35,1.0,.35));
 const gradePass=new ShaderPass({
-uniforms:{tDiffuse:{value:null},uTime:{value:0},uChroma:{value:0}},
+uniforms:{tDiffuse:{value:null},uTime:{value:0},uChroma:{value:0},uBreath:{value:0}},
 vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-fragmentShader:`uniform sampler2D tDiffuse;uniform float uTime;uniform float uChroma;varying vec2 vUv;
+fragmentShader:`uniform sampler2D tDiffuse;uniform float uTime;uniform float uChroma;uniform float uBreath;varying vec2 vUv;
 float h21(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 void main(){vec2 uv=vUv;float ca=.001+uChroma*.006;vec2 d=(uv-.5)*ca;
 float r=texture2D(tDiffuse,uv+d).r;float g=texture2D(tDiffuse,uv).g;float b=texture2D(tDiffuse,uv-d).b;
 vec3 c=vec3(r,g,b);c=pow(c,vec3(.97,1.,1.04));c=mix(c,c*vec3(1.02,.99,.96),smoothstep(0.,.5,c.g));
 c=c*c*(3.-2.*c);c=mix(c,c*c*(3.-2.*c),.15);
-float v=1.-smoothstep(.35,1.5,length((uv-.5)*vec2(1.6,1.8)));c*=mix(.2,1.,v);
-c+=(h21(uv+fract(uTime*.37))-.5)*.03;c+=sin(uv.y*800.+uTime*.5)*.005;gl_FragColor=vec4(c,1.);}`
+float v=1.-smoothstep(.35,1.5,length((uv-.5)*vec2(1.6,1.8)));c*=mix(.18,1.,v);
+c+=(h21(uv+fract(uTime*.37))-.5)*.028;c+=sin(uv.y*800.+uTime*.5)*.004;
+c*=.97+uBreath*.06;
+gl_FragColor=vec4(c,1.);}`
 });comp.addPass(gradePass);let chromT=0;
 
-// HDR
+// HDR Environment
 let envMap=null;const pmrem=new THREE.PMREMGenerator(renderer);pmrem.compileEquirectangularShader();
 new RGBELoader().load('https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/kloppenheim_02_1k.hdr',tex=>{
 envMap=pmrem.fromEquirectangular(tex).texture;tex.dispose();pmrem.dispose();
@@ -295,73 +385,66 @@ if(envMap)mat.envMap=envMap;
 const m=new THREE.Mesh(bGeo,mat);
 const rad=8+Math.random()*25,th=Math.random()*Math.PI*2,ph=(Math.random()-.5)*Math.PI*.6;
 m.position.set(Math.cos(th)*Math.cos(ph)*rad,Math.sin(ph)*rad*.4+(Math.random()-.5)*4,Math.sin(th)*Math.cos(ph)*rad-10);
-bData.push({mesh:m,base:m.position.clone(),ph:Math.random()*Math.PI*2,sx:.08+Math.random()*.15,sy:.05+Math.random()*.12,sz:.06+Math.random()*.1,ax:.3+Math.random()*1,ay:.2+Math.random()*.8,az:.2+Math.random()*.6});
+bData.push({mesh:m,base:m.position.clone(),ph:Math.random()*Math.PI*2,sx:.08+Math.random()*.15,sy:.05+Math.random()*.12,sz:.06+Math.random()*.1,ax:.3+Math.random()*1,ay:.2+Math.random()*.8,az:.2+Math.random()*.6,eI:.15});
 scene.add(m)}
 
 /* ═══ PARTICLE SYSTEMS — Dust + Ember + Streak ═══ */
-// Layer 1: Dust motes (from cinema version)
 const dustN=W()<768?50:150;const dPos=new Float32Array(dustN*3),dSz=new Float32Array(dustN);
 for(let i=0;i<dustN;i++){dPos[i*3]=(Math.random()-.5)*70;dPos[i*3+1]=(Math.random()-.5)*30;dPos[i*3+2]=(Math.random()-.5)*60-5;dSz[i]=.4+Math.random()*2}
 const dGeo=new THREE.BufferGeometry();dGeo.setAttribute('position',new THREE.BufferAttribute(dPos,3));dGeo.setAttribute('aSize',new THREE.BufferAttribute(dSz,1));
 const dMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-uniforms:{uTime:{value:0},uPR:{value:dpr}},
-vertexShader:`attribute float aSize;uniform float uTime;uniform float uPR;varying float vA;
-void main(){vec3 p=position;p.y+=sin(uTime*.12+position.x*.3)*.8;p.x+=cos(uTime*.08+position.z*.2)*.5;
-vec4 mv=modelViewMatrix*vec4(p,1.);float d=-mv.z;vA=smoothstep(50.,3.,d)*.15;
-gl_PointSize=aSize*uPR*(6./max(d,1.));gl_Position=projectionMatrix*mv;}`,
+uniforms:{uTime:{value:0},uPR:{value:dpr},uBreath:{value:0}},
+vertexShader:`attribute float aSize;uniform float uTime;uniform float uPR;uniform float uBreath;varying float vA;
+void main(){vec3 p=position;p.y+=sin(uTime*.12+position.x*.3)*.8+uBreath*.4;p.x+=cos(uTime*.08+position.z*.2)*.5;
+vec4 mv=modelViewMatrix*vec4(p,1.);float d=-mv.z;vA=smoothstep(50.,3.,d)*(.1+uBreath*.08);
+gl_PointSize=aSize*uPR*(6./max(d,1.))*(1.+uBreath*.2);gl_Position=projectionMatrix*mv;}`,
 fragmentShader:`varying float vA;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;gl_FragColor=vec4(.7,.8,1.,vA*smoothstep(.5,0.,d));}`});
 scene.add(new THREE.Points(dGeo,dMat));
 
-// Layer 2: Green embers — rising slowly, lottery-themed sparkle
-const embN=W()<768?30:80;const ePos=new Float32Array(embN*3),eSz=new Float32Array(embN),eSpd=new Float32Array(embN);
-for(let i=0;i<embN;i++){ePos[i*3]=(Math.random()-.5)*50;ePos[i*3+1]=(Math.random()-.5)*40-10;ePos[i*3+2]=(Math.random()-.5)*40-10;eSz[i]=.3+Math.random()*1.5;eSpd[i]=.3+Math.random()*.7}
-const eGeo=new THREE.BufferGeometry();eGeo.setAttribute('position',new THREE.BufferAttribute(ePos,3));eGeo.setAttribute('aSize',new THREE.BufferAttribute(eSz,1));eGeo.setAttribute('aSpd',new THREE.BufferAttribute(eSpd,1));
+const embN=W()<768?30:80;const ePos=new Float32Array(embN*3),eSz=new Float32Array(embN),ePh=new Float32Array(embN);
+for(let i=0;i<embN;i++){ePos[i*3]=(Math.random()-.5)*50;ePos[i*3+1]=Math.random()*40-25;ePos[i*3+2]=(Math.random()-.5)*40-8;eSz[i]=.3+Math.random()*1.5;ePh[i]=Math.random()*6.28}
+const eGeo=new THREE.BufferGeometry();eGeo.setAttribute('position',new THREE.BufferAttribute(ePos,3));eGeo.setAttribute('aSize',new THREE.BufferAttribute(eSz,1));eGeo.setAttribute('aPhase',new THREE.BufferAttribute(ePh,1));
 const eMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
 uniforms:{uTime:{value:0},uPR:{value:dpr}},
-vertexShader:`attribute float aSize;attribute float aSpd;uniform float uTime;uniform float uPR;varying float vA;varying vec3 vCol;
-void main(){vec3 p=position;
-p.y=mod(p.y+uTime*aSpd*1.5+20.,40.)-20.;
-p.x+=sin(uTime*.3+position.z)*.6;p.z+=cos(uTime*.2+position.x)*.4;
-vec4 mv=modelViewMatrix*vec4(p,1.);float d=-mv.z;
-vA=smoothstep(40.,2.,d)*.2*(1.+sin(uTime*2.+position.x*5.)*.5);
-float t=fract(position.x*.13+position.z*.07);
-vCol=mix(vec3(0.,1.,.53),vec3(0.,.9,1.),t);
-gl_PointSize=aSize*uPR*(5./max(d,1.));gl_Position=projectionMatrix*mv;}`,
-fragmentShader:`varying float vA;varying vec3 vCol;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;
-float core=smoothstep(.15,0.,d);float glow=smoothstep(.5,.05,d);
-gl_FragColor=vec4(vCol*glow+vec3(1.)*core*.4,vA*glow);}`});
+vertexShader:`attribute float aSize;attribute float aPhase;uniform float uTime;uniform float uPR;varying float vA;varying float vHot;
+void main(){vec3 p=position;p.y=mod(p.y+uTime*1.2+aPhase*5.,40.)-25.;p.x+=sin(uTime*.3+aPhase*4.)*.8;
+vHot=.5+.5*sin(uTime*2.+aPhase*6.);vA=smoothstep(40.,2.,-( modelViewMatrix*vec4(p,1.)).z)*.2*vHot;
+gl_PointSize=aSize*uPR*(5./max(-(modelViewMatrix*vec4(p,1.)).z,1.));gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
+fragmentShader:`varying float vA;varying float vHot;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;
+vec3 col=mix(vec3(0.,.8,.5),vec3(.5,1.,.8),vHot);
+gl_FragColor=vec4(col,vA*smoothstep(.5,.05,d));}`});
 scene.add(new THREE.Points(eGeo,eMat));
 
-// Layer 3: Golden streaks — rare, fast, cinematic
-const strN=W()<768?10:30;const sPos=new Float32Array(strN*3),sSz=new Float32Array(strN),sSpd2=new Float32Array(strN);
-for(let i=0;i<strN;i++){sPos[i*3]=(Math.random()-.5)*80;sPos[i*3+1]=(Math.random()-.5)*20;sPos[i*3+2]=(Math.random()-.5)*40-15;sSz[i]=.2+Math.random()*1;sSpd2[i]=2+Math.random()*4}
-const sGeo=new THREE.BufferGeometry();sGeo.setAttribute('position',new THREE.BufferAttribute(sPos,3));sGeo.setAttribute('aSize',new THREE.BufferAttribute(sSz,1));sGeo.setAttribute('aSpd',new THREE.BufferAttribute(sSpd2,1));
+const stkN=W()<768?10:30;const sPos=new Float32Array(stkN*3),sSz=new Float32Array(stkN),sPh=new Float32Array(stkN);
+for(let i=0;i<stkN;i++){sPos[i*3]=(Math.random()-.5)*80;sPos[i*3+1]=(Math.random()-.5)*20;sPos[i*3+2]=(Math.random()-.5)*50-10;sSz[i]=1+Math.random()*2;sPh[i]=Math.random()*6.28}
+const sGeo=new THREE.BufferGeometry();sGeo.setAttribute('position',new THREE.BufferAttribute(sPos,3));sGeo.setAttribute('aSize',new THREE.BufferAttribute(sSz,1));sGeo.setAttribute('aPhase',new THREE.BufferAttribute(sPh,1));
 const sMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
 uniforms:{uTime:{value:0},uPR:{value:dpr}},
-vertexShader:`attribute float aSize;attribute float aSpd;uniform float uTime;uniform float uPR;varying float vA;
-void main(){vec3 p=position;
-float cycle=mod(uTime*aSpd*.2+position.x*.01,1.);
-p.x=position.x+cycle*60.-30.;
-p.y+=sin(cycle*6.28+position.z)*.5;
-vec4 mv=modelViewMatrix*vec4(p,1.);float d=-mv.z;
-vA=smoothstep(45.,5.,d)*.08*sin(cycle*3.14159);
-gl_PointSize=aSize*uPR*(4./max(d,1.))*(1.+sin(cycle*3.14)*2.);
-gl_Position=projectionMatrix*mv;}`,
+vertexShader:`attribute float aSize;attribute float aPhase;uniform float uTime;uniform float uPR;varying float vA;
+void main(){vec3 p=position;p.x=mod(p.x+uTime*8.+aPhase*30.,80.)-40.;
+float flash=pow(max(0.,sin(uTime*.4+aPhase*10.)),12.);vA=flash*.25;
+gl_PointSize=aSize*uPR*(4.+flash*6.)/max(-(modelViewMatrix*vec4(p,1.)).z*.1,1.);
+gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
 fragmentShader:`varying float vA;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;gl_FragColor=vec4(1.,.85,.4,vA*smoothstep(.5,0.,d));}`});
 scene.add(new THREE.Points(sGeo,sMat));
 
 /* ═══ Grid Floor ═══ */
 const gMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,
-uniforms:{uTime:{value:0},uScr:{value:0}},
+uniforms:{uTime:{value:0},uScr:{value:0},uBreath:{value:0}},
 vertexShader:`varying vec3 vW;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`,
-fragmentShader:`uniform float uTime;uniform float uScr;varying vec3 vW;
+fragmentShader:`uniform float uTime;uniform float uScr;uniform float uBreath;varying vec3 vW;
 void main(){vec2 p=vW.xz+vec2(0.,uScr*15.);vec2 g=abs(fract(p*.2)-.5);float l=min(g.x,g.y);
 float grid=1.-smoothstep(0.,.012,l);vec2 sg=abs(fract(p*.8)-.5);float sl=min(sg.x,sg.y);
 float sub=(1.-smoothstep(0.,.008,sl))*.08;float fade=exp(-length(vW.xz)*.02);
-float pulse=.6+.4*sin(uTime*.15+length(vW.xz)*.04);float a=(grid*.06+sub)*fade*pulse;
+float pulse=.6+.4*sin(uTime*.15+length(vW.xz)*.04);float a=(grid*(.05+uBreath*.02)+sub)*fade*pulse;
 vec3 c=mix(vec3(0.,1.,.53),vec3(0.,.85,1.),smoothstep(8.,40.,length(vW.xz)));
 gl_FragColor=vec4(c,a);}`});
 const gP=new THREE.Mesh(new THREE.PlaneGeometry(200,200),gMat);gP.rotation.x=-Math.PI/2;gP.position.y=-6;scene.add(gP);
+
+/* ═══ Shooting Star (reusable mesh) ═══ */
+const ssGeo=new THREE.BufferGeometry();ssGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array([0,0,0,-2,.1,0,-4,.05,0]),3));
+const ssMat=new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0});
+const ssLine=new THREE.Line(ssGeo,ssMat);ssLine.visible=false;scene.add(ssLine);
 
 /* ═══ Social Particles ═══ */
 function initSoc(){
@@ -385,6 +468,21 @@ document.querySelectorAll('.soc-item').forEach(el=>{const pl=el.dataset.p,s=sys.
 el.addEventListener('mouseenter',()=>{s.hov=true;gm.track(pl);au.hover();for(const p of s.parts){const dx=p.x-s.w/2,dy=p.y-s.h/2,d2=Math.sqrt(dx*dx+dy*dy)||1;p.vx+=(dx/d2)*4;p.vy+=(dy/d2)*4}});
 el.addEventListener('mouseleave',()=>{s.hov=false})})}
 
+/* ═══ IDLE EASTER EGGS ═══ */
+let idleTime=0,idlePhase=0;
+let idleDrift=false,ssActive=false,ssT=0,ballGlow=0,lastEgg=-1;
+const eggNames=['ORBIT','COMET','GLITCH','PING','CHROMATIC','GLOW'];
+const eggs=[
+  ()=>{idleDrift=true;setTimeout(()=>idleDrift=false,8000)},
+  ()=>{ssActive=true;ssT=0},
+  ()=>{const h=document.getElementById('ht');if(h){h.classList.add('glitch');setTimeout(()=>h.classList.remove('glitch'),500)}},
+  ()=>{au.play('ping')},
+  ()=>{chromT=3;setTimeout(()=>chromT=0,600)},
+  ()=>{ballGlow=2}
+];
+function triggerEgg(){let i;do{i=Math.floor(Math.random()*eggs.length)}while(i===lastEgg);
+  lastEgg=i;eggs[i]();toast('✧ '+eggNames[i]);gm.track('easter')}
+
 /* ═══ SCROLL & REVEALS ═══ */
 let sY=0;const lerp2=()=>{sY+=(scrollY-sY)*.06};const seen=new Set();
 const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;const id=e.target.id;if(seen.has(id))return;seen.add(id);
@@ -394,42 +492,78 @@ if(id==='pillars'){au.play('whoosh');chromT=1.5;setTimeout(()=>chromT=0,400);doc
 if(id==='stats'){au.play('whoosh');chromT=1.5;setTimeout(()=>chromT=0,400);document.querySelectorAll('.st-cell').forEach((c2,i)=>setTimeout(()=>{c2.classList.add('in');const tgt=+c2.dataset.v,nEl=c2.querySelector('.n'),st=performance.now();(function tk(now){const p=Math.min((now-st)/2000,1),e2=1-Math.pow(1-p,4);nEl.textContent=Math.round(tgt*e2);if(p<1)requestAnimationFrame(tk);else{nEl.textContent=tgt;if(i===3){gm.track('stats');au.play('chime')}}})(performance.now())},i*180))}
 if(id==='community'){au.play('whoosh');document.getElementById('ch').classList.add('in');document.querySelectorAll('.soc-item').forEach((s,i)=>setTimeout(()=>{s.classList.add('in');gm.track('social')},150+i*120))}})},{threshold:.2});
 document.querySelectorAll('.sec').forEach(s=>obs.observe(s));
-document.querySelectorAll('.p-card,.st-cell,.soc-item,#snd,a,button').forEach(el=>{el.addEventListener('mouseenter',()=>au.hover())});
+document.querySelectorAll('.p-card,.st-cell,.soc-item,#audio-toggle,a,button').forEach(el=>{el.addEventListener('mouseenter',()=>au.hover())});
 document.querySelectorAll('.p-card').forEach(c2=>{c2.addEventListener('mousemove',e=>{const r=c2.getBoundingClientRect();c2.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');c2.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%')})});
 window.addEventListener('resize',()=>{cam.aspect=W()/H();cam.updateProjectionMatrix();renderer.setSize(W(),H());comp.setSize(W(),H())});
-document.getElementById('snd').addEventListener('click',e=>{e.stopPropagation();const m=au.toggle();e.currentTarget.textContent=m?'✧':'♫';e.currentTarget.style.color=m?'':'rgba(0,255,136,.5)'});
+document.getElementById('audio-toggle').addEventListener('click',e=>{e.stopPropagation();au.toggle()});
 
 /* ═══ PRELOADER ═══ */
 async function preload(){const fl=document.getElementById('pl-fill'),pc=document.getElementById('pl-pct');
 return new Promise(r=>{let p=0;const iv=setInterval(()=>{p+=Math.random()*15+3;if(p>100)p=100;fl.style.width=p+'%';pc.textContent=Math.round(p);
 if(p>=100){clearInterval(iv);setTimeout(()=>{document.getElementById('preloader').classList.add('bye');setTimeout(r,1200)},400)}},80)})}
 
-/* ═══ RENDER ═══ */
+/* ═══ RENDER — Living Breathing Environment ═══ */
 const clock=new THREE.Clock();let mx2=0,my2=0;
 document.addEventListener('mousemove',e=>{mx2=e.clientX;my2=e.clientY});
-function loop(){requestAnimationFrame(loop);const t=clock.getElapsedTime();lerp2();
+
+function loop(){requestAnimationFrame(loop);const t=clock.getElapsedTime();const dt=Math.min(clock.getDelta(),.05);lerp2();
 const sp=sY/Math.max(document.documentElement.scrollHeight-H(),1);
 
-dMat.uniforms.uTime.value=t;eMat.uniforms.uTime.value=t;sMat.uniforms.uTime.value=t;
-gMat.uniforms.uTime.value=t;gMat.uniforms.uScr.value=sp;
-gradePass.uniforms.uTime.value=t;gradePass.uniforms.uChroma.value+=(chromT-gradePass.uniforms.uChroma.value)*.08;
+// ─── GLOBAL BREATHING ─── (~35s full cycle, everything responds)
+const breath=Math.sin(t*.18)*.5+.5;
+const breathFast=Math.sin(t*.4)*.5+.5;
 
+// ─── IDLE ───
+idleTime+=dt;
+if(idleTime>8&&idlePhase===0){idlePhase=1;triggerEgg()}
+if(idleTime>16){idleTime=5;idlePhase=0}
+
+// ─── UNIFORMS ───
+dMat.uniforms.uTime.value=t;dMat.uniforms.uBreath.value=breath;
+eMat.uniforms.uTime.value=t;sMat.uniforms.uTime.value=t;
+gMat.uniforms.uTime.value=t;gMat.uniforms.uScr.value=sp;gMat.uniforms.uBreath.value=breath;
+gradePass.uniforms.uTime.value=t;gradePass.uniforms.uBreath.value=breath;
+gradePass.uniforms.uChroma.value+=(chromT-gradePass.uniforms.uChroma.value)*.08;
+
+// ─── CAMERA ───
 const nmx=(mx2/W())*2-1,nmy=-(my2/H())*2+1;
-cam.position.x+=(nmx*1.2-cam.position.x)*.015;cam.position.y+=(nmy*.6-cam.position.y)*.015;
+let cx=nmx*1.2,cy=nmy*.6;
+if(idleDrift){cx+=Math.sin(t*.15)*2.5;cy+=Math.cos(t*.12)*1.2}
+cam.position.x+=(cx-cam.position.x)*.015;cam.position.y+=(cy-cam.position.y)*.015;
 cam.position.z=22-sp*12;cam.lookAt(0,0,-8);
 
+// ─── TOTEM — breathing scale ───
 totem.rotation.y=t*.06;totem.rotation.x=Math.sin(t*.08)*.08;totem.rotation.z=Math.cos(t*.1)*.05;
-heroG.position.y=Math.sin(t*.15)*.4;
-const ha=Math.max(0,1-sp*4);tkMat.opacity=.9*ha;coreMat.opacity=.6*ha;coreMat.emissiveIntensity=.4+Math.sin(t*.5)*.15;r1Mat.opacity=.12*ha;
+heroG.position.y=Math.sin(t*.15)*.5;
+heroG.scale.setScalar(1+Math.sin(t*.2)*.015);
+const ha=Math.max(0,1-sp*4);
+tkMat.opacity=.9*ha;coreMat.opacity=(.5+breath*.15)*ha;
+coreMat.emissiveIntensity=.3+Math.sin(t*.5)*.15+breath*.1;
+r1Mat.opacity=(.08+breath*.06)*ha;
 ring1.rotation.z=t*.1;ring2.rotation.y=t*.08;ring3.rotation.z=-t*.06;ring3.rotation.x=1.2+Math.sin(t*.07)*.1;
 
+// ─── BALLS — breathing float + glow easter egg ───
 for(const b of bData){
-b.mesh.position.x=b.base.x+Math.sin(t*b.sx+b.ph)*b.ax;
-b.mesh.position.y=b.base.y+Math.cos(t*b.sy+b.ph*1.3)*b.ay;
-b.mesh.position.z=b.base.z+Math.sin(t*b.sz+b.ph*.7)*b.az;
-b.mesh.rotation.x=t*b.sx;b.mesh.rotation.y=t*b.sy}
+  b.mesh.position.x=b.base.x+Math.sin(t*b.sx+b.ph)*b.ax;
+  b.mesh.position.y=b.base.y+Math.cos(t*b.sy+b.ph*1.3)*b.ay+breath*.3;
+  b.mesh.position.z=b.base.z+Math.sin(t*b.sz+b.ph*.7)*b.az;
+  b.mesh.rotation.x=t*b.sx;b.mesh.rotation.y=t*b.sy;
+  const tgtE=ballGlow>0?.15*(1+ballGlow):.15;
+  b.eI+=(tgtE-b.eI)*.05;b.mesh.material.emissiveIntensity=b.eI}
+if(ballGlow>0)ballGlow=Math.max(0,ballGlow-dt*.8);
 
-kL.intensity=2+Math.sin(t*.2)*.4;kL.position.x=Math.sin(t*.08)*6;fL.position.y=-5+Math.sin(t*.1)*2;
+// ─── LIGHTS — breathing ───
+kL.intensity=1.8+Math.sin(t*.2)*.4+breath*.3;kL.position.x=Math.sin(t*.08)*6;
+fL.position.y=-5+Math.sin(t*.1)*2;fL.intensity=.7+breathFast*.2;
+rL.intensity=.4+breath*.15;wL2.intensity=.25+breathFast*.1;
+scene.fog.density=.016+breath*.003;
+
+// ─── SHOOTING STAR ───
+if(ssActive){ssLine.visible=true;ssT+=dt;const p=ssT/1.5;
+  ssLine.position.set(-20+p*50,8+Math.sin(p*2)*2,5-p*15);ssLine.rotation.z=-.3;
+  ssMat.opacity=p<.2?p*5:Math.max(0,1-(p-.2)/.8);
+  if(ssT>1.5){ssActive=false;ssLine.visible=false}}
+
 comp.render()}
 
 /* ═══ INIT ═══ */
