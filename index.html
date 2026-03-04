@@ -102,9 +102,8 @@ canvas#gl{position:fixed;inset:0;z-index:0}
 footer{padding:80px 40px 40px;text-align:center;border-top:1px solid rgba(255,255,255,.02)}
 .ft-mark{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:400;letter-spacing:4px;color:rgba(255,255,255,.08);margin-bottom:6px}
 .ft-copy{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.05)}
-#hub-logo{position:fixed;top:16px;left:16px;z-index:60;width:54px;height:54px;opacity:.55;mix-blend-mode:screen;filter:saturate(1.2);transition:opacity .6s,filter .6s,transform .6s cubic-bezier(.16,1,.3,1);pointer-events:auto;cursor:none;border-radius:50%}
-#hub-logo:hover{opacity:.85;filter:saturate(1.5) brightness(1.2);transform:scale(1.08)}
-#hub-logo img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+#particle-logo{position:fixed;top:24px;left:20px;z-index:60;width:160px;height:120px;pointer-events:auto;cursor:none}
+#particle-logo canvas{width:100%;height:100%}
 #ticker{position:fixed;top:0;left:0;right:0;height:22px;background:rgba(2,3,8,.9);border-bottom:1px solid rgba(255,255,255,.02);z-index:50;overflow:hidden;display:flex;align-items:center;backdrop-filter:blur(30px)}
 .tk-s{display:flex;gap:50px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;color:rgba(255,215,0,.15);white-space:nowrap;animation:tkScr 50s linear infinite}
 @keyframes tkScr{to{transform:translateX(-50%)}}
@@ -147,7 +146,7 @@ footer{padding:80px 40px 40px;text-align:center;border-top:1px solid rgba(255,25
 <div id="cursor"><div id="cursor-ball">13</div><div id="cursor-ring"></div></div>
 <div id="preloader"><div class="pl-logo">INNOVATIONHUB</div><div class="pl-bar"><div class="pl-fill" id="pl-fill"></div></div><div class="pl-pct" id="pl-pct">0</div></div>
 <canvas id="gl"></canvas>
-<div id="hub-logo"><img src="logo.png" alt="InnovationHub"></div>
+<div id="particle-logo"><canvas id="plc"></canvas></div>
 <div id="ticker"><div class="tk-s"><span>ÖTÖSLOTTÓ 7·14·28·35·42 — JACKPOT 2.4 MRD FT</span><span>HATOSLOTTÓ 3·11·19·27·38·44 — 890M FT</span><span>SKANDINÁV 5·12·22·31·35 — 45M SEK</span><span>ÖTÖSLOTTÓ 7·14·28·35·42 — JACKPOT 2.4 MRD FT</span><span>HATOSLOTTÓ 3·11·19·27·38·44 — 890M FT</span></div></div>
 <div id="audio-toggle" role="button" tabindex="0" aria-label="Hang ki/be">
 <div class="at-bars"><div class="at-bar"></div><div class="at-bar"></div><div class="at-bar"></div><div class="at-bar"></div><div class="at-bar"></div></div>
@@ -183,7 +182,7 @@ const cursorEl=document.getElementById('cursor');
 let curX=innerWidth/2,curY=innerHeight/2,curVX=0,curVY=0,curDX=innerWidth/2,curDY=innerHeight/2;
 document.addEventListener('mousemove',e=>{curDX=e.clientX;curDY=e.clientY;idleTime=0;idlePhase=0});
 (function uc(){curVX+=(curDX-curX)*.15;curVY+=(curDY-curY)*.15;curVX*=.7;curVY*=.7;curX+=curVX;curY+=curVY;cursorEl.style.left=curX+'px';cursorEl.style.top=curY+'px';requestAnimationFrame(uc)})();
-document.addEventListener('mouseover',e=>{const t=e.target;cursorEl.classList.toggle('hover',!!(t.closest&&(t.closest('a')||t.closest('button')||t.closest('.p-card')||t.closest('.st-cell')||t.closest('#audio-toggle')||t.closest('#hub-logo'))))});
+document.addEventListener('mouseover',e=>{const t=e.target;cursorEl.classList.toggle('hover',!!(t.closest&&(t.closest('a')||t.closest('button')||t.closest('.p-card')||t.closest('.st-cell')||t.closest('#audio-toggle')||t.closest('#particle-logo'))))});
 document.addEventListener('keydown',()=>{idleTime=0;idlePhase=0});
 document.addEventListener('scroll',()=>{idleTime=0;idlePhase=0},{passive:true});
 
@@ -872,6 +871,159 @@ if(ssActive){ssLine.visible=true;ssT+=dt;const p=ssT/1.5;
 
 comp.render()}
 
+/* ═══ PARTICLE LOGO — Top-Left Corner ═══ */
+function initParticleLogo(){
+  const container=document.getElementById('particle-logo');
+  const canvas=document.getElementById('plc');
+  const ctx=canvas.getContext('2d');
+  const dpr2=Math.min(devicePixelRatio,2);
+  const cW=Math.floor(160*dpr2),cH=Math.floor(120*dpr2);
+  canvas.width=cW;canvas.height=cH;
+
+  // Offscreen: draw torus knot shape + text
+  const off=document.createElement('canvas');off.width=cW;off.height=cH;
+  const oc=off.getContext('2d');
+
+  // ── Draw torus knot (parametric, green glow) ──
+  const cx=cW/2,knotY=cH*.38,knotR=cW*.22;
+  oc.save();
+  // Multiple passes for glow effect
+  for(let pass=0;pass<3;pass++){
+    const alpha=pass===0?.15:pass===1?.3:.7;
+    const lw=pass===0?8*dpr2:pass===1?4*dpr2:2*dpr2;
+    oc.strokeStyle=`rgba(0,${180+pass*30},${80+pass*20},${alpha})`;
+    oc.lineWidth=lw;oc.lineCap='round';oc.lineJoin='round';
+    // Torus knot p=2 q=3
+    oc.beginPath();
+    for(let i=0;i<=600;i++){
+      const t=i/600*Math.PI*4;
+      const r2=knotR*(.6+.4*Math.cos(1.5*t));
+      const x=cx+r2*Math.cos(t);
+      const y=knotY+r2*Math.sin(t)*.55;
+      if(i===0)oc.moveTo(x,y);else oc.lineTo(x,y)}
+    oc.stroke();
+    // Second loop offset for 3D illusion
+    oc.beginPath();
+    for(let i=0;i<=600;i++){
+      const t=i/600*Math.PI*4;
+      const r2=knotR*(.6+.4*Math.cos(1.5*t+2));
+      const x=cx+r2*Math.cos(t+.3);
+      const y=knotY+r2*Math.sin(t+.3)*.55;
+      if(i===0)oc.moveTo(x,y);else oc.lineTo(x,y)}
+    oc.stroke();
+    // Third interweave
+    oc.beginPath();
+    for(let i=0;i<=600;i++){
+      const t=i/600*Math.PI*4;
+      const r2=knotR*(.6+.4*Math.cos(1.5*t+4));
+      const x=cx+r2*Math.cos(t+.6);
+      const y=knotY+r2*Math.sin(t+.6)*.55;
+      if(i===0)oc.moveTo(x,y);else oc.lineTo(x,y)}
+    oc.stroke()}
+  // Center glow
+  const grd=oc.createRadialGradient(cx,knotY,0,cx,knotY,knotR*.5);
+  grd.addColorStop(0,'rgba(200,255,200,.25)');grd.addColorStop(1,'rgba(0,255,100,0)');
+  oc.fillStyle=grd;oc.beginPath();oc.arc(cx,knotY,knotR*.5,0,Math.PI*2);oc.fill();
+  oc.restore();
+
+  // ── Text: "Innovation" gray + "HUB" green ──
+  const tY=cH*.82;
+  const fSz=Math.floor(cH*.14);
+  oc.font=`500 ${fSz}px 'Space Grotesk',sans-serif`;
+  oc.textAlign='center';oc.textBaseline='middle';
+  // Measure to place side by side
+  const t1='Innovation';const t2='HUB';
+  const w1=oc.measureText(t1).width;
+  oc.font=`700 ${fSz}px 'Space Grotesk',sans-serif`;
+  const w2=oc.measureText(t2).width;
+  const totalW=w1+w2+2*dpr2;
+  const startX=cx-totalW/2;
+  // Draw "Innovation" in white
+  oc.font=`500 ${fSz}px 'Space Grotesk',sans-serif`;
+  oc.fillStyle='rgba(230,235,240,.85)';
+  oc.textAlign='left';
+  oc.fillText(t1,startX,tY);
+  // Draw "HUB" in green
+  oc.font=`700 ${fSz}px 'Space Grotesk',sans-serif`;
+  oc.fillStyle='rgba(0,230,100,.9)';
+  oc.fillText(t2,startX+w1+2*dpr2,tY);
+
+  // ── Sample pixels → particles ──
+  const imgData=oc.getImageData(0,0,cW,cH).data;
+  const gap=dpr2>1.5?3:2;
+  const pts=[];
+  for(let y=0;y<cH;y+=gap)for(let x=0;x<cW;x+=gap){
+    const idx=(y*cW+x)*4;
+    const r=imgData[idx],g=imgData[idx+1],b=imgData[idx+2],a=imgData[idx+3];
+    if(a>40){
+      pts.push({
+        tx:x,ty:y,x:x+(Math.random()-.5)*cW,y:y+(Math.random()-.5)*cH,
+        vx:0,vy:0,sz:.4+Math.random()*.8,
+        al:Math.min(1,(a/255)*.7+.2),
+        cr:r,cg:g,cb:b,
+        phase:Math.random()*6.28
+      })}}
+
+  let mouseIn=false,mxP=0,myP=0;
+  const scR=50*dpr2;
+  container.addEventListener('mouseenter',()=>{mouseIn=true});
+  container.addEventListener('mouseleave',()=>{mouseIn=false});
+  container.addEventListener('mousemove',e=>{
+    const r=container.getBoundingClientRect();
+    mxP=(e.clientX-r.left)*dpr2;myP=(e.clientY-r.top)*dpr2});
+
+  let frame=0;
+  function drawLogo(){
+    requestAnimationFrame(drawLogo);frame++;
+    ctx.clearRect(0,0,cW,cH);
+    const t=frame*.01;
+
+    for(const p of pts){
+      if(mouseIn){
+        const dx=p.x-mxP,dy=p.y-myP;
+        const dist=Math.sqrt(dx*dx+dy*dy)||1;
+        if(dist<scR){
+          const force=(1-dist/scR)*10;
+          p.vx+=dx/dist*force;
+          p.vy+=dy/dist*force}}
+      const spring=mouseIn?.008:.06;
+      p.vx+=(p.tx-p.x)*spring;
+      p.vy+=(p.ty-p.y)*spring;
+      p.vx*=.86;p.vy*=.86;
+      p.x+=p.vx;p.y+=p.vy;
+
+      const ox=Math.sin(t*.7+p.phase)*.3;
+      const oy=Math.cos(t*.5+p.phase*1.3)*.3;
+      const speed=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
+      const distHome=Math.sqrt((p.x-p.tx)**2+(p.y-p.ty)**2);
+      const settled=Math.max(0,1-distHome/15);
+      const breathP=.85+.15*Math.sin(t*1.2+p.phase);
+
+      if(speed>2.5){
+        // Scattered = bright green spark
+        ctx.globalAlpha=Math.min(1,.4+speed*.04);
+        ctx.fillStyle=`rgba(0,255,136,1)`;
+        ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*1.3,0,Math.PI*2);ctx.fill();
+        ctx.globalAlpha=.15;
+        ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*4,0,Math.PI*2);ctx.fill();
+      } else {
+        // Settled = original color with glow
+        const a=p.al*settled*breathP;
+        // Glow halo
+        ctx.globalAlpha=a*.1;
+        ctx.fillStyle=`rgba(${p.cr},${p.cg},${p.cb},1)`;
+        ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*3.5,0,Math.PI*2);ctx.fill();
+        // Core
+        ctx.globalAlpha=a;
+        ctx.fillStyle=`rgba(${p.cr},${p.cg},${p.cb},1)`;
+        ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz,0,Math.PI*2);ctx.fill();
+      }
+    }
+    ctx.globalAlpha=1;
+  }
+  drawLogo();
+}
+
 /* ═══ PARTICLE TEXT — "INNOVATION HUB" ═══ */
 function initParticleText(){
   const container=document.getElementById('particle-text');
@@ -975,7 +1127,7 @@ function initParticleText(){
     canvas.height=Math.floor(r2.height*dpr2)});
 }
 
-async function init(){gm.init();initSoc();drawPillarIcons();initParticleText();await preload();document.getElementById('hud').classList.add('vis');loop()}
+async function init(){gm.init();initSoc();drawPillarIcons();initParticleLogo();initParticleText();await preload();document.getElementById('hud').classList.add('vis');loop()}
 init();
 </script>
 </body>
