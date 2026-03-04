@@ -289,7 +289,7 @@ const grad=ctx.createRadialGradient(0,0,2,0,0,14);grad.addColorStop(0,c+(.3*puls
 ctx.fillStyle=grad;ctx.beginPath();ctx.arc(0,0,14,0,Math.PI*2);ctx.fill();
 const eyeX=Math.sin(frame*.02)*3;ctx.fillStyle=c+pulse+')';ctx.beginPath();ctx.arc(eyeX,0,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=c+(.3*pulse)+')';ctx.beginPath();ctx.arc(eyeX,0,2,0,Math.PI*2);ctx.fill();
 for(let i=0;i<3;i++){const y2=-10+((frame*.3+i*30)%40)-10;ctx.strokeStyle=c+(.15*pulse)+')';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(-14,y2);ctx.lineTo(14,y2);ctx.stroke()}}
-ctx.restore();requestAnimationFrame(draw)}draw()})}
+ctx.restore();setTimeout(draw,66)}draw()})}
 
 /* ═══ THREE.JS ═══ */
 const cv=document.getElementById('gl'),W=()=>innerWidth,H=()=>innerHeight,dpr=Math.min(devicePixelRatio,2);
@@ -330,7 +330,7 @@ scene.traverse(o=>{if(o.isMesh&&o.material&&o.material.isMeshPhysicalMaterial){o
    ═══════════════════════════════════════════════════════════ */
 
 // ── 12 000 Stars, 3 depth layers, spectral color variation ──
-const starN=W()<768?3000:12000;
+const starN=W()<768?1500:5000;
 const stPos=new Float32Array(starN*3),stSz=new Float32Array(starN),stCol=new Float32Array(starN*3);
 for(let i=0;i<starN;i++){
   const th=Math.random()*Math.PI*2,ph=Math.acos(Math.random()*2-1);
@@ -372,7 +372,7 @@ float h(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
 float n(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
 return mix(mix(mix(h(i),h(i+vec3(1,0,0)),f.x),mix(h(i+vec3(0,1,0)),h(i+vec3(1,1,0)),f.x),f.y),
 mix(mix(h(i+vec3(0,0,1)),h(i+vec3(1,0,1)),f.x),mix(h(i+vec3(0,1,1)),h(i+vec3(1,1,1)),f.x),f.y),f.z);}
-float fb(vec3 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p*=2.07;a*=.48;}return v;}
+float fb(vec3 p){float v=0.,a=.5;for(int i=0;i<3;i++){v+=a*n(p);p*=2.07;a*=.48;}return v;}
 void main(){vec2 uv=vUv*2.-1.;float d=length(uv);if(d>1.)discard;
 vec3 p=vec3(uv*3.5,uTime*.012);float n1=fb(p)*.65+fb(p*2.3+vec3(uTime*.006))*.35;
 float n2=fb(p*1.5+vec3(5.,3.,uTime*.008));
@@ -388,10 +388,7 @@ const nebs=[
   mkNeb(80,80,60,-15,-80,0,-.4,.5,'.05,.1,.4','.2,.05,.35','.3,.5,1.'),
   mkNeb(65,65,5,40,-120,0,0,0,'.15,.02,.25','.3,.05,.15','1.,.4,.6'),
   mkNeb(90,70,-65,-28,-100,.2,.6,0,'.0,.12,.3','.05,.2,.35','.4,.8,1.'),
-  mkNeb(55,55,45,32,-130,-.3,0,.4,'.2,.02,.15','.35,.1,.05','1.,.6,.3'),
   mkNeb(70,70,15,-42,-85,.1,-.2,.3,'.05,.15,.35','.1,.05,.4','.6,.3,1.'),
-  mkNeb(60,60,-30,-10,-140,.4,.1,0,'.12,.0,.3','.25,.1,.35','.8,.3,.7'),
-  mkNeb(50,50,70,8,-115,0,-.5,.2,'.02,.08,.25','.1,.2,.4','.5,.7,1.'),
 ];
 
 // ═══ INTERSTELLAR-GRADE BLACK HOLE ═══
@@ -404,7 +401,7 @@ fragmentShader:`uniform float uTime;varying vec2 vUv;
 float h2(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
 return mix(mix(h2(i),h2(i+vec2(1,0)),f.x),mix(h2(i+vec2(0,1)),h2(i+vec2(1,1)),f.x),f.y);}
-float fb2(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n2(p);p*=2.1;a*=.48;}return v;}
+float fb2(vec2 p){float v=0.,a=.5;for(int i=0;i<3;i++){v+=a*n2(p);p*=2.1;a*=.48;}return v;}
 void main(){
   vec2 uv=(vUv-.5)*2.;
   float r=length(uv);
@@ -534,12 +531,12 @@ function mkGalaxy(n,arms,px,py,pz,rx,ry,rz,colA,colB,scl){
   const g=new THREE.Points(gGeo,gMat2);
   g.position.set(px,py,pz);g.rotation.set(rx,ry,rz);scene.add(g);return{mesh:g,mat:gMat2}}
 const galaxies=[
-  mkGalaxy(1800,2,-40,24,-100,.8,0,.3,0x8899ff,0xeeddff,1),
-  mkGalaxy(1000,3,65,18,-140,.5,.4,0,0xffaa77,0xffeedd,.7),
-  mkGalaxy(700,2,-60,-22,-130,1.2,-.3,.6,0x99bbff,0xffffff,.5),
-  mkGalaxy(500,4,48,-35,-160,.3,.8,0,0xddaaff,0xfff0dd,.4),
-  mkGalaxy(900,2,0,45,-180,1,0,.5,0x7799ff,0xddccff,.6),
-  mkGalaxy(400,3,-25,-40,-170,.6,.5,.2,0xffccaa,0xffffff,.35),
+  mkGalaxy(900,2,-40,24,-100,.8,0,.3,0x8899ff,0xeeddff,1),
+  mkGalaxy(500,3,65,18,-140,.5,.4,0,0xffaa77,0xffeedd,.7),
+  mkGalaxy(350,2,-60,-22,-130,1.2,-.3,.6,0x99bbff,0xffffff,.5),
+  mkGalaxy(250,4,48,-35,-160,.3,.8,0,0xddaaff,0xfff0dd,.4),
+  mkGalaxy(450,2,0,45,-180,1,0,.5,0x7799ff,0xddccff,.6),
+  mkGalaxy(200,3,-25,-40,-170,.6,.5,.2,0xffccaa,0xffffff,.35),
 ];
 
 // ── 8 Planets with atmosphere rim ──
@@ -559,15 +556,12 @@ const planets=[
   mkPlanet(1.5,-20,9,-48,0x3344aa,0x4488ff,null),
   mkPlanet(.9,32,14,-55,0xcc6633,0xff8844,null),
   mkPlanet(2.2,55,-18,-95,0x886644,0xddaa77,0xccbb99),
-  mkPlanet(.6,-12,-7,-38,0x448866,0x44ffaa,null),
   mkPlanet(1.8,-55,8,-115,0x994466,0xff6699,0xdd88aa),
   mkPlanet(.7,15,20,-62,0x556699,0x6699cc,null),
-  mkPlanet(1.2,-35,-15,-75,0x887755,0xbbaa88,0xaa9977),
-  mkPlanet(.5,42,5,-42,0x669977,0x88ddaa,null),
 ];
 
 // ── Event Horizon Vibrating Particles ──
-const ehN=W()<768?80:250;
+const ehN=W()<768?50:120;
 const ehPos=new Float32Array(ehN*3),ehSz=new Float32Array(ehN),ehPh=new Float32Array(ehN);
 const bhCenter=new THREE.Vector3(26,-4,-58);
 for(let i=0;i<ehN;i++){
@@ -609,7 +603,7 @@ fragmentShader:`varying float vA;varying float vHeat;void main(){float d=length(
 scene.add(new THREE.Points(ehGeo,ehMat));
 
 // ── Drifting Comets ──
-const cometCount=W()<768?3:6;
+const cometCount=W()<768?2:4;
 const comets=[];
 for(let i=0;i<cometCount;i++){
   const g=new THREE.Group();
@@ -627,7 +621,7 @@ for(let i=0;i<cometCount;i++){
   const coma=new THREE.Mesh(new THREE.PlaneGeometry(2,2),comaMat);
   g.add(coma);
   // Tail (stretched particle trail)
-  const tailN=40;const tPos=new Float32Array(tailN*3),tSz=new Float32Array(tailN);
+  const tailN=20;const tPos=new Float32Array(tailN*3),tSz=new Float32Array(tailN);
   for(let j=0;j<tailN;j++){
     tPos[j*3]=-j*.25-(Math.random()-.5)*.15;
     tPos[j*3+1]=(Math.random()-.5)*.12;
@@ -742,7 +736,7 @@ else{const p2=Math.random()*2-1;if(t<.5){x=p2*.3+(Math.random()-.5)*.05;y=-p2*.3
 pts.push(x,y)}return pts}
 const pC={twitch:[145,70,255],discord:[88,101,242],x:[180,185,195]},defC=[0,180,100],sys=[];
 document.querySelectorAll('.soc-item canvas').forEach(cv2=>{
-const pl=cv2.closest('.soc-item').dataset.p,ctx=cv2.getContext('2d'),w=cv2.width,h=cv2.height,n=600;
+const pl=cv2.closest('.soc-item').dataset.p,ctx=cv2.getContext('2d'),w=cv2.width,h=cv2.height,n=200;
 const tP=mkP(pl,n),parts=[];
 for(let i=0;i<n;i++)parts.push({x:Math.random()*w,y:Math.random()*h,tx:tP[i*2]*w*.7+w/2,ty:-tP[i*2+1]*h*.7+h/2,vx:0,vy:0,sz:.6+Math.random()*1.2,al:.2+Math.random()*.5});
 sys.push({ctx,parts,w,h,pl,hov:false,fp:0})});
@@ -750,7 +744,7 @@ function an2(){for(const s of sys){const{ctx:c,parts:ps,w,h}=s;c.clearRect(0,0,w
 for(const p of ps){if(s.fp>.03){p.vx+=(p.tx-p.x)*(s.hov?.06:.02);p.vy+=(p.ty-p.y)*(s.hov?.06:.02)}
 p.vx+=(Math.random()-.5)*(s.hov?.3:.15);p.vy+=(Math.random()-.5)*(s.hov?.3:.15);p.vx*=.88;p.vy*=.88;p.x+=p.vx;p.y+=p.vy;
 const a=p.al*(.15+s.fp*.7);c.globalAlpha=a;c.beginPath();c.arc(p.x,p.y,p.sz,0,Math.PI*2);c.fillStyle=`rgb(${cr},${cg},${cb})`;c.fill();
-c.globalAlpha=a*.08;c.beginPath();c.arc(p.x,p.y,p.sz*5,0,Math.PI*2);c.fill()}c.globalAlpha=1}requestAnimationFrame(an2)}requestAnimationFrame(an2);
+c.globalAlpha=a*.08;c.beginPath();c.arc(p.x,p.y,p.sz*5,0,Math.PI*2);c.fill()}c.globalAlpha=1}setTimeout(an2,50)}setTimeout(an2,50);
 document.querySelectorAll('.soc-item').forEach(el=>{const pl=el.dataset.p,s=sys.find(x=>x.pl===pl);if(!s)return;
 el.addEventListener('mouseenter',()=>{s.hov=true;gm.track(pl);au.hover();for(const p of s.parts){const dx=p.x-s.w/2,dy=p.y-s.h/2,d2=Math.sqrt(dx*dx+dy*dy)||1;p.vx+=(dx/d2)*4;p.vy+=(dy/d2)*4}});
 el.addEventListener('mouseleave',()=>{s.hov=false})})}
@@ -890,7 +884,7 @@ function initParticleLogo(){
 
     // ── Pixel-faithful sampling — every 2px ──
     const imgData=oc.getImageData(0,0,cW,cH).data;
-    const step=2;
+    const step=4;
     const pts=[];
     for(let y=0;y<cH;y+=step)for(let x=0;x<cW;x+=step){
       const idx=(y*cW+x)*4;
@@ -918,7 +912,7 @@ function initParticleLogo(){
 
     let frame=0;
     function drawLogo(){
-      requestAnimationFrame(drawLogo);frame++;
+      setTimeout(drawLogo,33);frame++;
       ctx.clearRect(0,0,cW,cH);
       const t=frame*.01;
 
@@ -989,7 +983,7 @@ function initParticleText(){
   oc.fillText('HUB',W2/2,H2*.72);
 
   const imgData=oc.getImageData(0,0,W2,H2).data;
-  const gap=W2<600?4:2;
+  const gap=W2<600?5:3;
   const pts=[];
   for(let y=0;y<H2;y+=gap)for(let x=0;x<W2;x+=gap){
     if(imgData[(y*W2+x)*4+3]>128){
@@ -1010,7 +1004,7 @@ function initParticleText(){
 
   let frame=0;
   function drawPT(){
-    requestAnimationFrame(drawPT);frame++;
+    setTimeout(drawPT,33);frame++;
     ctx.clearRect(0,0,W2,H2);
     const t=frame*.01;
 
