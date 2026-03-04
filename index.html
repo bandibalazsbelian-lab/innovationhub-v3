@@ -56,13 +56,26 @@ canvas#gl{position:fixed;inset:0;z-index:0}
 .pil-top h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:500;letter-spacing:-.02em;opacity:0;transform:translateY(25px)}
 .pil-top h2.in{opacity:1;transform:none;transition:all 1s cubic-bezier(.16,1,.3,1)}
 .pil-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;max-width:1400px;width:100%;background:rgba(255,255,255,.02)}
-.p-card{background:#020308;padding:clamp(30px,4vw,56px);min-height:380px;position:relative;overflow:hidden;opacity:0;transform:translateY(40px);transition:all .8s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column}
+.p-card{background:rgba(4,6,14,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:clamp(28px,3.5vw,48px);min-height:340px;position:relative;overflow:hidden;opacity:0;transform:translateY(40px);transition:all .8s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;border-radius:16px;border:1px solid rgba(255,255,255,.04)}
+.p-card::before{content:'';position:absolute;inset:0;border-radius:16px;padding:1px;background:linear-gradient(160deg,rgba(var(--c),.15),transparent 40%,transparent 60%,rgba(var(--c),.08));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;transition:opacity .5s}
+.p-card:hover::before{background:linear-gradient(160deg,rgba(var(--c),.35),transparent 40%,transparent 55%,rgba(var(--c),.2))}
+.p-card:hover{border-color:rgba(var(--c),.12);box-shadow:0 4px 40px rgba(var(--c),.06),inset 0 0 30px rgba(var(--c),.02)}
 .p-card.in{opacity:1;transform:none}
 .p-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.015),transparent 50%);opacity:0;transition:opacity .6s;pointer-events:none}
 .p-card:hover::before{opacity:1}
 .p-card:hover{background:rgba(255,255,255,.01)}
-.p-icon{width:200px;height:200px;margin-bottom:32px;opacity:.8;transition:opacity .5s,transform .5s cubic-bezier(.16,1,.3,1)}
-.p-card:hover .p-icon{opacity:1;transform:scale(1.1) rotate(3deg)}
+.p-icon-wrap{width:80px;height:80px;margin-bottom:24px;display:flex;align-items:center;justify-content:center;border-radius:16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);transition:all .5s cubic-bezier(.16,1,.3,1)}
+.p-svg{width:48px;height:48px;transition:transform .5s cubic-bezier(.16,1,.3,1),filter .5s}
+.p-card:hover .p-icon-wrap{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);box-shadow:0 0 20px rgba(var(--c),.15)}
+.p-card:hover .p-svg{transform:scale(1.1) rotate(3deg);filter:drop-shadow(0 0 8px rgba(var(--c),.4))}
+.p-card[data-c="cyan"]{--c:0,229,255}.p-card[data-c="gold"]{--c:255,215,0}.p-card[data-c="green"]{--c:0,255,136}.p-card[data-c="mag"]{--c:255,0,170}
+.p-card[data-c="cyan"] .p-svg{color:rgba(0,229,255,.7)}.p-card[data-c="gold"] .p-svg{color:rgba(255,215,0,.7)}.p-card[data-c="green"] .p-svg{color:rgba(0,255,136,.7)}.p-card[data-c="mag"] .p-svg{color:rgba(255,0,170,.7)}
+.p-badge{position:absolute;top:16px;right:16px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;padding:4px 10px;border-radius:20px;border:1px solid rgba(var(--c),.2);color:rgba(var(--c),.7);background:rgba(var(--c),.04);text-transform:uppercase;transition:all .4s}
+.p-card:hover .p-badge{border-color:rgba(var(--c),.4);color:rgba(var(--c),.9);background:rgba(var(--c),.08);box-shadow:0 0 12px rgba(var(--c),.1)}
+.p-xp{width:100%;height:3px;background:rgba(255,255,255,.04);border-radius:2px;margin-top:auto;overflow:hidden}
+.p-xp-bar{height:100%;width:30%;border-radius:2px;background:linear-gradient(90deg,rgba(var(--c),.3),rgba(var(--c),.6));transition:width 1.5s cubic-bezier(.16,1,.3,1)}
+.p-card:hover .p-xp-bar{filter:brightness(1.5)}
+.p-card:hover .p-icon-wrap{opacity:1;transform:scale(1.05) rotate(5deg)}
 .p-idx{font-family:'Space Grotesk',sans-serif;font-size:clamp(56px,6vw,84px);font-weight:700;color:rgba(255,255,255,.02);line-height:1;position:absolute;top:20px;right:24px;pointer-events:none}
 .p-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:5px;margin-bottom:16px}
 .p-card[data-c="cyan"] .p-tag{color:rgba(0,229,255,.4)}
@@ -71,12 +84,8 @@ canvas#gl{position:fixed;inset:0;z-index:0}
 .p-card[data-c="mag"] .p-tag{color:rgba(255,0,170,.35)}
 .p-name{font-family:'Space Grotesk',sans-serif;font-size:clamp(20px,2.4vw,28px);font-weight:600;letter-spacing:-.01em;margin-bottom:14px}
 .p-desc{font-size:14px;line-height:1.8;color:rgba(224,228,236,.28)}
-.p-line{position:absolute;bottom:0;left:0;right:0;height:1px;transform:scaleX(0);transform-origin:left;transition:transform .8s cubic-bezier(.16,1,.3,1)}
+.p-line{position:absolute;bottom:0;left:0;right:0;height:2px;transform:scaleX(0);transform-origin:left;transition:transform .8s cubic-bezier(.16,1,.3,1);background:linear-gradient(90deg,rgba(var(--c),.5),rgba(var(--c),.1));border-radius:1px}
 .p-card:hover .p-line{transform:scaleX(1)}
-.p-card[data-c="cyan"] .p-line{background:rgba(0,229,255,.4)}
-.p-card[data-c="gold"] .p-line{background:rgba(255,215,0,.3)}
-.p-card[data-c="green"] .p-line{background:rgba(0,255,136,.4)}
-.p-card[data-c="mag"] .p-line{background:rgba(255,0,170,.35)}
 #stats{min-height:60vh}
 .st-row{display:flex;max-width:1200px;width:100%;border-top:1px solid rgba(255,255,255,.03)}
 .st-cell{flex:1;padding:clamp(32px,5vw,64px) 24px;text-align:center;border-right:1px solid rgba(255,255,255,.03);opacity:0;transform:translateY(20px);transition:all .7s cubic-bezier(.16,1,.3,1)}
@@ -102,7 +111,7 @@ canvas#gl{position:fixed;inset:0;z-index:0}
 footer{padding:80px 40px 40px;text-align:center;border-top:1px solid rgba(255,255,255,.02)}
 .ft-mark{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:400;letter-spacing:4px;color:rgba(255,255,255,.08);margin-bottom:6px}
 .ft-copy{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.05)}
-#particle-logo{position:fixed;top:16px;left:12px;z-index:60;width:300px;height:192px;pointer-events:auto;cursor:none}
+#particle-logo{position:fixed;top:14px;left:14px;z-index:60;width:140px;height:90px;pointer-events:auto;cursor:none}
 #particle-logo canvas{width:100%;height:100%}
 #ticker{position:fixed;top:0;left:0;right:0;height:22px;background:rgba(2,3,8,.9);border-bottom:1px solid rgba(255,255,255,.02);z-index:50;overflow:hidden;display:flex;align-items:center;backdrop-filter:blur(30px)}
 .tk-s{display:flex;gap:50px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;color:rgba(255,215,0,.15);white-space:nowrap;animation:tkScr 50s linear infinite}
@@ -158,10 +167,10 @@ footer{padding:80px 40px 40px;text-align:center;border-top:1px solid rgba(255,25
 <div class="sec" id="hero"><div id="particle-text"><canvas id="ptc"></canvas></div><p class="hero-sub" id="hs">SZERENCSEJÁTÉK ZRT.</p><div class="hero-scroll" id="hsc"><div class="scroll-dot"></div><div class="scroll-tx">GÖRGESS</div></div></div>
 <div class="sec" id="vision"><div class="vis-wrap"><p class="vis-tag" id="vt">VÍZIÓNK</p><div class="vis-rule" id="vr"></div><h2 class="vis-h" id="vh"><span>Ahol a </span><span class="g">szerencse </span><span>találkozik az </span><span class="g">innovációval.</span></h2><p class="vis-p" id="vp">Adatvezérelt gondolkodást ötvözünk kreatív kísérletezéssel, hogy újraálmodjuk a lottózást — hidat építve a hagyomány és a holnap játékosa között.</p></div></div>
 <div class="sec" id="pillars"><div class="pil-top"><h2 id="pt">Projektek</h2></div><div class="pil-grid">
-<div class="p-card" data-c="cyan"><canvas class="p-icon" width="360" height="360"></canvas><div class="p-idx">01</div><div class="p-tag">EGYÜTTMŰKÖDÉS</div><h3 class="p-name">CoLabMűhely</h3><p class="p-desc">Részlegeken átívelő workshop, ahol sokszínű csapatok közösen alkotják meg a következő generáció lottó-élményeit.</p><div class="p-line"></div></div>
-<div class="p-card" data-c="gold"><canvas class="p-icon" width="360" height="360"></canvas><div class="p-idx">02</div><div class="p-tag">VERSENY</div><h3 class="p-name">InnoChallenge</h3><p class="p-desc">Vállalati szintű innovációs versenyek, amelyek áttörő ötleteket hoznak felszínre és jutalmazzák a kreatív gondolkodást.</p><div class="p-line"></div></div>
-<div class="p-card" data-c="green"><canvas class="p-icon" width="360" height="360"></canvas><div class="p-idx">03</div><div class="p-tag">KÍSÉRLETEZÉS</div><h3 class="p-name">InnoLab</h3><p class="p-desc">Gyors prototípus-labor, ahol a koncepciókat megépítjük, teszteljük és valós játékos adatokkal validáljuk.</p><div class="p-line"></div></div>
-<div class="p-card" data-c="mag"><canvas class="p-icon" width="360" height="360"></canvas><div class="p-idx">04</div><div class="p-tag">ELŐRETEKINTÉS</div><h3 class="p-name">FutureWatch</h3><p class="p-desc">Stratégiai előrejelző egység, amely globális trendeket, feltörekvő technológiákat és változó játékos-viselkedéseket követ.</p><div class="p-line"></div></div>
+<div class="p-card" data-c="cyan"><div class="p-icon-wrap"><svg class="p-svg" viewBox="0 0 48 48"><circle cx="12" cy="16" r="3" fill="currentColor" opacity=".8"/><circle cx="36" cy="16" r="3" fill="currentColor" opacity=".8"/><circle cx="24" cy="8" r="3" fill="currentColor"/><circle cx="24" cy="28" r="3" fill="currentColor"/><circle cx="14" cy="34" r="3" fill="currentColor" opacity=".8"/><circle cx="34" cy="34" r="3" fill="currentColor" opacity=".8"/><line x1="12" y1="16" x2="24" y2="8" stroke="currentColor" stroke-width=".8" opacity=".4"/><line x1="36" y1="16" x2="24" y2="8" stroke="currentColor" stroke-width=".8" opacity=".4"/><line x1="12" y1="16" x2="24" y2="28" stroke="currentColor" stroke-width=".8" opacity=".4"/><line x1="36" y1="16" x2="24" y2="28" stroke="currentColor" stroke-width=".8" opacity=".4"/><line x1="14" y1="34" x2="24" y2="28" stroke="currentColor" stroke-width=".8" opacity=".4"/><line x1="34" y1="34" x2="24" y2="28" stroke="currentColor" stroke-width=".8" opacity=".4"/><line x1="12" y1="16" x2="14" y2="34" stroke="currentColor" stroke-width=".5" opacity=".25"/><line x1="36" y1="16" x2="34" y2="34" stroke="currentColor" stroke-width=".5" opacity=".25"/></svg></div><div class="p-badge">LVL 1</div><div class="p-idx">01</div><div class="p-tag">EGYÜTTMŰKÖDÉS</div><h3 class="p-name">CoLabMűhely</h3><p class="p-desc">Részlegeken átívelő workshop, ahol sokszínű csapatok közösen alkotják meg a következő generáció lottó-élményeit.</p><div class="p-xp"><div class="p-xp-bar"></div></div><div class="p-line"></div></div>
+<div class="p-card" data-c="gold"><div class="p-icon-wrap"><svg class="p-svg" viewBox="0 0 48 48"><path d="M24 6l-14 24h28z" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".6"/><path d="M24 14l-7 12h14z" fill="currentColor" opacity=".15"/><circle cx="24" cy="18" r="4" fill="currentColor" opacity=".7"/><path d="M17 30l-3 8h20l-3-8" fill="none" stroke="currentColor" stroke-width=".8" opacity=".4"/><line x1="20" y1="38" x2="28" y2="38" stroke="currentColor" stroke-width="1" opacity=".5"/></svg></div><div class="p-badge">LVL 2</div><div class="p-idx">02</div><div class="p-tag">VERSENY</div><h3 class="p-name">InnoChallenge</h3><p class="p-desc">Vállalati szintű innovációs versenyek, amelyek áttörő ötleteket hoznak felszínre és jutalmazzák a kreatív gondolkodást.</p><div class="p-xp"><div class="p-xp-bar" style="width:65%"></div></div><div class="p-line"></div></div>
+<div class="p-card" data-c="green"><div class="p-icon-wrap"><svg class="p-svg" viewBox="0 0 48 48"><rect x="14" y="6" width="20" height="30" rx="2" fill="none" stroke="currentColor" stroke-width="1" opacity=".5"/><line x1="17" y1="6" x2="17" y2="36" stroke="currentColor" stroke-width=".5" opacity=".2"/><line x1="31" y1="6" x2="31" y2="36" stroke="currentColor" stroke-width=".5" opacity=".2"/><circle cx="22" cy="20" r="2.5" fill="currentColor" opacity=".6"/><circle cx="28" cy="24" r="1.8" fill="currentColor" opacity=".4"/><circle cx="20" cy="28" r="2" fill="currentColor" opacity=".5"/><path d="M14 36l6 8h8l6-8" fill="none" stroke="currentColor" stroke-width=".8" opacity=".4"/></svg></div><div class="p-badge">LVL 3</div><div class="p-idx">03</div><div class="p-tag">KÍSÉRLETEZÉS</div><h3 class="p-name">InnoLab</h3><p class="p-desc">Gyors prototípus-labor, ahol a koncepciókat megépítjük, teszteljük és valós játékos adatokkal validáljuk.</p><div class="p-xp"><div class="p-xp-bar" style="width:40%"></div></div><div class="p-line"></div></div>
+<div class="p-card" data-c="mag"><div class="p-icon-wrap"><svg class="p-svg" viewBox="0 0 48 48"><circle cx="24" cy="22" r="14" fill="none" stroke="currentColor" stroke-width="1" opacity=".4"/><circle cx="24" cy="22" r="8" fill="currentColor" opacity=".08"/><circle cx="24" cy="22" r="3" fill="currentColor" opacity=".5"/><path d="M24 22l10-6" stroke="currentColor" stroke-width=".8" opacity=".5"/><circle cx="34" cy="16" r="2" fill="currentColor" opacity=".4"/><line x1="14" y1="38" x2="34" y2="38" stroke="currentColor" stroke-width=".5" opacity=".2"/><line x1="17" y1="41" x2="31" y2="41" stroke="currentColor" stroke-width=".5" opacity=".15"/></svg></div><div class="p-badge">LVL 4</div><div class="p-idx">04</div><div class="p-tag">ELŐRETEKINTÉS</div><h3 class="p-name">FutureWatch</h3><p class="p-desc">Stratégiai előrejelző egység, amely globális trendeket, feltörekvő technológiákat és változó játékos-viselkedéseket követ.</p><div class="p-xp"><div class="p-xp-bar" style="width:20%"></div></div><div class="p-line"></div></div>
 </div></div>
 <div class="sec" id="stats"><div class="st-row"><div class="st-cell" data-v="247"><div class="st-v"><span class="n">0</span><span class="suf">+</span></div><div class="st-l">BEKÜLDÖTT ÖTLET</div></div><div class="st-cell" data-v="12"><div class="st-v"><span class="n">0</span></div><div class="st-l">LEZÁRT KIHÍVÁS</div></div><div class="st-cell" data-v="180"><div class="st-v"><span class="n">0</span><span class="suf">+</span></div><div class="st-l">CSAPATTAG</div></div><div class="st-cell" data-v="8"><div class="st-v"><span class="n">0</span></div><div class="st-l">ELINDÍTOTT INNOVÁCIÓ</div></div></div></div>
 <div class="sec" id="community"><h2 class="com-h" id="ch">Csatlakozz a Körhöz</h2><div class="soc-row"><a class="soc-item" data-p="twitch" href="#"><canvas width="160" height="160"></canvas><span>TWITCH</span></a><a class="soc-item" data-p="discord" href="#"><canvas width="160" height="160"></canvas><span>DISCORD</span></a><a class="soc-item" data-p="x" href="#"><canvas width="160" height="160"></canvas><span>X</span></a></div></div>
@@ -261,35 +270,6 @@ track(id){if(this.ex.has(id))return;this.ex.add(id);const p=Math.round(this.ex.s
 function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.getElementById('toasts').appendChild(e);setTimeout(()=>{e.classList.add('out');setTimeout(()=>e.remove(),300)},2500)}
 
 /* ═══ PILLAR ICONS ═══ */
-function drawPillarIcons(){
-const icons=document.querySelectorAll('.p-icon');
-const colors=['rgba(0,229,255,','rgba(255,215,0,','rgba(0,255,136,','rgba(255,0,170,'];
-icons.forEach((cv2,idx)=>{
-const ctx=cv2.getContext('2d');const s=360;const c=colors[idx];let frame=0;const sc=s/96;
-function draw(){frame++;ctx.clearRect(0,0,s,s);
-const hover=cv2.closest('.p-card:hover')!==null;
-const pulse=hover?Math.sin(frame*.08)*.15+.85:.75+Math.sin(frame*.03)*.08;
-ctx.save();ctx.translate(s/2,s/2);ctx.scale(sc,sc);if(hover)ctx.rotate(Math.sin(frame*.02)*.05);
-if(idx===0){const nodes=[[0,-18],[16,12],[-16,12],[-8,-4],[8,-4],[0,8]];
-ctx.strokeStyle=c+(.3*pulse)+')';ctx.lineWidth=1.5;
-for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){if(Math.random()>.3||hover){ctx.beginPath();ctx.moveTo(nodes[i][0],nodes[i][1]);ctx.lineTo(nodes[j][0],nodes[j][1]);ctx.stroke()}}
-nodes.forEach(([x,y],i)=>{const r=3+Math.sin(frame*.05+i)*(hover?2:1);ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=c+pulse+')';ctx.fill();ctx.beginPath();ctx.arc(x,y,r+4,0,Math.PI*2);ctx.fillStyle=c+(.1*pulse)+')';ctx.fill()})}
-else if(idx===1){ctx.strokeStyle=c+pulse+')';ctx.lineWidth=2;ctx.lineCap='round';
-ctx.beginPath();ctx.moveTo(-12,-14);ctx.quadraticCurveTo(-14,6,-6,10);ctx.lineTo(6,10);ctx.quadraticCurveTo(14,6,12,-14);ctx.closePath();ctx.stroke();ctx.fillStyle=c+(.1*pulse)+')';ctx.fill();
-ctx.beginPath();ctx.arc(-14,-4,5,Math.PI*1.5,Math.PI*.5);ctx.stroke();ctx.beginPath();ctx.arc(14,-4,5,-Math.PI*.5,Math.PI*.5);ctx.stroke();
-ctx.beginPath();ctx.moveTo(-8,10);ctx.lineTo(-4,18);ctx.lineTo(4,18);ctx.lineTo(8,10);ctx.stroke();ctx.beginPath();ctx.moveTo(-7,18);ctx.lineTo(7,18);ctx.stroke();
-const starY=-4+Math.sin(frame*.04)*2;ctx.fillStyle=c+pulse+')';ctx.beginPath();for(let i=0;i<5;i++){const a=i*Math.PI*2/5-Math.PI/2;const r2=i%2?3:6;ctx.lineTo(Math.cos(a)*r2,starY+Math.sin(a)*r2)}ctx.closePath();ctx.fill()}
-else if(idx===2){ctx.strokeStyle=c+pulse+')';ctx.lineWidth=2;ctx.lineCap='round';
-ctx.beginPath();ctx.moveTo(-4,-18);ctx.lineTo(-4,-4);ctx.lineTo(-14,14);ctx.quadraticCurveTo(-14,20,-8,20);ctx.lineTo(8,20);ctx.quadraticCurveTo(14,20,14,14);ctx.lineTo(4,-4);ctx.lineTo(4,-18);ctx.stroke();
-ctx.beginPath();ctx.moveTo(-7,-18);ctx.lineTo(7,-18);ctx.stroke();
-[[-4,8,2],[2,12,1.5],[5,6,1.8],[-2,14,1]].forEach(([bx,by,br])=>{const yo=Math.sin(frame*.06+bx)*2;ctx.beginPath();ctx.arc(bx,by+yo,br*(hover?1.3:1),0,Math.PI*2);ctx.fillStyle=c+(.5*pulse)+')';ctx.fill()});
-ctx.fillStyle=c+(.08*pulse)+')';ctx.beginPath();ctx.moveTo(-12,10+Math.sin(frame*.04)*1.5);ctx.quadraticCurveTo(0,8+Math.cos(frame*.05)*2,12,10+Math.sin(frame*.04+1)*1.5);ctx.lineTo(14,14);ctx.quadraticCurveTo(14,20,-8,20);ctx.lineTo(-8,20);ctx.quadraticCurveTo(-14,20,-14,14);ctx.fill()}
-else{ctx.strokeStyle=c+(.3*pulse)+')';ctx.lineWidth=1;ctx.beginPath();ctx.arc(0,0,20,0,Math.PI*2);ctx.stroke();
-const grad=ctx.createRadialGradient(0,0,2,0,0,14);grad.addColorStop(0,c+(.3*pulse)+')');grad.addColorStop(.7,c+(.08*pulse)+')');grad.addColorStop(1,'transparent');
-ctx.fillStyle=grad;ctx.beginPath();ctx.arc(0,0,14,0,Math.PI*2);ctx.fill();
-const eyeX=Math.sin(frame*.02)*3;ctx.fillStyle=c+pulse+')';ctx.beginPath();ctx.arc(eyeX,0,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=c+(.3*pulse)+')';ctx.beginPath();ctx.arc(eyeX,0,2,0,Math.PI*2);ctx.fill();
-for(let i=0;i<3;i++){const y2=-10+((frame*.3+i*30)%40)-10;ctx.strokeStyle=c+(.15*pulse)+')';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(-14,y2);ctx.lineTo(14,y2);ctx.stroke()}}
-ctx.restore();setTimeout(draw,66)}draw()})}
 
 /* ═══ THREE.JS ═══ */
 const cv=document.getElementById('gl'),W=()=>innerWidth,H=()=>innerHeight,dpr=Math.min(devicePixelRatio,2);
@@ -330,7 +310,7 @@ scene.traverse(o=>{if(o.isMesh&&o.material&&o.material.isMeshPhysicalMaterial){o
    ═══════════════════════════════════════════════════════════ */
 
 // ── 12 000 Stars, 3 depth layers, spectral color variation ──
-const starN=W()<768?1500:5000;
+const starN=W()<768?800:3000;
 const stPos=new Float32Array(starN*3),stSz=new Float32Array(starN),stCol=new Float32Array(starN*3);
 for(let i=0;i<starN;i++){
   const th=Math.random()*Math.PI*2,ph=Math.acos(Math.random()*2-1);
@@ -871,7 +851,7 @@ function initParticleLogo(){
   const canvas=document.getElementById('plc');
   const ctx=canvas.getContext('2d');
   const dpr2=Math.min(devicePixelRatio,2);
-  const cW=Math.floor(300*dpr2),cH=Math.floor(192*dpr2);
+  const cW=Math.floor(140*dpr2),cH=Math.floor(90*dpr2);
   canvas.width=cW;canvas.height=cH;
 
   const img=new Image();img.crossOrigin='anonymous';
@@ -884,7 +864,7 @@ function initParticleLogo(){
 
     // ── Pixel-faithful sampling — every 2px ──
     const imgData=oc.getImageData(0,0,cW,cH).data;
-    const step=4;
+    const step=5;
     const pts=[];
     for(let y=0;y<cH;y+=step)for(let x=0;x<cW;x+=step){
       const idx=(y*cW+x)*4;
@@ -983,7 +963,7 @@ function initParticleText(){
   oc.fillText('HUB',W2/2,H2*.72);
 
   const imgData=oc.getImageData(0,0,W2,H2).data;
-  const gap=W2<600?5:3;
+  const gap=W2<600?6:4;
   const pts=[];
   for(let y=0;y<H2;y+=gap)for(let x=0;x<W2;x+=gap){
     if(imgData[(y*W2+x)*4+3]>128){
@@ -1063,7 +1043,7 @@ function initParticleText(){
     canvas.height=Math.floor(r2.height*dpr2)});
 }
 
-async function init(){gm.init();initSoc();drawPillarIcons();initParticleLogo();initParticleText();await preload();document.getElementById('hud').classList.add('vis');loop()}
+async function init(){gm.init();initSoc();initParticleLogo();initParticleText();await preload();document.getElementById('hud').classList.add('vis');loop()}
 init();
 </script>
 </body>
