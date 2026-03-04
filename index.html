@@ -2,575 +2,580 @@
 <html lang="hu">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>InnovationHub — Szerencsejáték Zrt.</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InnovationHub — Futuristic Lottózó</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+:root{--bg:#0a0e17;--green:#00ff88;--cyan:#00e5ff;--magenta:#ff00aa;--gold:#ffd700;--white:#e8eaf0;--grey:#3a4156;--glass:rgba(255,255,255,0.03);--gborder:rgba(0,255,136,0.15)}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{
---bg:#060a07;--bge:#0c1410;
---g1:#00ff87;--g2:#00e5ff;--g3:#7c4dff;--gold:#ffd54f;
---t1:#e8f5e9;--t2:#81c784;--t3:#4a7c5e;--t4:#2d5a3f;
---ng:0 0 10px rgba(0,255,135,.4),0 0 40px rgba(0,255,135,.15),0 0 80px rgba(0,255,135,.05);
---nc:0 0 10px rgba(0,229,255,.4),0 0 40px rgba(0,229,255,.15);
-}
-html{overflow-x:hidden;scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);overflow-x:hidden}
-::selection{background:#1b5e20;color:#b9f6ca}
-canvas#TC{position:fixed!important;top:0;left:0;width:100%!important;height:100%!important;z-index:1;pointer-events:none}
+html{scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth}
+html::-webkit-scrollbar{display:none}
+body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;cursor:none;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a,button{cursor:none}
+canvas#c{position:fixed;inset:0;z-index:0}
 
-/* LOADER */
-#LD{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px}
-.ld-bar{width:180px;height:2px;background:var(--t4);border-radius:1px;overflow:hidden}
-.ld-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--g1),var(--g2));width:0%}
-.ld-t{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:8px;text-transform:uppercase;color:var(--t3)}
+/* PRELOADER */
+#preloader{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .8s}
+#preloader.done{opacity:0;pointer-events:none}
+.pre-scan{position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 20px var(--cyan);animation:scanD 2s ease-in-out infinite}
+@keyframes scanD{0%{top:-3px}100%{top:100vh}}
+.pre-lines{margin-bottom:40px;text-align:center}
+.pre-line{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--green);text-shadow:0 0 10px var(--green);opacity:0;margin:8px 0}
+.pre-line.show{animation:typeIn .4s ease forwards}
+.pre-line.gold{color:var(--gold);text-shadow:0 0 10px var(--gold)}
+@keyframes typeIn{to{opacity:1}}
+.pre-bar-wrap{width:280px;height:6px;background:var(--grey);border-radius:3px;overflow:hidden}
+.pre-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--green),var(--cyan));border-radius:3px;box-shadow:0 0 8px var(--green);transition:width .2s}
+.pre-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--grey);letter-spacing:3px;margin-top:8px;text-align:center}
+.door{position:fixed;top:0;width:51%;height:100%;background:var(--bg);z-index:999;transition:transform 1s cubic-bezier(.76,0,.24,1)}
+.door-l{left:0;border-right:1px solid var(--green)}.door-r{right:0;border-left:1px solid var(--green)}
+.door.open-l{transform:translateX(-100%)}.door.open-r{transform:translateX(100%)}
 
-/* GRAIN */
-.GR{position:fixed;inset:0;z-index:9000;pointer-events:none;opacity:.018;mix-blend-mode:overlay;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") repeat;background-size:256px}
+/* UI */
+#ui{position:relative;z-index:2;pointer-events:none;min-height:600vh}
+#ui *{pointer-events:auto}
+.ui-btn{position:fixed;right:16px;z-index:100;width:38px;height:38px;border-radius:50%;border:1px solid var(--gborder);background:rgba(10,14,23,.8);backdrop-filter:blur(10px);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .3s}
+.ui-btn:hover{border-color:var(--green);box-shadow:0 0 15px rgba(0,255,136,.3);transform:scale(1.1)}
+#snd-btn{top:16px}#mot-btn{top:60px;right:60px}
 
-/* SOUND BTN */
-#SB{position:fixed;bottom:28px;right:28px;z-index:600;width:40px;height:40px;border-radius:50%;border:1px solid rgba(0,255,135,.1);background:rgba(6,10,7,.7);backdrop-filter:blur(20px);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .4s}
-#SB:hover{border-color:var(--g1);box-shadow:var(--ng)}
-#SB svg{width:14px;height:14px;fill:none;stroke:var(--g1);stroke-width:1.5;opacity:.6}
-#SB.off .w2{display:none}
-#SB.off::after{content:'';position:absolute;width:18px;height:1px;background:var(--g1);opacity:.5;transform:rotate(-45deg)}
+/* TICKER */
+#ticker{position:fixed;top:0;left:0;right:0;height:26px;background:rgba(10,14,23,.9);border-bottom:1px solid rgba(255,215,0,.2);z-index:90;overflow:hidden;display:flex;align-items:center}
+.tick-c{display:flex;gap:20px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold);text-shadow:0 0 6px rgba(255,215,0,.5);white-space:nowrap;animation:tickS 30s linear infinite}
+@keyframes tickS{to{transform:translateX(-50%)}}
 
-/* NAV */
-.NV{position:fixed;top:0;left:0;right:0;z-index:100;padding:28px 64px;display:flex;align-items:center;justify-content:space-between;transition:all .6s cubic-bezier(.16,1,.3,1)}
-.NV.sc{padding:16px 64px;background:rgba(6,10,7,.88);backdrop-filter:blur(24px);border-bottom:1px solid rgba(0,255,135,.05)}
-.nv-b{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--t2);transition:all .4s}
-.nv-b:hover{color:var(--g1);text-shadow:var(--ng)}
-.nv-l{display:flex;gap:44px;list-style:none}
-.nv-l a{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--t2);text-decoration:none;opacity:.4;transition:all .4s;padding:4px 0}
-.nv-l a:hover{opacity:1;color:var(--g1);text-shadow:var(--ng)}
+/* HUD */
+#hud{position:fixed;top:38px;left:14px;z-index:90;opacity:0;transition:opacity .6s}
+#hud.vis{opacity:1}
+.hud-in{background:rgba(10,14,23,.85);backdrop-filter:blur(10px);border:1px solid var(--gborder);border-radius:8px;padding:8px 12px;min-width:140px}
+.hud-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--gold);letter-spacing:2px;margin-bottom:4px}
+.hud-bar{width:100%;height:3px;background:var(--grey);border-radius:2px;overflow:hidden}
+.hud-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--green),var(--gold));border-radius:2px;transition:width .8s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 6px var(--green)}
+.hud-val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600;color:var(--green);text-shadow:0 0 8px var(--green);margin-top:3px}
+#hud.jp .hud-in{border-color:var(--gold);box-shadow:0 0 25px rgba(255,215,0,.3)}
+#hud.jp .hud-val{color:var(--gold);text-shadow:0 0 12px var(--gold)}
+
+/* NEON */
+#neon{position:fixed;top:90px;left:30px;font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;color:var(--magenta);text-shadow:0 0 10px var(--magenta),0 0 30px var(--magenta),0 0 60px var(--magenta);opacity:.6;z-index:5;pointer-events:none;animation:flick 4s ease-in-out infinite}
+@keyframes flick{0%,100%{opacity:.6}5%{opacity:.2}6%{opacity:.8}50%{opacity:.5}51%{opacity:.9}52%{opacity:.3}53%{opacity:.7}}
+
+/* SECTIONS */
+.sec{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px}
 
 /* HERO */
-.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:2}
-.hero-c{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;pointer-events:none;margin-top:80px}
-.ht{font-family:'Syne',sans-serif;font-size:clamp(52px,9vw,120px);font-weight:800;line-height:.84;letter-spacing:-5px}
-.ht .w{display:inline-block;opacity:0;transform:translateY(100%)}
-.ht .hl{-webkit-text-fill-color:transparent;background:linear-gradient(135deg,var(--g1) 0%,var(--g2) 40%,var(--g3) 80%,var(--g1) 100%);background-size:300% 300%;-webkit-background-clip:text;background-clip:text;animation:gS 6s ease infinite}
-@keyframes gS{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-.hs{font-size:clamp(15px,1.8vw,18px);font-weight:300;color:var(--t2);margin-top:32px;letter-spacing:1px;opacity:0}
-.hp{font-family:'Space Mono',monospace;font-size:9px;color:var(--t3);margin-top:14px;letter-spacing:6px;text-transform:uppercase;opacity:0}
-.hsc{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0}
-.hsc span{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--t3)}
-.hsc i{display:block;width:1px;height:48px;background:linear-gradient(180deg,var(--g1),transparent);animation:scP 3s infinite}
-@keyframes scP{0%,100%{transform:scaleY(1);opacity:.6}50%{transform:scaleY(.2);opacity:.1}}
+#hero{justify-content:flex-end;padding-bottom:60px}
+#hero-canvas{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:3}
+.hero-sub{font-size:13px;color:rgba(232,234,240,.45);letter-spacing:3px;opacity:0;animation:fadeU 1s ease 3.5s forwards}
+.scroll-ind{margin-top:35px;text-align:center;opacity:0;animation:fadeU 1s ease 4s forwards}
+.scroll-ball{width:34px;height:34px;border:2px solid var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;color:var(--green);font-size:14px;animation:bounce 2s ease-in-out infinite;box-shadow:0 0 8px rgba(0,255,136,.3)}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+.scroll-ind span{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--green);animation:breathe 3s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes fadeU{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
-/* MANIFESTO */
-.MN{min-height:100vh;display:flex;align-items:center;padding:200px 64px;max-width:1200px;margin:0 auto;position:relative;z-index:2}
-.mn-t{font-family:'Syne',sans-serif;font-size:clamp(24px,3.5vw,44px);font-weight:500;line-height:1.45;letter-spacing:-.3px;max-width:800px}
-.mn-t .rw{display:inline;opacity:.06;transition:all 1.2s cubic-bezier(.16,1,.3,1)}
-.mn-t .rw.lit{opacity:1;color:var(--t1)}
-.mn-t .rw.acc{color:var(--g1);text-shadow:0 0 30px rgba(0,255,135,.25)}
+/* VISION */
+.vis-panel{max-width:760px;padding:50px;background:var(--glass);border:1px solid rgba(0,229,255,.15);border-radius:20px;backdrop-filter:blur(20px);position:relative;overflow:hidden}
+.vis-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 30%,rgba(0,229,255,.05),transparent 70%);pointer-events:none}
+.vis-h{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,5vw,52px);font-weight:700;line-height:1.1;margin-bottom:20px}
+.vis-h .w{display:inline-block;opacity:0;margin-right:10px;background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 6px rgba(0,255,136,.3));transition:opacity .6s}
+.vis-h .w.rev{opacity:1}
+.vis-b{font-size:15px;line-height:1.7;color:rgba(232,234,240,.65);opacity:0;transition:opacity .8s .5s}
+.vis-b.vis{opacity:1}
 
 /* PILLARS */
-.PL{padding:200px 0;z-index:2;position:relative}
-.pl-h{padding:0 64px;max-width:1200px;margin:0 auto 120px}
-.pl-l{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:6px;text-transform:uppercase;color:var(--g1);opacity:.5;margin-bottom:20px}
-.pl-hd{font-family:'Syne',sans-serif;font-size:clamp(30px,4.5vw,54px);font-weight:700;line-height:1.05;letter-spacing:-2px;opacity:0;transform:translateY(24px)}
-.pl-g{display:grid;grid-template-columns:repeat(4,1fr)}
-.pcd{background:transparent;border-right:1px solid rgba(0,255,135,.03);padding:56px 32px;min-height:520px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;cursor:pointer;transition:background .8s}
-.pcd:last-child{border-right:none}
-.pcd::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(0,255,135,.04),transparent 70%);opacity:0;transition:opacity .8s}
-.pcd:hover::before{opacity:1}
-.pcd::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--g1),var(--g2));transform:scaleX(0);transform-origin:left;transition:transform 1s cubic-bezier(.16,1,.3,1)}
-.pcd:hover::after{transform:scaleX(1)}
-.pcd-n{font-family:'Space Mono',monospace;font-size:10px;color:var(--t4);letter-spacing:5px;position:absolute;top:44px;left:32px;transition:all .6s}
-.pcd:hover .pcd-n{color:var(--g1);text-shadow:var(--ng)}
-.pcd-i{width:44px;height:44px;margin-bottom:28px;opacity:0;transform:translateY(16px)}
-.pcd-i svg{width:100%;height:100%;stroke:var(--g1);stroke-width:1.2;fill:none;opacity:.3;transition:all .6s}
-.pcd:hover .pcd-i svg{opacity:1;filter:drop-shadow(0 0 16px rgba(0,255,135,.5))}
-.pcd-tt{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:14px;opacity:0;transform:translateY(16px);transition:color .6s,text-shadow .6s}
-.pcd:hover .pcd-tt{color:var(--g1);text-shadow:var(--ng)}
-.pcd-dd{font-size:13px;line-height:1.8;color:var(--t2);max-width:230px;opacity:0;transform:translateY(16px)}
-.pcd-tg{margin-top:24px;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--g2);opacity:0;transition:all .6s}
-.pcd:hover .pcd-tg{opacity:.8;text-shadow:var(--nc)}
+.p-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:28px;max-width:960px;width:100%}
+.p-bub{background:var(--glass);border:1px solid var(--gborder);border-radius:18px;padding:28px;position:relative;overflow:hidden;opacity:0;transform:translateY(40px) scale(.9);transition:all .6s cubic-bezier(.34,1.56,.64,1);min-height:200px}
+.p-bub.vis{opacity:1;transform:translateY(0) scale(1)}
+.p-bub::before{content:'';position:absolute;inset:-1px;border-radius:18px;padding:1px;background:conic-gradient(from var(--ba,0deg),transparent 40%,var(--pc,var(--green)) 50%,transparent 60%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:bRot 4s linear infinite;pointer-events:none}
+@keyframes bRot{to{--ba:360deg}}
+@property --ba{syntax:'<angle>';initial-value:0deg;inherits:false}
+.p-bub[data-p="0"]{--pc:var(--cyan)}.p-bub[data-p="1"]{--pc:var(--gold)}.p-bub[data-p="2"]{--pc:var(--green)}.p-bub[data-p="3"]{--pc:var(--magenta)}
+.p-bub::after{content:'';position:absolute;inset:0;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.02) 0%,transparent 50%);pointer-events:none}
+.p-bub:hover{transform:translateY(-4px) scale(1.03)!important;border-color:var(--pc,var(--green));box-shadow:0 8px 35px rgba(0,255,136,.08),inset 0 0 25px rgba(0,255,136,.03)}
+.p-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--grey);margin-bottom:14px}
+.p-bub h3{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;margin-bottom:10px}
+.p-bub[data-p="0"] h3{color:var(--cyan);text-shadow:0 0 8px rgba(0,229,255,.5)}
+.p-bub[data-p="1"] h3{color:var(--gold);text-shadow:0 0 8px rgba(255,215,0,.5)}
+.p-bub[data-p="2"] h3{color:var(--green);text-shadow:0 0 8px rgba(0,255,136,.5)}
+.p-bub[data-p="3"] h3{color:var(--magenta);text-shadow:0 0 8px rgba(255,0,170,.5)}
+.p-desc{font-size:13px;line-height:1.6;color:rgba(232,234,240,.55)}
+.p-badge{position:absolute;top:14px;right:14px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;padding:3px 8px;border:1px solid var(--grey);border-radius:4px;color:var(--grey);transition:all .4s}
+.p-bub.expl .p-badge{color:var(--gold);border-color:var(--gold);box-shadow:0 0 8px rgba(255,215,0,.3)}
+.p-bub.expl .p-badge::after{content:' ✓'}
 
 /* STATS */
-.STS{z-index:2;position:relative;padding:120px 64px;border-top:1px solid rgba(0,255,135,.04);border-bottom:1px solid rgba(0,255,135,.04);background:linear-gradient(180deg,transparent,rgba(0,255,135,.008),transparent)}
-.sts-g{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:32px}
-.st{text-align:center;opacity:0;transform:translateY(20px)}
-.st-n{font-family:'Syne',sans-serif;font-size:clamp(36px,5vw,64px);font-weight:800;line-height:1;-webkit-text-fill-color:transparent;background:linear-gradient(135deg,var(--g1),var(--g2));-webkit-background-clip:text;background-clip:text}
-.st-l{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--t3);margin-top:12px}
+.st-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;max-width:1000px;width:100%}
+.st-tick{background:var(--glass);border:1px solid var(--gborder);border-radius:12px;padding:28px 16px;text-align:center;position:relative;overflow:hidden;transition:all .4s cubic-bezier(.34,1.56,.64,1)}
+.st-tick::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.03) 0%,transparent 60%);pointer-events:none}
+.st-tick:hover{transform:perspective(800px) translateZ(18px);border-color:var(--gold);box-shadow:0 8px 35px rgba(255,215,0,.08)}
+.st-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--grey);margin-bottom:14px}
+.st-num{font-family:'JetBrains Mono',monospace;font-size:clamp(36px,4.5vw,56px);font-weight:600;color:var(--gold);text-shadow:0 0 16px rgba(255,215,0,.5)}
+.st-bar{margin-top:14px;height:16px;background:repeating-linear-gradient(90deg,var(--grey) 0px,var(--grey) 2px,transparent 2px,transparent 5px);opacity:.25;border-radius:2px}
 
-/* CTA */
-.CTA{z-index:2;position:relative;min-height:55vh;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:160px 64px}
-.cta-h{font-family:'Syne',sans-serif;font-size:clamp(34px,5.5vw,72px);font-weight:800;line-height:.92;letter-spacing:-3px;opacity:0;transform:translateY(28px)}
-.cta-h em{font-style:normal;-webkit-text-fill-color:transparent;background:linear-gradient(135deg,var(--g1),var(--g2),var(--gold));-webkit-background-clip:text;background-clip:text}
-.cta-b{margin-top:52px;padding:18px 56px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--bg);background:linear-gradient(135deg,var(--g1),var(--g2));border:none;border-radius:0;cursor:pointer;position:relative;overflow:hidden;opacity:0;transform:translateY(12px);transition:all .5s}
-.cta-b:hover{box-shadow:0 0 40px rgba(0,255,135,.25),0 0 100px rgba(0,255,135,.1),0 0 160px rgba(0,229,255,.05);transform:translateY(-2px)!important}
-.cta-b::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transform:translateX(-100%);transition:transform .7s}
-.cta-b:hover::after{transform:translateX(100%)}
+/* COMMUNITY */
+.com-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,4vw,44px);font-weight:700;margin-bottom:50px;text-align:center;text-shadow:0 0 16px rgba(0,255,136,.3)}
+.soc-icons{display:flex;gap:50px;align-items:center;justify-content:center;margin-bottom:50px}
+.soc-link{text-decoration:none;text-align:center;color:var(--white);transition:all .4s}
+.soc-link span{display:block;margin-top:10px;font-family:'Space Grotesk',sans-serif;font-size:14px;letter-spacing:2px}
+.soc-link:hover{transform:scale(1.1)}
+.soc-link[data-p="twitch"]:hover span{color:#9146ff;text-shadow:0 0 10px #9146ff}
+.soc-link[data-p="discord"]:hover span{color:#5865f2;text-shadow:0 0 10px #5865f2}
+.soc-link[data-p="x"]:hover span{color:var(--white);text-shadow:0 0 10px rgba(232,234,240,.5)}
+.soc-cv{width:130px;height:130px;border-radius:16px}
+.com-tick{overflow:hidden;width:100%;max-width:700px;margin:0 auto}
+.com-tick-s{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(0,255,136,.25);letter-spacing:4px;white-space:nowrap;animation:tickS 20s linear infinite}
 
 /* FOOTER */
-.FT{z-index:2;position:relative;padding:36px 64px;border-top:1px solid rgba(0,255,135,.03);display:flex;justify-content:space-between;max-width:1200px;margin:0 auto;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:4px;color:var(--t4)}
-.FT a{color:var(--g1);text-decoration:none;opacity:.3;transition:all .4s}
-.FT a:hover{opacity:1;text-shadow:var(--ng)}
+footer{position:relative;padding:35px;text-align:center}
+.tear{border-top:2px dashed var(--grey);margin-bottom:25px;position:relative}
+.tear span{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--bg);padding:0 8px;color:var(--grey);font-size:12px}
+.foot-c{opacity:.5}
+.foot-logo{font-size:28px;color:var(--green);text-shadow:0 0 12px var(--green);margin-bottom:10px}
+.foot-txt{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);margin-bottom:10px}
+.foot-bc{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1px;color:var(--grey);opacity:.4;margin-bottom:6px}
+.foot-tk{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--grey)}
 
-/* PARALLAX BG */
-.pbg{position:fixed;inset:0;z-index:0;pointer-events:none}
-.orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.025;will-change:transform}
-.o1{width:600px;height:600px;background:var(--g1);top:10%;left:20%}
-.o2{width:500px;height:500px;background:var(--g2);top:50%;right:10%}
-.o3{width:400px;height:400px;background:var(--g3);bottom:10%;left:40%}
+/* TOASTS */
+#toasts{position:fixed;top:90px;right:16px;z-index:200;display:flex;flex-direction:column;gap:6px}
+.toast{background:rgba(10,14,23,.95);border:1px solid var(--gold);border-radius:7px;padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);text-shadow:0 0 5px rgba(255,215,0,.4);backdrop-filter:blur(10px);transform:translateX(120%);animation:tIn .4s cubic-bezier(.34,1.56,.64,1) forwards;box-shadow:0 4px 16px rgba(255,215,0,.08)}
+@keyframes tIn{to{transform:translateX(0)}}
+.toast.out{animation:tOut .3s ease forwards}
+@keyframes tOut{to{transform:translateX(120%);opacity:0}}
 
-/* RESPONSIVE */
-@media(max-width:1024px){.pl-g{grid-template-columns:repeat(2,1fr)}.pcd{min-height:380px;border-bottom:1px solid rgba(0,255,135,.02)}}
-@media(max-width:640px){.pl-g{grid-template-columns:1fr}.sts-g{grid-template-columns:repeat(2,1fr)}.NV{padding:16px 24px}.nv-l{display:none}.MN{padding:100px 24px}.pl-h{padding:0 24px}.STS{padding:60px 24px}.CTA{padding:80px 24px}.FT{padding:24px;flex-direction:column;gap:6px}.ht{letter-spacing:-3px}}
+/* CURSOR */
+#cur{position:fixed;pointer-events:none;z-index:9999}
+.cur-d{width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green),0 0 16px rgba(0,255,136,.4);position:absolute;transform:translate(-50%,-50%)}
+.cur-r{width:30px;height:30px;border:1px solid rgba(0,255,136,.5);border-radius:50%;position:absolute;transform:translate(-50%,-50%);transition:width .3s,height .3s,background .3s}
+#cur.hov .cur-r{width:52px;height:52px;background:rgba(0,255,136,.06);border-color:var(--green)}
+
+@media(max-width:1023px){.p-grid{grid-template-columns:repeat(2,1fr);gap:18px}.st-grid{grid-template-columns:repeat(2,1fr)}#neon{display:none}}
+@media(max-width:767px){.p-grid{grid-template-columns:1fr}.st-grid{grid-template-columns:repeat(2,1fr);gap:14px}.soc-icons{gap:24px}.soc-cv{width:90px;height:90px}.sec{padding:50px 18px}.vis-panel{padding:25px}#cur{display:none}body{cursor:auto}a,button{cursor:auto}}
 </style>
 </head>
 <body>
+<canvas id="c"></canvas>
 
-<div id="LD"><div class="ld-bar"><i id="lbi"></i></div><div class="ld-t">InnovationHub</div></div>
-<div class="GR"></div>
-<div class="pbg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
-<canvas id="TC"></canvas>
-
-<button id="SB" title="Hang"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path class="w1" d="M14.5,8.5a5,5 0 0 1 0,7"/><path class="w2" d="M17.5,6a9,9 0 0 1 0,12"/></svg></button>
-
-<nav class="NV" id="NV">
-<div class="nv-b">InnovationHub</div>
-<ul class="nv-l"><li><a href="#MN">Küldetés</a></li><li><a href="#PL">Pillérek</a></li><li><a href="#STS">Hatás</a></li><li><a href="#CTA">Csatlakozz</a></li></ul>
-</nav>
-
-<section class="hero" id="hero">
-<div class="hero-c">
-  <h1 class="ht"><span class="w">INNOVATION</span> <span class="w hl">HUB</span></h1>
-  <p class="hs">Ahol az innováció és a lehetőség találkozik.</p>
-  <p class="hp">Powered by Szerencsejáték Zrt.</p>
+<!-- Preloader -->
+<div id="preloader">
+  <div class="pre-scan"></div>
+  <div class="pre-lines">
+    <div class="pre-line" id="pl1">INITIATING LOTTÓZÓ SYSTEM…</div>
+    <div class="pre-line" id="pl2">SCANNING TICKET…</div>
+    <div class="pre-line" id="pl3">CALIBRATING HOLOGRAPHIC DISPLAYS…</div>
+    <div class="pre-line gold" id="pl4">ACCESS GRANTED ✓</div>
+  </div>
+  <div class="pre-bar-wrap"><div class="pre-bar" id="pbar"></div></div>
+  <div class="pre-label">LOADING EXPERIENCE</div>
+  <div class="door door-l" id="dl"></div>
+  <div class="door door-r" id="dr"></div>
 </div>
-<div class="hsc"><span>Scroll</span><i></i></div>
-</section>
 
-<section class="MN" id="MN">
-<div class="mn-t" id="mnt">Hiszünk abban, hogy a <em>jövő innovációja</em> nem magányos zsenik műve — hanem <em>közösségek</em>, gondolatok és bátorság találkozásából születik. Az InnovationHub olyan <em>teret teremt</em>, ahol a kísérletezés nem kudarc, hanem <em>haladás</em>.</div>
-</section>
+<!-- UI -->
+<div id="ui">
+  <button class="ui-btn" id="snd-btn" aria-label="Toggle sound">🔇</button>
+  <button class="ui-btn" id="mot-btn" aria-label="Reduced motion">⏱</button>
 
-<section class="PL" id="PL">
-<div class="pl-h"><div class="pl-l">// Pillérek</div><h2 class="pl-hd">Négy terület.<br>Egy ökoszisztéma.</h2></div>
-<div class="pl-g">
-<div class="pcd"><span class="pcd-n">01</span><div class="pcd-i"><svg viewBox="0 0 64 64"><path d="M32 8l22 12v24L32 56 10 44V20z"/><path d="M32 8v48"/><path d="M10 20l22 12 22-12"/><circle cx="32" cy="32" r="3"/></svg></div><h3 class="pcd-tt">InnoChallenge</h3><p class="pcd-dd">Innovációs versenyek, hackathonok, pitch-ek. A legjobb ötletek valósággá válnak.</p><span class="pcd-tg">→ Versenyek</span></div>
-<div class="pcd"><span class="pcd-n">02</span><div class="pcd-i"><svg viewBox="0 0 64 64"><circle cx="20" cy="20" r="7"/><circle cx="44" cy="20" r="7"/><circle cx="20" cy="44" r="7"/><circle cx="44" cy="44" r="7"/><line x1="27" y1="20" x2="37" y2="20"/><line x1="20" y1="27" x2="20" y2="37"/><line x1="44" y1="27" x2="44" y2="37"/><line x1="27" y1="44" x2="37" y2="44"/></svg></div><h3 class="pcd-tt">CoLab Műhely</h3><p class="pcd-dd">Workshopok, design sprintek — a silók lebontása közös alkotással.</p><span class="pcd-tg">→ Együttműködés</span></div>
-<div class="pcd"><span class="pcd-n">03</span><div class="pcd-i"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20"/><ellipse cx="32" cy="32" rx="20" ry="9"/><ellipse cx="32" cy="32" rx="9" ry="20"/><circle cx="32" cy="32" r="2.5"/></svg></div><h3 class="pcd-tt">Future Watch</h3><p class="pcd-dd">Trendkutatás, scouting és stratégiai foresight. A jövő ma kezdődik.</p><span class="pcd-tg">→ Trendfigyelés</span></div>
-<div class="pcd"><span class="pcd-n">04</span><div class="pcd-i"><svg viewBox="0 0 64 64"><rect x="14" y="26" width="36" height="24" rx="2"/><path d="M22 26V18a10 10 0 0120 0v8"/><circle cx="32" cy="40" r="4"/><line x1="32" y1="44" x2="32" y2="47"/></svg></div><h3 class="pcd-tt">InnoLab</h3><p class="pcd-dd">Ötletből prototípus, prototípusból termék. Gyors iteráció, valódi teszt.</p><span class="pcd-tg">→ Kísérletezés</span></div>
+  <div id="ticker"><div class="tick-c"><span>ÖTÖSLOTTÓ: 7 - 14 - 28 - 35 - 42 | JACKPOT: 2.4 MILLIÁRD FT</span><span>•</span><span>HATOSLOTTÓ: 3 - 11 - 19 - 27 - 38 - 44 | JACKPOT: 890 MILLIÓ FT</span><span>•</span><span>SKANDINÁV LOTTÓ: 5 - 12 - 22 - 31 - 35 | JACKPOT: 45M SEK</span><span>•</span><span>ÖTÖSLOTTÓ: 7 - 14 - 28 - 35 - 42 | JACKPOT: 2.4 MILLIÁRD FT</span></div></div>
+
+  <div id="hud"><div class="hud-in"><div class="hud-lbl">YOUR LUCK SCORE</div><div class="hud-bar"><div class="hud-fill" id="hfill"></div></div><div class="hud-val" id="hval">0%</div></div></div>
+
+  <div id="neon">NYERJ!</div>
+
+  <!-- HERO -->
+  <div class="sec" id="hero">
+    <canvas id="hero-canvas" width="900" height="180"></canvas>
+    <div class="hero-sub">Powered by Szerencsejáték Zrt.</div>
+    <div class="scroll-ind"><div class="scroll-ball">↓</div><span>STEP INSIDE</span></div>
+  </div>
+
+  <!-- VISION -->
+  <div class="sec" id="vision">
+    <div class="vis-panel">
+      <h2 class="vis-h"><span class="w" data-i="0">WHERE</span><span class="w" data-i="1">LUCK</span><span class="w" data-i="2">MEETS</span><span class="w" data-i="3">INNOVATION</span></h2>
+      <p class="vis-b">InnovationHub is where the future of gaming takes shape. We combine data-driven insights, creative collaboration, and cutting-edge technology to reimagine the lottery experience for a new generation of dreamers.</p>
+    </div>
+  </div>
+
+  <!-- PILLARS -->
+  <div class="sec" id="pillars">
+    <div class="p-grid">
+      <div class="p-bub" data-p="0"><div class="p-lbl">STATION 01</div><h3>CoLabMűhely</h3><p class="p-desc">Cross-departmental collaboration workshop where diverse teams connect to co-create next-generation lottery experiences.</p><div class="p-badge">EXPLORE</div></div>
+      <div class="p-bub" data-p="1"><div class="p-lbl">STATION 02</div><h3>InnoChallenge</h3><p class="p-desc">Company-wide innovation competitions that surface breakthrough ideas and reward creative problem-solving.</p><div class="p-badge">EXPLORE</div></div>
+      <div class="p-bub" data-p="2"><div class="p-lbl">STATION 03</div><h3>InnoLab</h3><p class="p-desc">Rapid experimentation laboratory where prototypes are built, tested, and validated with real player data.</p><div class="p-badge">EXPLORE</div></div>
+      <div class="p-bub" data-p="3"><div class="p-lbl">STATION 04</div><h3>FutureWatch</h3><p class="p-desc">Strategic foresight unit scanning global trends, emerging technologies, and shifting player behaviors.</p><div class="p-badge">EXPLORE</div></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="sec" id="stats">
+    <div class="st-grid">
+      <div class="st-tick" data-t="247" data-s="+"><div class="st-lbl">IDEAS SUBMITTED</div><div class="st-num">0</div><div class="st-bar"></div></div>
+      <div class="st-tick" data-t="12" data-s=""><div class="st-lbl">CHALLENGES COMPLETED</div><div class="st-num">0</div><div class="st-bar"></div></div>
+      <div class="st-tick" data-t="180" data-s="+"><div class="st-lbl">TEAM MEMBERS ENGAGED</div><div class="st-num">0</div><div class="st-bar"></div></div>
+      <div class="st-tick" data-t="8" data-s=""><div class="st-lbl">INNOVATIONS LAUNCHED</div><div class="st-num">0</div><div class="st-bar"></div></div>
+    </div>
+  </div>
+
+  <!-- COMMUNITY -->
+  <div class="sec" id="community">
+    <h2 class="com-title">JOIN THE LUCKY CIRCLE</h2>
+    <div class="soc-icons">
+      <a href="#" class="soc-link" data-p="twitch"><canvas class="soc-cv" width="180" height="180"></canvas><span>Twitch</span></a>
+      <a href="#" class="soc-link" data-p="discord"><canvas class="soc-cv" width="180" height="180"></canvas><span>Discord</span></a>
+      <a href="#" class="soc-link" data-p="x"><canvas class="soc-cv" width="180" height="180"></canvas><span>X</span></a>
+    </div>
+    <div class="com-tick"><div class="com-tick-s">LUCK FAVORS THE BOLD • INNOVATE • COLLABORATE • PLAY • DISCOVER • LUCK FAVORS THE BOLD • INNOVATE • COLLABORATE • PLAY • DISCOVER •&nbsp;</div></div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="tear"><span>✂</span></div>
+    <div class="foot-c">
+      <div class="foot-logo">✦</div>
+      <div class="foot-txt">© 2025 InnovationHub — Szerencsejáték Zrt.</div>
+      <div class="foot-bc">||||| || ||| || ||||| ||| || ||||| || |||</div>
+      <div class="foot-tk">TICKET #00001 — THANK YOU FOR VISITING</div>
+    </div>
+  </footer>
 </div>
-</section>
 
-<section class="STS" id="STS">
-<div class="sts-g">
-<div class="st"><div class="st-n" data-c="4">0</div><div class="st-l">Pillér</div></div>
-<div class="st"><div class="st-n" data-c="17" data-s="M Ft">0</div><div class="st-l">Éves keret</div></div>
-<div class="st"><div class="st-n" data-inf>∞</div><div class="st-l">Lehetőség</div></div>
-<div class="st"><div class="st-n" data-c="2026">0</div><div class="st-l">A jövő éve</div></div>
-</div>
-</section>
+<div id="toasts"></div>
+<div id="cur"><div class="cur-d"></div><div class="cur-r"></div></div>
 
-<section class="CTA" id="CTA">
-<h2 class="cta-h">Készen állsz<br><em>újragondolni a jövőt?</em></h2>
-<button class="cta-b">Csatlakozz</button>
-</section>
-
-<footer class="FT"><span>© 2026 InnovationHub</span><span>Powered by <a href="#">Szerencsejáték Zrt.</a></span></footer>
-
-<!-- ============================================================ -->
-<!-- GSAP / DOM / SOUND (non-module, uses global gsap)            -->
-<!-- ============================================================ -->
-<script>
-gsap.registerPlugin(ScrollTrigger);
-
-// === SOUND ENGINE ===
-var AC=null, sOn=true;
-function iA(){if(AC)return;AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}
-['click','touchstart','mousemove','keydown'].forEach(function(ev){
-  document.addEventListener(ev,function h(){iA();document.removeEventListener(ev,h)},{once:true,passive:true});
-});
-function tn(f,d,tp,v){
-  d=d||.3;tp=tp||'sine';v=v||.1;if(!sOn||!AC)return;
-  try{var o=AC.createOscillator(),g=AC.createGain(),lp=AC.createBiquadFilter();
-  lp.type='lowpass';lp.frequency.value=4000;o.type=tp;o.frequency.value=f;
-  g.gain.setValueAtTime(0,AC.currentTime);g.gain.linearRampToValueAtTime(v,AC.currentTime+.01);
-  g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);
-  o.connect(lp);lp.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d+.05)}catch(e){}
-}
-function sfxCard(){tn(660,.12,'triangle',.06);setTimeout(function(){tn(880,.1,'triangle',.04)},40)}
-function sfxCta(){[523.25,659.25,783.99,1046.5,1318.5].forEach(function(f,i){setTimeout(function(){tn(f,.6,'sine',.06)},i*45)})}
-document.getElementById('SB').addEventListener('click',function(){iA();sOn=!sOn;document.getElementById('SB').classList.toggle('off',!sOn);if(sOn)tn(880,.15,'sine',.08)});
-
-// === LOADER → HERO ===
-window.addEventListener('load',function(){
-  gsap.to('#lbi',{width:'100%',duration:1.5,ease:'power2.inOut'});
-  gsap.to('#LD',{opacity:0,delay:2.2,duration:1,ease:'power3.inOut',onComplete:function(){document.getElementById('LD').style.display='none'}});
-  var tl=gsap.timeline({delay:2.8});
-  tl.to('.ht .w',{y:0,opacity:1,duration:1.4,stagger:.18,ease:'expo.out'})
-    .to('.hs',{y:0,opacity:1,duration:1,ease:'power3.out'},'-=.8')
-    .to('.hp',{opacity:1,duration:.8},'-=.4')
-    .to('.hsc',{opacity:1,duration:.6},'-=.2')
-    .to('#SB',{opacity:1,duration:.5},'-=.2');
-});
-
-// === NAV ===
-addEventListener('scroll',function(){document.getElementById('NV').classList.toggle('sc',scrollY>50)},{passive:true});
-
-// === PARALLAX ORBS ===
-gsap.to('.o1',{scrollTrigger:{trigger:'body',start:'top top',end:'bottom bottom',scrub:1},y:-300,x:100});
-gsap.to('.o2',{scrollTrigger:{trigger:'body',start:'top top',end:'bottom bottom',scrub:1},y:-200,x:-150});
-gsap.to('.o3',{scrollTrigger:{trigger:'body',start:'top top',end:'bottom bottom',scrub:1},y:-400,x:80});
-
-// === MANIFESTO WORD REVEAL ===
-var mEl=document.getElementById('mnt'),mW=[];
-(function(){
-  var nodes=[];for(var i=0;i<mEl.childNodes.length;i++)nodes.push(mEl.childNodes[i]);
-  nodes.forEach(function(n){
-    if(n.nodeType===3){
-      n.textContent.split(/(\s+)/).forEach(function(w){if(w.trim()){var s=document.createElement('span');s.className='rw';s.textContent=w;mW.push(s);mEl.insertBefore(s,n);mEl.insertBefore(document.createTextNode(' '),n)}});mEl.removeChild(n);
-    } else if(n.tagName==='EM'){
-      n.textContent.split(/(\s+)/).forEach(function(w){if(w.trim()){var s=document.createElement('span');s.className='rw';s.dataset.a='1';s.textContent=w;mW.push(s);mEl.insertBefore(s,n);mEl.insertBefore(document.createTextNode(' '),n)}});mEl.removeChild(n);
-    }
-  });
-})();
-ScrollTrigger.create({trigger:'#MN',start:'top 65%',end:'bottom 30%',onUpdate:function(self){
-  var lit=Math.floor(self.progress*mW.length*1.15);
-  mW.forEach(function(w,i){if(i<lit){w.classList.add('lit');if(w.dataset.a)w.classList.add('acc')}else{w.classList.remove('lit','acc')}});
-}});
-
-// === PILLARS ===
-gsap.to('.pl-hd',{scrollTrigger:{trigger:'.pl-h',start:'top 75%'},y:0,opacity:1,duration:1.4,ease:'expo.out'});
-document.querySelectorAll('.pcd').forEach(function(card,idx){
-  gsap.to(card.querySelectorAll('.pcd-i,.pcd-tt,.pcd-dd'),{scrollTrigger:{trigger:card,start:'top 80%'},y:0,opacity:1,duration:1.2,stagger:.06,ease:'expo.out',delay:idx*.08});
-  card.addEventListener('mousemove',function(e){var r=card.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;card.style.transform='perspective(1200px) rotateY('+(x*4)+'deg) rotateX('+(-y*4)+'deg)';card.style.transition='transform .06s'});
-  card.addEventListener('mouseleave',function(){card.style.transform='';card.style.transition='transform 1s cubic-bezier(.16,1,.3,1)'});
-  card.addEventListener('mouseenter',sfxCard);
-});
-
-// === STATS ===
-document.querySelectorAll('.st').forEach(function(el,i){
-  gsap.to(el,{scrollTrigger:{trigger:el,start:'top 85%'},opacity:1,y:0,duration:1,delay:i*.1,ease:'expo.out',
-    onComplete:function(){var n=el.querySelector('.st-n');if(n.hasAttribute('data-inf'))return;var t=+n.dataset.c,s=n.dataset.s||'';if(!t)return;var st=performance.now();(function tk(now){var p=Math.min((now-st)/2200,1);n.textContent=Math.floor((1-Math.pow(1-p,3))*t).toLocaleString('hu-HU')+(s?' '+s:'');if(p<1)requestAnimationFrame(tk)})(st)}
-  });
-});
-
-// === CTA ===
-gsap.to('.cta-h',{scrollTrigger:{trigger:'.CTA',start:'top 70%'},opacity:1,y:0,duration:1.4,ease:'expo.out'});
-gsap.to('.cta-b',{scrollTrigger:{trigger:'.CTA',start:'top 60%'},opacity:1,y:0,duration:1,delay:.2,ease:'expo.out'});
-document.querySelector('.cta-b').addEventListener('click',sfxCta);
-
-// === HERO PARALLAX ===
-gsap.to('.ht',{scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true},y:-80,opacity:.3,scale:.95});
-gsap.to('.hs',{scrollTrigger:{trigger:'.hero',start:'top top',end:'60% top',scrub:true},y:-40,opacity:0});
-gsap.from('.pl-g',{scrollTrigger:{trigger:'.PL',start:'top 85%',end:'top 40%',scrub:true},y:60,opacity:.5});
-gsap.from('.sts-g',{scrollTrigger:{trigger:'.STS',start:'top 85%',end:'top 50%',scrub:true},scale:.96,opacity:.5});
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/examples/jsm/postprocessing/EffectComposer.js":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js","three/examples/jsm/postprocessing/RenderPass.js":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/RenderPass.js","three/examples/jsm/postprocessing/UnrealBloomPass.js":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js","three/examples/jsm/postprocessing/ShaderPass.js":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/ShaderPass.js","three/examples/jsm/shaders/FXAAShader.js":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/shaders/FXAAShader.js","three/examples/jsm/shaders/CopyShader.js":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/shaders/CopyShader.js","three/examples/jsm/shaders/LuminosityHighPassShader.js":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/shaders/LuminosityHighPassShader.js"}}
 </script>
-
-<!-- ============================================================ -->
-<!-- THREE.JS SCENE (ES module)                                   -->
-<!-- ============================================================ -->
 <script type="module">
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-import {EffectComposer} from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js';
-import {RenderPass} from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/RenderPass.js';
-import {UnrealBloomPass} from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js';
-import {ShaderPass} from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/ShaderPass.js';
-import {OutputPass} from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/OutputPass.js';
+import * as THREE from 'three';
+import{EffectComposer}from'three/examples/jsm/postprocessing/EffectComposer.js';
+import{RenderPass}from'three/examples/jsm/postprocessing/RenderPass.js';
+import{UnrealBloomPass}from'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import{ShaderPass}from'three/examples/jsm/postprocessing/ShaderPass.js';
 
-// === LOGO DATA ===
-var LP = [[-0.533,-0.967,28,50,41],[-0.5,-0.967,27,58,44],[-0.467,-0.967,18,55,38],[-0.433,-0.967,13,50,30],[-0.4,-0.967,15,52,32],[-0.367,-0.967,21,57,38],[-0.333,-0.967,39,69,53],[-0.3,-0.967,23,42,36],[0.167,-0.967,24,45,26],[0.2,-0.967,95,125,78],[0.233,-0.967,192,241,145],[0.267,-0.967,179,246,129],[0.3,-0.967,158,254,144],[0.333,-0.967,110,249,167],[0.367,-0.967,82,226,176],[0.4,-0.967,83,178,129],[0.433,-0.967,54,90,53],[-0.6,-0.933,30,57,43],[-0.3,-0.933,15,48,29],[-0.267,-0.933,19,43,35],[-0.133,-0.933,13,43,36],[-0.1,-0.933,10,51,39],[-0.067,-0.933,10,41,34],[0.167,-0.933,107,131,79],[0.2,-0.933,193,247,138],[0.233,-0.933,172,250,113],[0.267,-0.933,155,255,130],[0.3,-0.933,71,231,138],[0.333,-0.933,57,236,160],[0.367,-0.933,110,248,161],[0.4,-0.933,153,246,130],[0.433,-0.933,157,235,109],[0.467,-0.933,190,247,154],[0.5,-0.933,30,55,26],[-0.667,-0.9,26,47,39],[-0.6,-0.9,12,55,20],[-0.567,-0.9,19,64,17],[-0.533,-0.9,19,60,18],[-0.267,-0.9,22,59,37],[-0.233,-0.9,14,48,30],[-0.2,-0.9,12,45,34],[-0.167,-0.9,12,47,39],[-0.133,-0.9,32,79,63],[-0.1,-0.9,67,121,100],[-0.067,-0.9,14,73,51],[-0.033,-0.9,10,47,33],[0.0,-0.9,16,47,32],[0.133,-0.9,88,119,65],[0.167,-0.9,181,243,107],[0.2,-0.9,172,247,94],[0.233,-0.9,157,248,120],[0.267,-0.9,73,230,133],[0.3,-0.9,77,234,155],[0.333,-0.9,143,249,134],[0.367,-0.9,142,238,91],[0.4,-0.9,142,230,86],[0.433,-0.9,135,226,88],[0.467,-0.9,135,228,72],[0.5,-0.9,147,221,83],[0.533,-0.9,86,120,66],[-0.7,-0.867,29,54,40],[-0.667,-0.867,14,56,26],[-0.633,-0.867,27,76,33],[-0.6,-0.867,24,79,27],[-0.567,-0.867,19,74,20],[-0.533,-0.867,20,77,19],[-0.5,-0.867,27,79,26],[-0.467,-0.867,59,97,58],[-0.267,-0.867,9,59,26],[-0.233,-0.867,26,76,40],[-0.2,-0.867,9,55,32],[-0.167,-0.867,8,52,42],[-0.133,-0.867,102,172,155],[-0.1,-0.867,186,254,237],[-0.067,-0.867,30,119,83],[-0.033,-0.867,11,64,45],[0.0,-0.867,13,57,38],[0.033,-0.867,15,50,26],[0.067,-0.867,19,44,30],[0.1,-0.867,65,95,49],[0.133,-0.867,177,240,104],[0.167,-0.867,177,246,93],[0.2,-0.867,161,251,106],[0.233,-0.867,88,234,128],[0.267,-0.867,82,231,141],[0.3,-0.867,152,248,123],[0.333,-0.867,150,235,90],[0.367,-0.867,137,228,83],[0.4,-0.867,127,223,66],[0.433,-0.867,128,221,68],[0.467,-0.867,128,214,72],[0.5,-0.867,141,224,77],[0.533,-0.867,132,216,76],[0.567,-0.867,111,158,87],[-0.733,-0.833,31,56,40],[-0.7,-0.833,13,50,22],[-0.667,-0.833,23,66,27],[-0.633,-0.833,20,68,21],[-0.6,-0.833,18,72,21],[-0.567,-0.833,19,72,25],[-0.533,-0.833,21,74,25],[-0.5,-0.833,22,75,21],[-0.467,-0.833,19,79,16],[-0.433,-0.833,65,110,60],[-0.233,-0.833,7,65,27],[-0.2,-0.833,26,80,49],[-0.167,-0.833,5,54,30],[-0.133,-0.833,27,102,76],[-0.1,-0.833,109,203,168],[-0.067,-0.833,62,159,108],[-0.033,-0.833,2,74,38],[0.0,-0.833,10,70,37],[0.033,-0.833,18,69,40],[0.067,-0.833,31,60,19],[0.1,-0.833,184,244,122],[0.133,-0.833,170,248,93],[0.167,-0.833,156,245,83],[0.2,-0.833,95,235,105],[0.233,-0.833,67,226,127],[0.267,-0.833,141,244,112],[0.3,-0.833,142,232,80],[0.333,-0.833,144,234,79],[0.367,-0.833,136,229,71],[0.4,-0.833,127,224,69],[0.433,-0.833,123,215,61],[0.467,-0.833,120,211,60],[0.5,-0.833,117,206,48],[0.533,-0.833,116,200,52],[0.567,-0.833,115,198,55],[0.6,-0.833,107,148,79],[-0.733,-0.8,21,63,28],[-0.7,-0.8,14,59,19],[-0.633,-0.8,13,63,14],[-0.6,-0.8,14,65,17],[-0.567,-0.8,13,66,15],[-0.533,-0.8,19,69,20],[-0.5,-0.8,17,71,17],[-0.467,-0.8,23,80,21],[-0.433,-0.8,31,87,27],[-0.4,-0.8,88,138,79],[-0.233,-0.8,9,71,31],[-0.2,-0.8,2,65,25],[-0.167,-0.8,24,84,46],[-0.133,-0.8,3,75,40],[-0.1,-0.8,7,99,56],[-0.067,-0.8,107,201,141],[-0.033,-0.8,20,104,48],[0.0,-0.8,24,92,46],[0.033,-0.8,20,79,22],[0.067,-0.8,194,248,140],[0.1,-0.8,179,250,106],[0.133,-0.8,167,247,90],[0.167,-0.8,131,253,107],[0.2,-0.8,52,217,99],[0.233,-0.8,117,236,98],[0.267,-0.8,128,224,70],[0.3,-0.8,126,213,55],[0.333,-0.8,120,218,67],[0.367,-0.8,86,200,48],[0.4,-0.8,53,172,37],[0.433,-0.8,76,181,47],[0.467,-0.8,116,205,57],[0.5,-0.8,115,203,49],[0.533,-0.8,109,201,54],[0.567,-0.8,125,213,64],[0.6,-0.8,130,209,75],[0.633,-0.8,118,163,95],[-0.767,-0.767,36,85,33],[-0.733,-0.767,24,74,22],[-0.7,-0.767,19,63,18],[-0.667,-0.767,21,58,19],[-0.633,-0.767,16,62,21],[-0.6,-0.767,19,64,23],[-0.567,-0.767,16,69,19],[-0.533,-0.767,19,75,21],[-0.5,-0.767,20,79,21],[-0.467,-0.767,25,86,25],[-0.433,-0.767,23,89,25],[-0.4,-0.767,28,98,18],[-0.367,-0.767,51,105,50],[-0.233,-0.767,14,68,33],[-0.2,-0.767,35,101,58],[-0.167,-0.767,10,78,34],[-0.133,-0.767,37,108,67],[-0.1,-0.767,6,84,46],[-0.067,-0.767,0,94,47],[-0.033,-0.767,137,230,173],[0.033,-0.767,189,245,163],[0.067,-0.767,178,249,119],[0.1,-0.767,167,246,92],[0.133,-0.767,162,248,94],[0.167,-0.767,91,223,86],[0.2,-0.767,105,231,94],[0.233,-0.767,122,221,67],[0.267,-0.767,115,213,54],[0.3,-0.767,113,209,50],[0.333,-0.767,102,208,61],[0.367,-0.767,53,176,48],[0.4,-0.767,19,145,34],[0.433,-0.767,117,222,112],[0.467,-0.767,115,207,63],[0.5,-0.767,119,212,62],[0.533,-0.767,106,201,58],[0.567,-0.767,85,182,38],[0.6,-0.767,85,174,45],[0.633,-0.767,59,132,29],[0.667,-0.767,95,139,83],[-0.8,-0.733,54,96,54],[-0.767,-0.733,23,87,17],[-0.733,-0.733,24,76,18],[-0.7,-0.733,18,70,17],[-0.667,-0.733,13,65,20],[-0.633,-0.733,17,68,20],[-0.6,-0.733,16,69,20],[-0.567,-0.733,18,71,20],[-0.533,-0.733,20,76,23],[-0.5,-0.733,21,80,21],[-0.467,-0.733,20,85,23],[-0.433,-0.733,18,89,23],[-0.4,-0.733,27,97,19],[-0.367,-0.733,89,160,78],[-0.2,-0.733,9,73,33],[-0.167,-0.733,38,116,60],[-0.133,-0.733,8,91,41],[-0.1,-0.733,39,124,81],[-0.067,-0.733,74,190,150],[-0.033,-0.733,7,129,75],[0.0,-0.733,176,255,170],[0.033,-0.733,191,253,143],[0.067,-0.733,171,247,103],[0.1,-0.733,167,246,89],[0.133,-0.733,146,252,106],[0.167,-0.733,108,227,95],[0.2,-0.733,126,224,70],[0.233,-0.733,118,212,53],[0.267,-0.733,111,207,46],[0.3,-0.733,117,212,55],[0.333,-0.733,114,213,70],[0.367,-0.733,46,154,43],[0.4,-0.733,6,116,24],[0.433,-0.733,26,128,22],[0.467,-0.733,133,226,88],[0.5,-0.733,121,217,71],[0.533,-0.733,83,185,45],[0.567,-0.733,62,156,33],[0.6,-0.733,12,90,5],[0.633,-0.733,13,87,13],[0.667,-0.733,22,87,14],[0.7,-0.733,46,95,41],[-0.833,-0.7,88,125,78],[-0.8,-0.7,13,68,6],[-0.767,-0.7,25,72,17],[-0.733,-0.7,24,74,21],[-0.7,-0.7,25,78,23],[-0.667,-0.7,3,66,18],[-0.633,-0.7,24,120,77],[-0.6,-0.7,1,76,31],[-0.567,-0.7,17,75,22],[-0.533,-0.7,18,76,21],[-0.5,-0.7,18,78,19],[-0.467,-0.7,23,85,25],[-0.433,-0.7,23,84,24],[-0.4,-0.7,29,93,23],[-0.367,-0.7,42,115,30],[-0.2,-0.7,2,59,24],[-0.167,-0.7,34,109,57],[-0.133,-0.7,30,119,64],[-0.1,-0.7,32,133,77],[-0.067,-0.7,56,185,148],[-0.033,-0.7,2,132,80],[0.0,-0.7,172,255,161],[0.033,-0.7,172,243,112],[0.067,-0.7,167,246,97],[0.1,-0.7,161,250,96],[0.133,-0.7,101,222,84],[0.167,-0.7,128,229,91],[0.2,-0.7,117,211,61],[0.233,-0.7,116,212,59],[0.267,-0.7,122,211,60],[0.3,-0.7,115,205,52],[0.333,-0.7,102,194,51],[0.367,-0.7,76,170,40],[0.4,-0.7,57,150,33],[0.433,-0.7,85,178,53],[0.467,-0.7,107,204,73],[0.5,-0.7,48,145,12],[0.533,-0.7,132,228,77],[0.567,-0.7,140,229,92],[0.6,-0.7,17,85,8],[0.633,-0.7,16,87,19],[0.667,-0.7,22,84,21],[0.7,-0.7,17,79,15],[0.733,-0.7,41,85,40],[-0.867,-0.667,60,98,46],[-0.833,-0.667,114,188,81],[-0.8,-0.667,30,93,15],[-0.767,-0.667,17,69,12],[-0.733,-0.667,11,67,7],[-0.7,-0.667,19,81,16],[-0.667,-0.667,11,99,46],[-0.633,-0.667,48,232,187],[-0.6,-0.667,48,181,136],[-0.567,-0.667,15,81,26],[-0.533,-0.667,16,79,19],[-0.5,-0.667,15,76,17],[-0.467,-0.667,23,82,24],[-0.433,-0.667,22,83,23],[-0.4,-0.667,20,90,25],[-0.367,-0.667,22,97,15],[-0.333,-0.667,59,113,53],[-0.233,-0.667,4,53,28],[-0.2,-0.667,6,61,30],[-0.167,-0.667,7,71,31],[-0.133,-0.667,26,113,64],[-0.1,-0.667,31,138,81],[-0.067,-0.667,63,194,155],[-0.033,-0.667,18,141,91],[0.0,-0.667,180,255,165],[0.033,-0.667,168,244,111],[0.067,-0.667,168,246,97],[0.1,-0.667,148,254,103],[0.133,-0.667,108,220,74],[0.167,-0.667,123,216,74],[0.2,-0.667,116,215,80],[0.233,-0.667,118,208,60],[0.267,-0.667,110,206,55],[0.3,-0.667,100,195,43],[0.333,-0.667,99,191,45],[0.367,-0.667,98,191,44],[0.4,-0.667,99,190,45],[0.433,-0.667,95,188,55],[0.467,-0.667,17,115,1],[0.5,-0.667,43,135,25],[0.533,-0.667,130,217,79],[0.567,-0.667,132,220,86],[0.6,-0.667,12,85,6],[0.633,-0.667,22,86,21],[0.667,-0.667,21,77,21],[0.7,-0.667,19,77,22],[0.733,-0.667,17,76,16],[0.767,-0.667,38,87,36],[0.8,-0.667,27,50,35],[-0.9,-0.633,48,82,42],[-0.867,-0.633,121,203,76],[-0.833,-0.633,104,189,60],[-0.8,-0.633,47,124,23],[-0.767,-0.633,83,159,56],[-0.733,-0.633,120,200,89],[-0.7,-0.633,43,108,27],[-0.667,-0.633,17,85,27],[-0.633,-0.633,5,128,72],[-0.6,-0.633,62,208,149],[-0.567,-0.633,4,90,28],[-0.533,-0.633,24,84,20],[-0.5,-0.633,23,91,32],[-0.467,-0.633,24,91,27],[-0.433,-0.633,20,87,25],[-0.4,-0.633,20,85,24],[-0.367,-0.633,19,90,21],[-0.333,-0.633,83,144,80],[-0.233,-0.633,2,59,27],[-0.2,-0.633,5,69,35],[-0.167,-0.633,9,80,44],[-0.133,-0.633,9,102,57],[-0.1,-0.633,34,150,97],[-0.067,-0.633,60,195,151],[-0.033,-0.633,18,147,95],[0.0,-0.633,176,255,158],[0.033,-0.633,164,246,111],[0.067,-0.633,164,246,98],[0.1,-0.633,120,227,81],[0.133,-0.633,112,217,71],[0.167,-0.633,102,223,108],[0.2,-0.633,79,234,176],[0.233,-0.633,94,215,101],[0.267,-0.633,103,202,50],[0.3,-0.633,96,195,44],[0.333,-0.633,87,186,38],[0.367,-0.633,80,180,31],[0.4,-0.633,80,180,40],[0.433,-0.633,53,153,23],[0.467,-0.633,43,140,35],[0.5,-0.633,16,95,6],[0.533,-0.633,21,93,7],[0.567,-0.633,23,92,7],[0.6,-0.633,20,81,21],[0.633,-0.633,15,80,21],[0.667,-0.633,15,81,18],[0.7,-0.633,23,83,23],[0.733,-0.633,25,86,26],[0.767,-0.633,28,91,27],[0.8,-0.633,31,78,34],[-0.933,-0.6,24,48,20],[-0.9,-0.6,143,218,97],[-0.867,-0.6,106,200,50],[-0.833,-0.6,95,184,50],[-0.8,-0.6,41,126,4],[-0.767,-0.6,121,211,80],[-0.733,-0.6,119,212,68],[-0.7,-0.6,94,170,68],[-0.667,-0.6,12,78,8],[-0.633,-0.6,33,98,19],[-0.6,-0.6,17,126,58],[-0.567,-0.6,41,166,98],[-0.533,-0.6,24,95,33],[-0.5,-0.6,24,92,24],[-0.467,-0.6,25,90,24],[-0.433,-0.6,25,91,26],[-0.4,-0.6,21,90,29],[-0.367,-0.6,24,95,31],[-0.333,-0.6,75,146,65],[-0.233,-0.6,3,62,30],[-0.2,-0.6,4,73,38],[-0.167,-0.6,7,84,46],[-0.133,-0.6,4,103,56],[-0.1,-0.6,38,155,102],[-0.067,-0.6,51,188,143],[-0.033,-0.6,9,140,88],[0.0,-0.6,172,255,151],[0.033,-0.6,164,248,108],[0.067,-0.6,160,248,98],[0.1,-0.6,108,211,67],[0.133,-0.6,116,210,62],[0.167,-0.6,81,211,94],[0.2,-0.6,76,231,166],[0.233,-0.6,83,215,97],[0.267,-0.6,96,201,42],[0.3,-0.6,92,196,42],[0.333,-0.6,86,190,38],[0.367,-0.6,94,198,50],[0.4,-0.6,64,168,37],[0.433,-0.6,44,142,26],[0.467,-0.6,23,110,18],[0.5,-0.6,32,101,29],[0.533,-0.6,19,79,16],[0.567,-0.6,15,80,16],[0.6,-0.6,13,78,15],[0.633,-0.6,0,77,18],[0.667,-0.6,1,80,18],[0.7,-0.6,15,84,27],[0.733,-0.6,20,87,25],[0.767,-0.6,19,90,22],[0.8,-0.6,32,93,34],[0.833,-0.6,25,62,34],[-0.933,-0.567,169,231,124],[-0.9,-0.567,130,222,84],[-0.867,-0.567,106,193,46],[-0.833,-0.567,98,188,45],[-0.8,-0.567,103,190,56],[-0.767,-0.567,68,156,27],[-0.733,-0.567,102,193,64],[-0.7,-0.567,58,142,30],[-0.667,-0.567,29,103,18],[-0.633,-0.567,36,101,21],[-0.6,-0.567,28,111,29],[-0.567,-0.567,35,159,81],[-0.533,-0.567,12,113,47],[-0.5,-0.567,19,83,17],[-0.467,-0.567,26,88,18],[-0.433,-0.567,23,90,20],[-0.4,-0.567,23,100,24],[-0.367,-0.567,37,112,38],[-0.333,-0.567,50,131,33],[-0.3,-0.567,17,67,15],[-0.233,-0.567,1,59,29],[-0.2,-0.567,7,75,39],[-0.167,-0.567,6,84,43],[-0.133,-0.567,3,101,54],[-0.1,-0.567,34,146,95],[-0.067,-0.567,51,182,140],[-0.033,-0.567,7,136,84],[0.0,-0.567,176,255,157],[0.033,-0.567,162,247,102],[0.067,-0.567,154,243,99],[0.1,-0.567,115,214,68],[0.133,-0.567,113,208,69],[0.167,-0.567,107,233,109],[0.2,-0.567,85,203,76],[0.233,-0.567,86,192,49],[0.267,-0.567,91,194,39],[0.3,-0.567,88,193,38],[0.333,-0.567,86,193,36],[0.367,-0.567,92,197,53],[0.4,-0.567,43,144,27],[0.433,-0.567,28,121,24],[0.467,-0.567,17,97,17],[0.5,-0.567,22,94,20],[0.533,-0.567,18,88,13],[0.567,-0.567,13,74,12],[0.6,-0.567,0,74,15],[0.633,-0.567,81,236,180],[0.667,-0.567,74,213,164],[0.7,-0.567,6,74,23],[0.733,-0.567,20,82,22],[0.767,-0.567,19,85,22],[0.8,-0.567,24,87,27],[0.833,-0.567,30,78,35],[0.867,-0.567,43,67,53],[-0.967,-0.533,161,206,127],[-0.933,-0.533,140,220,80],[-0.9,-0.533,124,219,72],[-0.867,-0.533,94,192,39],[-0.833,-0.533,96,192,40],[-0.8,-0.533,114,208,57],[-0.767,-0.533,120,212,71],[-0.733,-0.533,59,151,20],[-0.7,-0.533,58,144,23],[-0.667,-0.533,31,110,13],[-0.633,-0.533,35,109,21],[-0.6,-0.533,39,118,23],[-0.567,-0.533,29,119,36],[-0.533,-0.533,77,187,115],[-0.5,-0.533,17,105,34],[-0.467,-0.533,36,109,34],[-0.433,-0.533,37,109,32],[-0.4,-0.533,31,116,27],[-0.367,-0.533,36,117,28],[-0.333,-0.533,30,119,14],[-0.3,-0.533,73,135,70],[-0.267,-0.533,17,63,26],[-0.2,-0.533,88,153,118],[-0.167,-0.533,4,77,37],[-0.133,-0.533,4,95,51],[-0.1,-0.533,36,141,92],[-0.067,-0.533,53,175,136],[-0.033,-0.533,9,133,83],[0.0,-0.533,183,255,163],[0.033,-0.533,166,249,109],[0.067,-0.533,138,228,85],[0.1,-0.533,123,213,73],[0.133,-0.533,99,204,76],[0.167,-0.533,105,220,96],[0.2,-0.533,98,200,51],[0.233,-0.533,87,188,40],[0.267,-0.533,85,186,45],[0.3,-0.533,75,178,36],[0.333,-0.533,73,177,35],[0.367,-0.533,54,157,27],[0.4,-0.533,33,131,25],[0.433,-0.533,36,127,28],[0.467,-0.533,31,113,21],[0.5,-0.533,27,109,27],[0.533,-0.533,12,98,31],[0.567,-0.533,20,106,45],[0.6,-0.533,74,174,118],[0.633,-0.533,40,180,133],[0.667,-0.533,32,141,95],[0.7,-0.533,10,76,26],[0.733,-0.533,23,80,22],[0.767,-0.533,22,81,26],[0.8,-0.533,20,82,24],[0.833,-0.533,53,105,53],[0.867,-0.533,22,53,34],[-0.967,-0.5,170,239,109],[-0.933,-0.5,140,226,83],[-0.9,-0.5,125,214,66],[-0.867,-0.5,96,194,46],[-0.833,-0.5,92,185,50],[-0.8,-0.5,94,195,74],[-0.767,-0.5,95,198,69],[-0.733,-0.5,118,210,70],[-0.7,-0.5,75,169,34],[-0.667,-0.5,55,149,29],[-0.633,-0.5,37,126,24],[-0.6,-0.5,37,122,27],[-0.567,-0.5,36,120,29],[-0.533,-0.5,17,115,32],[-0.5,-0.5,69,177,102],[-0.467,-0.5,28,117,34],[-0.433,-0.5,37,119,29],[-0.4,-0.5,38,122,31],[-0.367,-0.5,40,128,35],[-0.333,-0.5,44,130,30],[-0.3,-0.5,115,192,95],[-0.2,-0.5,61,123,90],[-0.167,-0.5,5,72,32],[-0.133,-0.5,7,89,49],[-0.1,-0.5,36,137,92],[-0.067,-0.5,53,171,130],[-0.033,-0.5,12,137,92],[0.0,-0.5,193,255,177],[0.033,-0.5,171,249,126],[0.067,-0.5,138,221,85],[0.1,-0.5,121,215,83],[0.133,-0.5,131,239,124],[0.167,-0.5,87,193,64],[0.2,-0.5,82,186,42],[0.233,-0.5,74,174,36],[0.267,-0.5,74,174,39],[0.3,-0.5,71,173,37],[0.333,-0.5,58,157,31],[0.367,-0.5,41,139,25],[0.4,-0.5,34,129,25],[0.433,-0.5,33,127,30],[0.467,-0.5,24,123,30],[0.5,-0.5,34,144,66],[0.533,-0.5,88,211,139],[0.567,-0.5,26,132,70],[0.6,-0.5,1,79,25],[0.633,-0.5,12,75,23],[0.667,-0.5,13,80,27],[0.7,-0.5,18,82,29],[0.733,-0.5,22,83,19],[0.767,-0.5,21,80,24],[0.8,-0.5,17,74,17],[0.833,-0.5,55,97,52],[0.9,-0.5,28,53,42],[-1.0,-0.467,114,175,114],[-0.967,-0.467,168,239,110],[-0.933,-0.467,142,229,85],[-0.9,-0.467,131,221,76],[-0.867,-0.467,108,206,65],[-0.833,-0.467,36,131,17],[-0.8,-0.467,54,158,72],[-0.767,-0.467,29,138,30],[-0.733,-0.467,95,195,57],[-0.7,-0.467,114,210,62],[-0.667,-0.467,67,163,32],[-0.633,-0.467,54,147,31],[-0.6,-0.467,39,127,22],[-0.567,-0.467,36,129,27],[-0.533,-0.467,46,136,35],[-0.5,-0.467,46,163,71],[-0.467,-0.467,38,153,64],[-0.433,-0.467,41,127,38],[-0.4,-0.467,39,124,29],[-0.367,-0.467,43,128,34],[-0.333,-0.467,50,137,34],[-0.3,-0.467,96,182,68],[-0.2,-0.467,79,139,102],[-0.167,-0.467,4,66,34],[-0.133,-0.467,6,86,47],[-0.1,-0.467,31,130,85],[-0.067,-0.467,54,174,133],[-0.033,-0.467,14,145,98],[0.0,-0.467,187,255,173],[0.033,-0.467,174,244,130],[0.067,-0.467,136,215,93],[0.1,-0.467,115,213,98],[0.133,-0.467,123,233,124],[0.167,-0.467,87,200,57],[0.2,-0.467,78,182,42],[0.233,-0.467,69,171,36],[0.267,-0.467,66,170,39],[0.3,-0.467,59,157,33],[0.333,-0.467,52,146,34],[0.367,-0.467,36,135,31],[0.4,-0.467,24,128,29],[0.433,-0.467,37,145,55],[0.467,-0.467,93,207,130],[0.5,-0.467,27,134,66],[0.533,-0.467,11,105,36],[0.567,-0.467,22,102,36],[0.6,-0.467,22,90,27],[0.633,-0.467,20,83,22],[0.667,-0.467,23,83,22],[0.7,-0.467,24,83,26],[0.733,-0.467,26,85,27],[0.767,-0.467,26,85,32],[0.8,-0.467,13,72,12],[0.833,-0.467,39,78,37],[0.9,-0.467,32,62,45],[-1.0,-0.433,125,219,154],[-0.967,-0.433,147,249,127],[-0.933,-0.433,146,234,97],[-0.9,-0.433,138,225,85],[-0.867,-0.433,125,218,83],[-0.833,-0.433,42,127,12],[-0.8,-0.433,35,124,24],[-0.767,-0.433,40,142,30],[-0.733,-0.433,83,182,50],[-0.7,-0.433,113,207,56],[-0.667,-0.433,84,180,37],[-0.633,-0.433,79,177,44],[-0.6,-0.433,58,153,31],[-0.567,-0.433,45,141,27],[-0.533,-0.433,40,135,33],[-0.5,-0.433,43,145,41],[-0.467,-0.433,70,187,98],[-0.433,-0.433,28,126,35],[-0.4,-0.433,43,134,34],[-0.367,-0.433,48,132,33],[-0.333,-0.433,47,138,35],[-0.3,-0.433,56,149,31],[-0.267,-0.433,41,89,37],[-0.2,-0.433,74,140,105],[-0.167,-0.433,7,69,38],[-0.133,-0.433,11,89,50],[-0.1,-0.433,34,128,85],[-0.067,-0.433,54,171,131],[-0.033,-0.433,15,149,101],[0.0,-0.433,189,255,174],[0.033,-0.433,163,236,121],[0.067,-0.433,137,220,107],[0.1,-0.433,123,232,129],[0.133,-0.433,87,208,92],[0.167,-0.433,87,210,65],[0.2,-0.433,66,180,41],[0.233,-0.433,69,176,41],[0.267,-0.433,64,163,37],[0.3,-0.433,44,141,29],[0.333,-0.433,45,144,43],[0.367,-0.433,15,121,28],[0.4,-0.433,76,188,106],[0.433,-0.433,32,136,60],[0.467,-0.433,12,104,28],[0.5,-0.433,19,101,29],[0.533,-0.433,24,96,27],[0.567,-0.433,25,97,31],[0.6,-0.433,20,92,28],[0.633,-0.433,19,90,26],[0.667,-0.433,21,90,27],[0.7,-0.433,22,84,22],[0.733,-0.433,22,84,26],[0.767,-0.433,21,84,23],[0.8,-0.433,38,94,38],[0.9,-0.433,19,55,30],[-1.0,-0.4,120,243,194],[-0.967,-0.4,91,244,145],[-0.933,-0.4,138,237,115],[-0.9,-0.4,130,226,86],[-0.867,-0.4,129,217,76],[-0.833,-0.4,91,176,48],[-0.8,-0.4,53,145,26],[-0.767,-0.4,46,144,21],[-0.733,-0.4,114,208,71],[-0.7,-0.4,108,201,56],[-0.667,-0.4,90,186,39],[-0.633,-0.4,81,182,35],[-0.6,-0.4,78,182,39],[-0.567,-0.4,66,167,36],[-0.533,-0.4,47,146,26],[-0.5,-0.4,44,139,26],[-0.467,-0.4,40,143,43],[-0.433,-0.4,88,204,109],[-0.4,-0.4,29,128,28],[-0.367,-0.4,47,134,36],[-0.333,-0.4,48,137,37],[-0.3,-0.4,44,138,28],[-0.267,-0.4,98,154,85],[-0.2,-0.4,66,139,100],[-0.167,-0.4,5,78,41],[-0.133,-0.4,11,94,54],[-0.1,-0.4,33,128,85],[-0.067,-0.4,51,165,126],[-0.033,-0.4,18,144,98],[0.0,-0.4,188,255,172],[0.033,-0.4,139,224,103],[0.067,-0.4,110,214,90],[0.1,-0.4,123,247,138],[0.133,-0.4,67,199,63],[0.167,-0.4,93,223,89],[0.2,-0.4,68,192,51],[0.233,-0.4,62,178,43],[0.267,-0.4,44,153,31],[0.3,-0.4,35,145,38],[0.333,-0.4,57,167,74],[0.367,-0.4,28,130,47],[0.4,-0.4,27,116,40],[0.433,-0.4,24,103,29],[0.467,-0.4,24,100,24],[0.5,-0.4,26,100,23],[0.533,-0.4,24,98,21],[0.567,-0.4,26,97,29],[0.6,-0.4,23,90,25],[0.633,-0.4,26,91,29],[0.667,-0.4,24,92,29],[0.7,-0.4,24,90,28],[0.733,-0.4,20,87,24],[0.767,-0.4,28,91,23],[0.8,-0.4,47,96,46],[0.867,-0.4,12,53,29],[0.9,-0.4,18,58,29],[-1.0,-0.367,136,242,172],[-0.967,-0.367,44,232,147],[-0.933,-0.367,115,244,139],[-0.9,-0.367,132,230,104],[-0.867,-0.367,145,223,93],[-0.833,-0.367,138,226,82],[-0.8,-0.367,133,213,73],[-0.767,-0.367,117,220,86],[-0.733,-0.367,99,208,80],[-0.7,-0.367,107,202,56],[-0.667,-0.367,99,193,50],[-0.633,-0.367,87,186,33],[-0.6,-0.367,83,185,40],[-0.567,-0.367,79,185,39],[-0.533,-0.367,66,173,37],[-0.5,-0.367,47,148,28],[-0.467,-0.367,48,145,35],[-0.433,-0.367,39,148,48],[-0.4,-0.367,54,158,60],[-0.367,-0.367,44,137,42],[-0.333,-0.367,47,134,37],[-0.3,-0.367,52,140,38],[-0.267,-0.367,112,193,95],[-0.2,-0.367,59,142,96],[-0.167,-0.367,5,91,45],[-0.133,-0.367,9,103,50],[-0.1,-0.367,31,136,88],[-0.067,-0.367,56,169,130],[-0.033,-0.367,21,134,89],[0.0,-0.367,178,255,165],[0.033,-0.367,121,212,86],[0.067,-0.367,86,209,84],[0.1,-0.367,83,216,96],[0.133,-0.367,76,205,62],[0.167,-0.367,75,204,75],[0.2,-0.367,68,200,59],[0.233,-0.367,45,173,38],[0.267,-0.367,49,182,56],[0.3,-0.367,53,174,59],[0.333,-0.367,35,139,38],[0.367,-0.367,36,128,36],[0.4,-0.367,34,114,31],[0.433,-0.367,29,104,23],[0.467,-0.367,29,103,25],[0.5,-0.367,28,102,25],[0.533,-0.367,28,100,26],[0.567,-0.367,26,98,26],[0.6,-0.367,19,90,20],[0.633,-0.367,24,91,28],[0.667,-0.367,25,95,34],[0.7,-0.367,27,104,33],[0.733,-0.367,38,109,35],[0.767,-0.367,56,112,51],[0.867,-0.367,8,56,22],[0.9,-0.367,20,59,34],[-1.0,-0.333,170,242,132],[-0.967,-0.333,126,248,137],[-0.933,-0.333,58,226,135],[-0.9,-0.333,109,244,148],[-0.867,-0.333,140,234,113],[-0.833,-0.333,154,230,92],[-0.8,-0.333,133,216,67],[-0.767,-0.333,115,229,96],[-0.733,-0.333,91,236,136],[-0.7,-0.333,93,221,97],[-0.667,-0.333,110,211,60],[-0.633,-0.333,87,193,42],[-0.6,-0.333,85,190,37],[-0.567,-0.333,77,187,41],[-0.533,-0.333,67,178,37],[-0.5,-0.333,65,175,42],[-0.467,-0.333,51,156,35],[-0.433,-0.333,52,153,38],[-0.4,-0.333,60,164,57],[-0.367,-0.333,35,139,39],[-0.333,-0.333,45,143,42],[-0.3,-0.333,49,146,41],[-0.267,-0.333,75,164,57],[-0.2,-0.333,53,142,96],[-0.167,-0.333,8,100,50],[-0.133,-0.333,12,113,57],[-0.1,-0.333,30,137,88],[-0.067,-0.333,53,161,121],[-0.033,-0.333,12,113,70],[0.0,-0.333,174,255,151],[0.033,-0.333,99,207,70],[0.067,-0.333,103,231,107],[0.1,-0.333,66,191,58],[0.133,-0.333,77,199,67],[0.167,-0.333,74,206,84],[0.2,-0.333,58,199,68],[0.233,-0.333,63,199,65],[0.267,-0.333,58,183,54],[0.3,-0.333,50,162,43],[0.333,-0.333,43,143,34],[0.367,-0.333,42,134,34],[0.4,-0.333,36,119,30],[0.433,-0.333,30,107,24],[0.467,-0.333,27,102,22],[0.5,-0.333,29,101,25],[0.533,-0.333,29,99,26],[0.567,-0.333,29,96,22],[0.6,-0.333,25,93,21],[0.633,-0.333,18,91,15],[0.667,-0.333,31,103,29],[0.7,-0.333,69,124,62],[0.733,-0.333,19,69,19],[0.767,-0.333,9,57,19],[0.833,-0.333,9,53,26],[0.867,-0.333,7,58,26],[0.9,-0.333,16,61,36],[-1.0,-0.3,193,239,137],[-0.967,-0.3,179,254,105],[-0.933,-0.3,145,249,148],[-0.9,-0.3,66,235,138],[-0.867,-0.3,109,245,147],[-0.833,-0.3,151,241,119],[-0.8,-0.3,141,225,85],[-0.767,-0.3,122,222,91],[-0.733,-0.3,103,225,102],[-0.7,-0.3,103,233,115],[-0.667,-0.3,101,229,97],[-0.633,-0.3,85,197,58],[-0.6,-0.3,89,188,41],[-0.567,-0.3,76,181,37],[-0.533,-0.3,74,179,37],[-0.5,-0.3,74,174,39],[-0.467,-0.3,72,171,42],[-0.433,-0.3,63,156,33],[-0.4,-0.3,47,147,37],[-0.367,-0.3,67,173,72],[-0.333,-0.3,46,152,51],[-0.3,-0.3,49,151,50],[-0.267,-0.3,59,151,38],[-0.233,-0.3,67,140,54],[-0.2,-0.3,21,102,56],[-0.167,-0.3,166,251,203],[-0.133,-0.3,7,104,50],[-0.1,-0.3,30,125,77],[-0.067,-0.3,51,138,102],[-0.033,-0.3,5,82,43],[0.0,-0.3,170,255,142],[0.033,-0.3,82,202,69],[0.067,-0.3,111,239,125],[0.1,-0.3,75,192,65],[0.133,-0.3,72,187,70],[0.167,-0.3,56,184,73],[0.2,-0.3,54,189,70],[0.233,-0.3,54,182,58],[0.267,-0.3,50,163,40],[0.3,-0.3,49,159,39],[0.333,-0.3,38,143,29],[0.367,-0.3,43,143,35],[0.4,-0.3,33,128,28],[0.433,-0.3,31,115,23],[0.467,-0.3,27,106,19],[0.5,-0.3,27,98,20],[0.533,-0.3,36,99,29],[0.567,-0.3,50,117,51],[0.6,-0.3,68,125,69],[0.633,-0.3,60,108,60],[0.833,-0.3,8,54,26],[0.9,-0.3,22,62,42],[-1.0,-0.267,189,231,147],[-0.967,-0.267,189,248,106],[-0.933,-0.267,182,249,106],[-0.9,-0.267,153,252,127],[-0.867,-0.267,84,236,136],[-0.833,-0.267,82,229,120],[-0.8,-0.267,135,249,127],[-0.767,-0.267,120,223,83],[-0.733,-0.267,126,223,79],[-0.7,-0.267,122,220,86],[-0.667,-0.267,104,226,95],[-0.633,-0.267,103,232,110],[-0.6,-0.267,86,201,73],[-0.567,-0.267,89,199,64],[-0.533,-0.267,81,187,46],[-0.5,-0.267,94,194,59],[-0.467,-0.267,64,163,34],[-0.433,-0.267,69,168,41],[-0.4,-0.267,65,164,41],[-0.367,-0.267,52,154,38],[-0.333,-0.267,71,174,67],[-0.3,-0.267,69,176,72],[-0.267,-0.267,58,166,53],[-0.233,-0.267,107,200,93],[-0.2,-0.267,13,89,32],[-0.167,-0.267,0,83,32],[-0.133,-0.267,13,97,47],[-0.1,-0.267,32,108,66],[-0.067,-0.267,3,60,32],[-0.033,-0.267,7,56,26],[0.0,-0.267,178,255,155],[0.033,-0.267,110,222,113],[0.067,-0.267,92,215,103],[0.1,-0.267,70,183,73],[0.133,-0.267,101,217,116],[0.167,-0.267,53,172,62],[0.2,-0.267,52,165,53],[0.233,-0.267,44,148,37],[0.267,-0.267,51,152,37],[0.3,-0.267,55,154,40],[0.333,-0.267,52,149,37],[0.367,-0.267,67,159,52],[0.4,-0.267,73,158,60],[0.433,-0.267,82,156,72],[0.467,-0.267,69,133,61],[0.5,-0.267,42,95,39],[0.8,-0.267,8,55,25],[0.867,-0.267,15,53,32],[0.9,-0.267,31,55,44],[-0.967,-0.233,201,245,155],[-0.933,-0.233,189,250,116],[-0.9,-0.233,176,247,94],[-0.867,-0.233,169,251,105],[-0.833,-0.233,128,250,121],[-0.8,-0.233,65,213,107],[-0.767,-0.233,88,228,108],[-0.733,-0.233,114,230,101],[-0.7,-0.233,128,222,85],[-0.667,-0.233,124,214,67],[-0.633,-0.233,100,203,68],[-0.6,-0.233,102,226,109],[-0.567,-0.233,94,220,111],[-0.533,-0.233,69,186,63],[-0.5,-0.233,101,204,71],[-0.467,-0.233,86,185,53],[-0.433,-0.233,77,178,44],[-0.4,-0.233,77,178,44],[-0.367,-0.233,76,176,46],[-0.333,-0.233,71,173,50],[-0.3,-0.233,66,173,58],[-0.267,-0.233,84,203,93],[-0.233,-0.233,75,187,71],[-0.2,-0.233,10,84,17],[-0.167,-0.233,10,76,38],[-0.133,-0.233,11,85,39],[-0.1,-0.233,26,87,47],[0.0,-0.233,174,255,169],[0.033,-0.233,135,250,158],[0.067,-0.233,97,212,107],[0.1,-0.233,130,240,151],[0.133,-0.233,56,174,73],[0.167,-0.233,56,167,64],[0.2,-0.233,41,141,36],[0.233,-0.233,44,135,32],[0.267,-0.233,68,149,52],[0.3,-0.233,96,167,81],[0.333,-0.233,72,135,62],[0.367,-0.233,36,98,32],[0.833,-0.233,11,56,26],[0.867,-0.233,21,46,33],[-0.933,-0.2,177,220,127],[-0.9,-0.2,192,250,115],[-0.867,-0.2,178,249,90],[-0.833,-0.2,168,250,87],[-0.8,-0.2,151,252,95],[-0.767,-0.2,118,245,99],[-0.733,-0.2,75,212,85],[-0.7,-0.2,99,226,97],[-0.667,-0.2,120,226,89],[-0.633,-0.2,122,219,79],[-0.6,-0.2,109,210,70],[-0.567,-0.2,89,201,70],[-0.533,-0.2,102,223,102],[-0.5,-0.2,107,230,114],[-0.467,-0.2,107,220,102],[-0.433,-0.2,87,189,71],[-0.4,-0.2,89,191,63],[-0.367,-0.2,107,209,72],[-0.333,-0.2,108,207,72],[-0.3,-0.2,91,189,58],[-0.267,-0.2,55,163,46],[-0.233,-0.2,69,187,75],[-0.2,-0.2,83,165,85],[-0.133,-0.2,14,81,35],[-0.1,-0.2,31,90,51],[0.0,-0.2,171,253,184],[0.033,-0.2,120,230,151],[0.067,-0.2,125,239,142],[0.1,-0.2,69,178,95],[0.133,-0.2,88,190,98],[0.167,-0.2,94,178,84],[0.2,-0.2,113,170,91],[0.233,-0.2,50,88,45],[0.367,-0.2,7,52,26],[0.4,-0.2,4,61,25],[0.433,-0.2,6,65,27],[0.467,-0.2,8,67,31],[0.5,-0.2,6,64,31],[0.533,-0.2,5,61,29],[0.567,-0.2,3,63,31],[0.6,-0.2,3,62,29],[0.633,-0.2,4,58,32],[0.733,-0.2,18,85,37],[0.767,-0.2,11,78,32],[0.8,-0.2,12,63,32],[0.833,-0.2,20,44,30],[-0.9,-0.167,150,189,118],[-0.867,-0.167,180,243,103],[-0.833,-0.167,172,246,86],[-0.8,-0.167,157,242,80],[-0.767,-0.167,157,246,89],[-0.733,-0.167,159,251,99],[-0.7,-0.167,141,249,105],[-0.667,-0.167,120,228,85],[-0.633,-0.167,121,223,82],[-0.6,-0.167,119,210,73],[-0.567,-0.167,122,211,71],[-0.533,-0.167,116,213,71],[-0.5,-0.167,106,200,70],[-0.467,-0.167,103,198,81],[-0.433,-0.167,119,228,117],[-0.4,-0.167,125,233,127],[-0.367,-0.167,84,192,78],[-0.333,-0.167,76,185,55],[-0.3,-0.167,105,210,78],[-0.267,-0.167,104,203,72],[-0.233,-0.167,44,154,37],[-0.2,-0.167,93,189,99],[-0.133,-0.167,22,82,34],[-0.1,-0.167,32,92,53],[0.0,-0.167,155,255,190],[0.033,-0.167,87,214,128],[0.067,-0.167,63,176,87],[0.1,-0.167,114,197,123],[0.133,-0.167,85,157,84],[0.267,-0.167,12,64,33],[0.3,-0.167,13,63,32],[0.333,-0.167,15,66,31],[0.367,-0.167,18,72,38],[0.4,-0.167,21,79,46],[0.433,-0.167,21,83,48],[0.467,-0.167,20,87,50],[0.5,-0.167,30,105,64],[0.533,-0.167,14,93,50],[0.567,-0.167,10,77,39],[0.6,-0.167,7,69,37],[0.633,-0.167,5,65,33],[0.667,-0.167,3,60,27],[0.7,-0.167,24,99,45],[0.733,-0.167,45,120,62],[0.767,-0.167,3,63,19],[-0.867,-0.133,117,159,88],[-0.833,-0.133,189,252,125],[-0.8,-0.133,172,244,100],[-0.767,-0.133,165,243,94],[-0.733,-0.133,165,244,90],[-0.7,-0.133,163,241,86],[-0.667,-0.133,161,241,89],[-0.633,-0.133,157,242,99],[-0.6,-0.133,150,242,101],[-0.567,-0.133,146,241,95],[-0.533,-0.133,132,221,80],[-0.5,-0.133,126,211,73],[-0.467,-0.133,127,211,73],[-0.433,-0.133,125,207,78],[-0.4,-0.133,107,201,82],[-0.367,-0.133,109,216,104],[-0.333,-0.133,112,236,117],[-0.3,-0.133,86,211,87],[-0.267,-0.133,80,197,67],[-0.233,-0.133,104,214,91],[-0.2,-0.133,55,165,59],[-0.167,-0.133,118,211,123],[-0.133,-0.133,7,82,19],[-0.1,-0.133,36,96,53],[0.0,-0.133,143,245,189],[0.033,-0.133,90,195,123],[0.067,-0.133,93,170,106],[0.133,-0.133,12,70,31],[0.167,-0.133,9,81,40],[0.2,-0.133,3,90,47],[0.233,-0.133,126,221,172],[0.267,-0.133,21,114,58],[0.3,-0.133,11,96,41],[0.333,-0.133,12,86,36],[0.367,-0.133,4,67,25],[0.4,-0.133,10,68,33],[0.433,-0.133,12,73,39],[0.467,-0.133,15,80,44],[0.5,-0.133,21,96,55],[0.533,-0.133,9,89,47],[0.567,-0.133,4,81,41],[0.6,-0.133,5,83,43],[0.633,-0.133,0,83,29],[0.667,-0.133,29,119,55],[0.7,-0.133,45,140,68],[0.733,-0.133,3,67,21],[-0.833,-0.1,67,115,51],[-0.8,-0.1,187,255,147],[-0.767,-0.1,175,246,120],[-0.733,-0.1,173,245,107],[-0.7,-0.1,170,243,105],[-0.667,-0.1,171,244,107],[-0.633,-0.1,172,246,109],[-0.6,-0.1,171,248,115],[-0.567,-0.1,168,249,118],[-0.533,-0.1,166,249,122],[-0.5,-0.1,167,253,128],[-0.467,-0.1,170,247,126],[-0.433,-0.1,155,239,116],[-0.4,-0.1,135,223,97],[-0.367,-0.1,120,211,85],[-0.333,-0.1,104,205,81],[-0.3,-0.1,97,209,88],[-0.267,-0.1,109,230,125],[-0.233,-0.1,128,244,146],[-0.2,-0.1,136,242,164],[-0.167,-0.1,102,209,134],[-0.133,-0.1,85,189,119],[-0.1,-0.1,17,88,45],[0.0,-0.1,147,233,190],[0.033,-0.1,43,107,61],[0.067,-0.1,15,65,25],[0.1,-0.1,16,72,37],[0.133,-0.1,14,84,40],[0.167,-0.1,14,95,52],[0.2,-0.1,13,101,56],[0.233,-0.1,22,114,65],[0.267,-0.1,19,109,60],[0.3,-0.1,13,103,56],[0.333,-0.1,15,104,57],[0.367,-0.1,14,97,55],[0.4,-0.1,15,93,54],[0.433,-0.1,17,93,55],[0.467,-0.1,12,90,51],[0.5,-0.1,11,94,53],[0.533,-0.1,11,99,57],[0.567,-0.1,8,97,54],[0.6,-0.1,6,100,52],[0.633,-0.1,47,149,84],[0.667,-0.1,37,149,69],[0.7,-0.1,18,110,52],[0.733,-0.1,8,69,33],[0.767,-0.1,5,62,40],[0.8,-0.1,72,135,114],[0.833,-0.1,78,139,121],[-0.9,-0.067,11,61,35],[-0.867,-0.067,7,68,35],[-0.833,-0.067,5,73,30],[-0.8,-0.067,91,169,102],[-0.767,-0.067,161,238,159],[-0.733,-0.067,173,246,158],[-0.7,-0.067,172,249,156],[-0.667,-0.067,170,247,156],[-0.633,-0.067,169,246,158],[-0.6,-0.067,163,243,156],[-0.567,-0.067,161,242,152],[-0.533,-0.067,165,244,155],[-0.5,-0.067,165,241,154],[-0.467,-0.067,167,242,155],[-0.433,-0.067,166,240,153],[-0.4,-0.067,168,242,155],[-0.367,-0.067,167,243,157],[-0.333,-0.067,165,246,158],[-0.3,-0.067,165,245,158],[-0.267,-0.067,162,247,168],[-0.233,-0.067,144,235,163],[-0.2,-0.067,151,234,181],[-0.167,-0.067,161,248,199],[-0.133,-0.067,160,249,205],[-0.1,-0.067,111,172,144],[0.0,-0.067,60,108,80],[0.033,-0.067,42,91,55],[0.067,-0.067,36,87,53],[0.1,-0.067,38,87,52],[0.133,-0.067,42,90,53],[0.167,-0.067,44,94,60],[0.2,-0.067,30,98,55],[0.233,-0.067,28,108,60],[0.267,-0.067,31,119,65],[0.3,-0.067,31,125,71],[0.333,-0.067,29,126,72],[0.367,-0.067,29,125,73],[0.4,-0.067,32,125,76],[0.433,-0.067,32,123,75],[0.467,-0.067,31,125,76],[0.5,-0.067,27,124,73],[0.533,-0.067,24,121,71],[0.567,-0.067,22,118,67],[0.6,-0.067,21,121,66],[0.633,-0.067,21,124,68],[0.667,-0.067,31,138,77],[0.7,-0.067,1,90,40],[0.733,-0.067,9,93,52],[0.767,-0.067,0,78,38],[0.8,-0.067,158,249,222],[0.833,-0.067,172,249,225],[0.867,-0.067,3,52,37],[-0.967,-0.033,8,50,31],[-0.933,-0.033,11,67,38],[-0.9,-0.033,11,79,41],[-0.867,-0.033,0,78,32],[-0.833,-0.033,131,217,179],[-0.8,-0.033,72,168,132],[-0.767,-0.033,67,172,133],[-0.733,-0.033,61,170,129],[-0.7,-0.033,61,169,131],[-0.667,-0.033,58,166,130],[-0.633,-0.033,54,165,131],[-0.6,-0.033,55,163,132],[-0.567,-0.033,53,161,128],[-0.533,-0.033,58,163,131],[-0.5,-0.033,60,164,129],[-0.467,-0.033,65,166,132],[-0.433,-0.033,66,164,125],[-0.4,-0.033,65,163,124],[-0.367,-0.033,70,164,125],[-0.333,-0.033,72,166,127],[-0.3,-0.033,71,168,126],[-0.267,-0.033,70,166,124],[-0.233,-0.033,73,163,123],[-0.2,-0.033,0,62,28],[0.267,-0.033,0,79,38],[0.3,-0.033,1,95,53],[0.333,-0.033,7,108,64],[0.367,-0.033,13,117,73],[0.4,-0.033,16,124,80],[0.433,-0.033,14,127,81],[0.467,-0.033,18,132,86],[0.5,-0.033,15,131,84],[0.533,-0.033,13,129,82],[0.567,-0.033,18,130,85],[0.6,-0.033,18,128,84],[0.633,-0.033,15,126,80],[0.667,-0.033,20,133,87],[0.7,-0.033,29,138,95],[0.733,-0.033,25,124,86],[0.767,-0.033,136,233,192],[0.8,-0.033,28,116,79],[0.833,-0.033,19,94,68],[0.867,-0.033,7,57,40],[-0.967,0.0,10,59,40],[-0.933,0.0,58,119,92],[-0.9,0.0,77,146,111],[-0.867,0.0,156,238,196],[-0.833,0.0,34,121,80],[-0.8,0.0,28,124,86],[-0.767,0.0,23,124,86],[-0.733,0.0,28,135,95],[-0.7,0.0,35,143,99],[-0.667,0.0,33,147,101],[-0.633,0.0,30,144,99],[-0.6,0.0,30,141,97],[-0.567,0.0,27,137,99],[-0.533,0.0,28,135,95],[-0.5,0.0,25,130,90],[-0.467,0.0,20,126,83],[-0.433,0.0,25,129,82],[-0.4,0.0,25,129,82],[-0.367,0.0,22,122,77],[-0.333,0.0,20,114,74],[-0.3,0.0,18,108,69],[-0.267,0.0,12,96,58],[-0.233,0.0,6,82,44],[-0.2,0.0,5,64,31],[0.233,0.0,51,130,88],[0.267,0.0,71,173,130],[0.3,0.0,64,169,127],[0.333,0.0,56,165,121],[0.367,0.0,59,168,123],[0.4,0.0,64,172,127],[0.433,0.0,66,176,130],[0.467,0.0,68,177,132],[0.5,0.0,67,174,129],[0.533,0.0,66,173,128],[0.567,0.0,63,174,129],[0.6,0.0,65,176,130],[0.633,0.0,66,175,128],[0.667,0.0,73,180,132],[0.7,0.0,91,197,154],[0.733,0.0,132,235,194],[0.767,0.0,0,91,49],[0.8,0.0,13,83,47],[0.833,0.0,1,62,35],[0.867,0.0,7,50,32],[-1.0,0.033,9,47,36],[-0.967,0.033,10,63,49],[-0.933,0.033,187,246,227],[-0.9,0.033,194,255,232],[-0.867,0.033,0,63,33],[-0.833,0.033,6,70,35],[-0.8,0.033,13,91,47],[-0.767,0.033,13,100,51],[-0.733,0.033,12,105,54],[-0.7,0.033,12,108,57],[-0.667,0.033,14,115,63],[-0.633,0.033,16,118,65],[-0.6,0.033,19,118,67],[-0.567,0.033,22,118,65],[-0.533,0.033,21,115,61],[-0.5,0.033,22,114,60],[-0.467,0.033,22,115,59],[-0.433,0.033,20,114,59],[-0.4,0.033,20,114,58],[-0.367,0.033,19,112,57],[-0.333,0.033,18,106,55],[-0.3,0.033,21,101,55],[-0.267,0.033,20,88,50],[-0.233,0.033,24,83,50],[-0.2,0.033,22,78,47],[-0.167,0.033,27,81,47],[-0.133,0.033,6,73,23],[-0.1,0.033,134,199,157],[0.0,0.033,113,182,139],[0.033,0.033,141,231,177],[0.067,0.033,144,240,180],[0.1,0.033,134,212,149],[0.133,0.033,144,213,137],[0.167,0.033,164,224,144],[0.2,0.033,169,233,142],[0.233,0.033,172,245,151],[0.267,0.033,172,254,156],[0.3,0.033,172,255,158],[0.333,0.033,172,255,158],[0.367,0.033,169,255,154],[0.4,0.033,168,255,152],[0.433,0.033,168,255,153],[0.467,0.033,169,255,153],[0.5,0.033,169,255,153],[0.533,0.033,172,255,156],[0.567,0.033,173,255,156],[0.6,0.033,174,255,157],[0.633,0.033,177,255,160],[0.667,0.033,180,255,162],[0.7,0.033,121,202,126],[0.733,0.033,6,91,35],[0.767,0.033,2,77,39],[0.8,0.033,3,61,31],[-0.967,0.067,13,60,49],[-0.933,0.067,48,105,87],[-0.9,0.067,49,108,84],[-0.867,0.067,6,59,33],[-0.833,0.067,9,63,29],[-0.8,0.067,5,84,32],[-0.767,0.067,17,100,47],[-0.733,0.067,14,93,46],[-0.7,0.067,3,78,40],[-0.667,0.067,10,86,45],[-0.633,0.067,11,83,45],[-0.6,0.067,11,84,43],[-0.567,0.067,11,93,51],[-0.533,0.067,14,93,53],[-0.5,0.067,12,88,47],[-0.467,0.067,13,87,46],[-0.433,0.067,17,89,43],[-0.4,0.067,11,91,43],[-0.367,0.067,13,90,45],[-0.333,0.067,12,88,44],[-0.3,0.067,11,86,43],[-0.267,0.067,12,84,43],[-0.233,0.067,8,73,40],[-0.2,0.067,15,67,35],[-0.133,0.067,109,196,134],[-0.1,0.067,146,224,170],[0.0,0.067,27,92,43],[0.033,0.067,91,176,97],[0.067,0.067,72,184,82],[0.1,0.067,87,195,97],[0.133,0.067,136,235,148],[0.167,0.067,128,225,141],[0.2,0.067,111,211,107],[0.233,0.067,113,212,94],[0.267,0.067,103,201,74],[0.3,0.067,103,198,68],[0.333,0.067,113,207,73],[0.367,0.067,136,228,93],[0.4,0.067,152,241,105],[0.433,0.067,157,246,107],[0.467,0.067,157,243,106],[0.5,0.067,157,243,104],[0.533,0.067,160,243,104],[0.567,0.067,165,244,107],[0.6,0.067,163,247,106],[0.633,0.067,166,249,109],[0.667,0.067,171,246,113],[0.7,0.067,181,249,131],[0.733,0.067,99,159,88],[-0.933,0.1,10,48,37],[-0.867,0.1,8,64,32],[-0.833,0.1,6,83,30],[-0.8,0.1,38,130,61],[-0.767,0.1,19,102,45],[-0.733,0.1,0,70,28],[-0.7,0.1,5,68,32],[-0.667,0.1,7,64,33],[-0.633,0.1,0,61,30],[-0.6,0.1,34,108,77],[-0.567,0.1,5,78,48],[-0.533,0.1,5,86,54],[-0.5,0.1,5,91,55],[-0.467,0.1,5,83,50],[-0.433,0.1,9,90,57],[-0.4,0.1,10,94,55],[-0.367,0.1,113,204,159],[-0.333,0.1,9,92,44],[-0.3,0.1,7,85,37],[-0.267,0.1,16,76,35],[-0.2,0.1,43,96,39],[-0.167,0.1,136,218,133],[-0.133,0.1,123,240,159],[-0.1,0.1,165,248,191],[0.0,0.1,37,92,52],[0.067,0.1,119,198,98],[0.1,0.1,107,208,83],[0.133,0.1,84,185,68],[0.167,0.1,90,190,79],[0.2,0.1,105,205,107],[0.233,0.1,123,225,128],[0.267,0.1,111,216,112],[0.3,0.1,95,206,88],[0.333,0.1,97,212,79],[0.367,0.1,109,217,79],[0.4,0.1,118,217,79],[0.433,0.1,119,216,75],[0.467,0.1,125,220,80],[0.5,0.1,136,231,93],[0.533,0.1,149,242,102],[0.567,0.1,156,246,99],[0.6,0.1,162,244,98],[0.633,0.1,163,242,95],[0.667,0.1,163,242,95],[0.7,0.1,178,245,111],[0.733,0.1,184,240,124],[0.767,0.1,162,208,130],[-0.9,0.133,20,54,33],[-0.867,0.133,4,70,26],[-0.833,0.133,15,101,43],[-0.8,0.133,21,105,48],[-0.767,0.133,2,72,30],[-0.733,0.133,9,63,35],[-0.7,0.133,7,63,30],[-0.6,0.133,50,97,73],[-0.567,0.133,20,74,50],[-0.533,0.133,17,82,55],[-0.5,0.133,15,82,53],[-0.467,0.133,16,79,48],[-0.433,0.133,15,75,37],[-0.4,0.133,14,70,38],[-0.367,0.133,25,75,46],[-0.333,0.133,12,63,28],[-0.267,0.133,58,116,49],[-0.233,0.133,119,193,105],[-0.2,0.133,105,207,108],[-0.167,0.133,70,188,84],[-0.133,0.133,88,209,121],[-0.1,0.133,156,232,170],[0.0,0.133,45,105,64],[0.033,0.133,34,98,49],[0.067,0.133,52,121,48],[0.1,0.133,99,192,64],[0.133,0.133,81,190,64],[0.167,0.133,83,182,58],[0.2,0.133,97,193,67],[0.233,0.133,94,194,70],[0.267,0.133,85,189,76],[0.3,0.133,107,212,107],[0.333,0.133,122,230,125],[0.367,0.133,105,214,101],[0.4,0.133,84,193,71],[0.433,0.133,98,202,69],[0.467,0.133,114,212,74],[0.5,0.133,124,219,78],[0.533,0.133,134,225,86],[0.567,0.133,127,225,87],[0.6,0.133,119,230,86],[0.633,0.133,146,252,108],[0.667,0.133,155,241,100],[0.7,0.133,165,244,96],[0.733,0.133,166,240,101],[0.767,0.133,176,236,112],[0.8,0.133,185,229,150],[-0.933,0.167,22,40,28],[-0.867,0.167,18,70,34],[-0.833,0.167,7,62,26],[-0.733,0.167,6,57,28],[-0.7,0.167,7,57,27],[-0.367,0.167,32,74,28],[-0.333,0.167,91,152,81],[-0.3,0.167,103,186,87],[-0.267,0.167,75,169,56],[-0.233,0.167,95,208,95],[-0.2,0.167,51,176,64],[-0.167,0.167,85,212,106],[-0.133,0.167,115,235,137],[-0.1,0.167,155,234,161],[0.0,0.167,44,110,65],[0.033,0.167,23,101,43],[0.067,0.167,7,73,23],[0.1,0.167,117,191,94],[0.133,0.167,72,167,44],[0.167,0.167,69,178,55],[0.2,0.167,69,178,64],[0.233,0.167,127,230,111],[0.267,0.167,106,208,74],[0.3,0.167,94,193,63],[0.333,0.167,97,194,72],[0.367,0.167,88,196,80],[0.4,0.167,104,223,109],[0.433,0.167,121,235,114],[0.467,0.167,96,204,73],[0.5,0.167,104,202,65],[0.533,0.167,124,213,69],[0.567,0.167,131,216,73],[0.6,0.167,128,225,88],[0.633,0.167,111,223,93],[0.667,0.167,104,223,99],[0.7,0.167,144,245,114],[0.733,0.167,155,238,98],[0.767,0.167,167,239,93],[0.8,0.167,171,237,105],[0.833,0.167,189,234,141],[-0.967,0.2,22,49,31],[-0.467,0.2,56,106,51],[-0.433,0.2,109,171,95],[-0.4,0.2,111,187,94],[-0.367,0.2,66,151,45],[-0.333,0.2,58,146,38],[-0.3,0.2,58,152,45],[-0.267,0.2,80,190,79],[-0.233,0.2,48,168,57],[-0.2,0.2,96,218,110],[-0.167,0.2,88,215,109],[-0.133,0.2,128,227,143],[-0.1,0.2,171,244,176],[-0.067,0.2,88,177,133],[0.0,0.2,42,113,67],[0.033,0.2,20,94,40],[0.067,0.2,18,85,36],[0.1,0.2,44,108,35],[0.133,0.2,78,167,47],[0.167,0.2,71,171,52],[0.2,0.2,67,171,55],[0.233,0.2,74,184,64],[0.267,0.2,75,186,54],[0.3,0.2,72,179,46],[0.333,0.2,85,182,53],[0.367,0.2,100,207,76],[0.4,0.2,119,233,100],[0.433,0.2,79,188,60],[0.467,0.2,100,211,86],[0.5,0.2,119,225,98],[0.533,0.2,109,206,78],[0.567,0.2,128,214,79],[0.6,0.2,138,216,82],[0.633,0.2,129,213,77],[0.667,0.2,131,230,102],[0.7,0.2,85,218,96],[0.733,0.2,102,233,112],[0.767,0.2,153,249,121],[0.8,0.2,171,244,104],[0.833,0.2,176,246,107],[0.867,0.2,194,242,151],[-1.0,0.233,28,53,39],[-0.633,0.233,36,86,39],[-0.6,0.233,71,126,71],[-0.567,0.233,94,147,90],[-0.533,0.233,77,140,71],[-0.5,0.233,49,125,40],[-0.467,0.233,37,124,22],[-0.433,0.233,42,132,26],[-0.4,0.233,51,142,34],[-0.367,0.233,52,147,35],[-0.333,0.233,52,155,44],[-0.3,0.233,67,179,74],[-0.267,0.233,37,154,57],[-0.233,0.233,97,219,106],[-0.2,0.233,70,194,79],[-0.167,0.233,120,243,150],[-0.133,0.233,124,220,126],[-0.1,0.233,172,247,177],[-0.067,0.233,116,218,179],[0.0,0.233,43,111,69],[0.033,0.233,17,93,41],[0.067,0.233,18,92,45],[0.133,0.233,118,194,93],[0.167,0.233,72,170,45],[0.2,0.233,66,166,50],[0.233,0.233,64,168,54],[0.267,0.233,75,180,62],[0.3,0.233,66,175,49],[0.333,0.233,75,175,46],[0.367,0.233,80,186,53],[0.4,0.233,110,223,85],[0.433,0.233,89,195,52],[0.467,0.233,94,191,46],[0.5,0.233,99,197,63],[0.533,0.233,115,218,98],[0.567,0.233,108,230,129],[0.6,0.233,104,236,131],[0.633,0.233,121,220,81],[0.667,0.233,132,211,61],[0.7,0.233,123,221,86],[0.733,0.233,105,231,119],[0.767,0.233,83,230,130],[0.8,0.233,142,253,140],[0.833,0.233,166,242,118],[0.867,0.233,172,244,106],[0.9,0.233,183,234,146],[-1.0,0.267,17,50,29],[-0.733,0.267,64,94,63],[-0.7,0.267,92,135,91],[-0.667,0.267,61,119,62],[-0.633,0.267,36,105,32],[-0.6,0.267,28,110,26],[-0.567,0.267,31,119,27],[-0.533,0.267,35,126,27],[-0.5,0.267,43,132,34],[-0.467,0.267,38,126,27],[-0.433,0.267,33,131,23],[-0.4,0.267,39,133,26],[-0.367,0.267,47,143,38],[-0.333,0.267,55,163,56],[-0.3,0.267,44,164,59],[-0.267,0.267,95,208,105],[-0.233,0.267,64,183,64],[-0.2,0.267,73,195,86],[-0.167,0.267,132,245,156],[-0.133,0.267,134,222,116],[-0.1,0.267,168,244,168],[-0.067,0.267,110,221,186],[0.0,0.267,43,117,72],[0.033,0.267,41,123,72],[0.067,0.267,24,110,58],[0.1,0.267,8,66,25],[0.133,0.267,114,182,101],[0.167,0.267,70,159,36],[0.2,0.267,64,160,48],[0.233,0.267,59,157,44],[0.267,0.267,58,159,51],[0.3,0.267,48,157,44],[0.333,0.267,64,168,45],[0.367,0.267,74,173,42],[0.4,0.267,76,181,42],[0.433,0.267,83,185,44],[0.467,0.267,88,190,43],[0.5,0.267,95,193,45],[0.533,0.267,98,194,45],[0.567,0.267,87,228,113],[0.6,0.267,69,244,146],[0.633,0.267,105,218,82],[0.667,0.267,134,213,62],[0.7,0.267,135,210,60],[0.733,0.267,147,220,93],[0.767,0.267,128,244,145],[0.8,0.267,81,232,150],[0.833,0.267,121,248,150],[0.867,0.267,160,245,117],[0.9,0.267,190,254,143],[-1.0,0.3,16,50,26],[-0.8,0.3,79,118,74],[-0.767,0.3,48,98,44],[-0.733,0.3,18,77,20],[-0.7,0.3,21,83,22],[-0.667,0.3,22,88,23],[-0.633,0.3,24,95,22],[-0.6,0.3,23,100,23],[-0.567,0.3,25,103,22],[-0.533,0.3,46,133,38],[-0.5,0.3,37,133,25],[-0.467,0.3,38,133,30],[-0.433,0.3,38,132,26],[-0.4,0.3,41,141,32],[-0.367,0.3,35,142,29],[-0.333,0.3,60,175,59],[-0.3,0.3,66,187,68],[-0.267,0.3,78,187,68],[-0.233,0.3,95,208,89],[-0.2,0.3,107,221,119],[-0.167,0.3,121,224,124],[-0.133,0.3,149,230,114],[-0.1,0.3,166,245,168],[-0.067,0.3,106,222,175],[-0.033,0.3,0,80,36],[0.0,0.3,45,130,81],[0.033,0.3,27,120,70],[0.067,0.3,51,153,98],[0.1,0.3,10,81,36],[0.133,0.3,34,87,32],[0.167,0.3,75,157,43],[0.2,0.3,61,151,42],[0.233,0.3,53,146,35],[0.267,0.3,49,148,42],[0.3,0.3,71,178,70],[0.333,0.3,44,151,31],[0.367,0.3,62,162,33],[0.4,0.3,78,180,40],[0.433,0.3,81,183,40],[0.467,0.3,84,188,42],[0.5,0.3,93,192,45],[0.533,0.3,93,186,38],[0.567,0.3,105,212,62],[0.6,0.3,98,218,72],[0.633,0.3,113,214,63],[0.667,0.3,122,209,51],[0.7,0.3,145,225,77],[0.733,0.3,140,219,73],[0.767,0.3,160,231,101],[0.8,0.3,122,247,145],[0.833,0.3,63,229,148],[0.867,0.3,103,247,160],[0.9,0.3,177,255,151],[-0.867,0.333,34,70,30],[-0.833,0.333,68,114,62],[-0.8,0.333,24,78,19],[-0.767,0.333,29,78,22],[-0.733,0.333,29,75,21],[-0.7,0.333,25,77,20],[-0.667,0.333,22,86,22],[-0.633,0.333,25,97,28],[-0.6,0.333,23,100,26],[-0.567,0.333,22,104,20],[-0.533,0.333,40,135,29],[-0.5,0.333,32,127,23],[-0.467,0.333,35,131,34],[-0.433,0.333,38,134,31],[-0.4,0.333,35,139,37],[-0.367,0.333,70,184,77],[-0.333,0.333,47,157,39],[-0.3,0.333,73,184,57],[-0.267,0.333,83,188,59],[-0.233,0.333,83,195,71],[-0.2,0.333,127,241,144],[-0.167,0.333,115,210,95],[-0.133,0.333,165,239,126],[-0.1,0.333,165,247,168],[-0.067,0.333,109,223,175],[-0.033,0.333,0,88,41],[0.0,0.333,40,132,81],[0.033,0.333,16,105,54],[0.067,0.333,65,173,115],[0.1,0.333,4,73,33],[0.167,0.333,110,184,88],[0.2,0.333,65,152,37],[0.233,0.333,55,143,40],[0.267,0.333,56,145,32],[0.3,0.333,38,143,31],[0.333,0.333,68,182,70],[0.367,0.333,49,154,36],[0.4,0.333,54,154,29],[0.433,0.333,73,173,39],[0.467,0.333,83,182,37],[0.5,0.333,85,182,38],[0.533,0.333,87,185,34],[0.567,0.333,101,197,49],[0.6,0.333,118,208,56],[0.633,0.333,125,216,63],[0.667,0.333,130,218,69],[0.7,0.333,140,228,84],[0.733,0.333,134,219,72],[0.767,0.333,143,224,80],[0.8,0.333,143,234,93],[0.833,0.333,115,248,136],[0.867,0.333,46,233,168],[0.9,0.333,146,255,192],[-1.0,0.367,13,46,26],[-0.867,0.367,43,90,38],[-0.833,0.367,24,75,19],[-0.8,0.367,25,79,21],[-0.767,0.367,24,79,21],[-0.733,0.367,28,78,22],[-0.7,0.367,22,76,18],[-0.667,0.367,21,89,24],[-0.633,0.367,22,95,25],[-0.6,0.367,20,100,24],[-0.567,0.367,21,104,19],[-0.533,0.367,44,132,36],[-0.5,0.367,39,126,29],[-0.467,0.367,26,129,29],[-0.433,0.367,31,142,47],[-0.4,0.367,87,196,93],[-0.367,0.367,54,154,38],[-0.333,0.367,72,170,46],[-0.3,0.367,71,176,42],[-0.267,0.367,77,195,56],[-0.233,0.367,66,189,64],[-0.2,0.367,109,218,112],[-0.167,0.367,116,209,78],[-0.133,0.367,174,247,129],[-0.1,0.367,169,247,165],[-0.067,0.367,113,224,178],[-0.033,0.367,0,100,50],[0.0,0.367,41,134,83],[0.033,0.367,17,105,54],[0.067,0.367,66,171,116],[0.1,0.367,4,70,33],[0.167,0.367,114,176,99],[0.2,0.367,61,146,34],[0.233,0.367,54,141,37],[0.267,0.367,48,143,29],[0.3,0.367,52,147,41],[0.333,0.367,45,153,49],[0.367,0.367,44,155,46],[0.4,0.367,51,149,39],[0.433,0.367,48,142,24],[0.467,0.367,67,162,34],[0.5,0.367,84,181,42],[0.533,0.367,90,189,34],[0.567,0.367,98,197,38],[0.6,0.367,114,212,52],[0.633,0.367,117,214,66],[0.667,0.367,63,161,26],[0.7,0.367,61,169,35],[0.733,0.367,106,208,64],[0.767,0.367,136,225,75],[0.8,0.367,138,223,76],[0.833,0.367,146,237,91],[0.867,0.367,87,244,146],[0.9,0.367,80,238,194],[-1.0,0.4,24,54,31],[-0.9,0.4,67,104,58],[-0.867,0.4,18,74,16],[-0.833,0.4,19,73,16],[-0.8,0.4,18,74,19],[-0.767,0.4,20,77,20],[-0.733,0.4,24,79,21],[-0.7,0.4,17,78,16],[-0.667,0.4,21,91,24],[-0.633,0.4,19,95,27],[-0.6,0.4,17,96,20],[-0.567,0.4,19,100,20],[-0.533,0.4,32,129,32],[-0.5,0.4,20,125,36],[-0.467,0.4,72,192,107],[-0.433,0.4,44,152,57],[-0.4,0.4,49,150,38],[-0.367,0.4,68,166,38],[-0.333,0.4,71,171,38],[-0.3,0.4,82,188,52],[-0.267,0.4,105,231,94],[-0.233,0.4,97,224,108],[-0.2,0.4,95,201,76],[-0.167,0.4,123,217,77],[-0.133,0.4,177,250,129],[-0.1,0.4,171,246,163],[-0.067,0.4,112,222,175],[-0.033,0.4,4,112,62],[0.0,0.4,43,137,85],[0.033,0.4,15,106,54],[0.067,0.4,69,173,119],[0.1,0.4,3,68,33],[0.167,0.4,64,110,56],[0.2,0.4,64,147,42],[0.233,0.4,52,138,31],[0.267,0.4,46,140,31],[0.3,0.4,45,132,29],[0.333,0.4,42,143,42],[0.367,0.4,95,206,106],[0.4,0.4,36,136,38],[0.433,0.4,39,134,28],[0.467,0.4,47,139,25],[0.5,0.4,61,154,28],[0.533,0.4,95,194,48],[0.567,0.4,94,195,37],[0.6,0.4,110,211,53],[0.633,0.4,76,181,35],[0.667,0.4,44,153,27],[0.7,0.4,44,160,30],[0.733,0.4,73,182,38],[0.767,0.4,130,225,77],[0.8,0.4,132,225,74],[0.833,0.4,143,232,85],[0.867,0.4,137,245,119],[0.9,0.4,100,208,154],[-1.0,0.433,34,63,44],[-0.9,0.433,26,76,21],[-0.867,0.433,21,75,18],[-0.833,0.433,20,75,18],[-0.8,0.433,21,76,21],[-0.767,0.433,19,77,19],[-0.733,0.433,18,76,18],[-0.7,0.433,15,79,18],[-0.667,0.433,20,92,25],[-0.633,0.433,16,92,21],[-0.6,0.433,16,96,20],[-0.567,0.433,10,104,24],[-0.533,0.433,51,166,89],[-0.5,0.433,52,163,88],[-0.467,0.433,27,126,36],[-0.433,0.433,43,137,27],[-0.4,0.433,69,167,43],[-0.367,0.433,71,175,40],[-0.333,0.433,72,179,43],[-0.3,0.433,72,182,43],[-0.267,0.433,64,185,66],[-0.233,0.433,112,230,123],[-0.2,0.433,109,211,75],[-0.167,0.433,130,220,88],[-0.133,0.433,174,248,124],[-0.1,0.433,162,243,157],[-0.067,0.433,104,222,172],[-0.033,0.433,5,117,66],[0.0,0.433,43,141,90],[0.033,0.433,14,110,57],[0.067,0.433,70,178,125],[0.1,0.433,3,72,36],[0.167,0.433,15,59,14],[0.2,0.433,82,164,65],[0.233,0.433,62,147,43],[0.267,0.433,51,140,38],[0.3,0.433,40,133,29],[0.333,0.433,40,130,28],[0.367,0.433,30,132,34],[0.4,0.433,86,200,103],[0.433,0.433,38,141,40],[0.467,0.433,44,139,31],[0.5,0.433,49,142,28],[0.533,0.433,66,160,36],[0.567,0.433,83,180,37],[0.6,0.433,108,207,53],[0.633,0.433,89,190,48],[0.667,0.433,38,141,23],[0.7,0.433,42,160,49],[0.733,0.433,66,183,47],[0.767,0.433,114,212,61],[0.8,0.433,129,213,62],[0.833,0.433,141,228,87],[0.867,0.433,157,239,108],[0.9,0.433,71,118,70],[0.933,0.433,25,38,27],[-0.933,0.467,23,64,25],[-0.9,0.467,13,72,13],[-0.867,0.467,19,76,18],[-0.833,0.467,21,76,23],[-0.8,0.467,23,75,20],[-0.767,0.467,19,75,15],[-0.733,0.467,18,76,20],[-0.7,0.467,15,78,19],[-0.667,0.467,21,94,30],[-0.633,0.467,8,95,25],[-0.6,0.467,26,122,57],[-0.567,0.467,71,182,104],[-0.533,0.467,22,121,38],[-0.5,0.467,26,115,28],[-0.467,0.467,38,130,24],[-0.433,0.467,67,161,34],[-0.4,0.467,73,178,42],[-0.367,0.467,77,183,46],[-0.333,0.467,81,184,51],[-0.3,0.467,87,194,59],[-0.267,0.467,94,210,102],[-0.233,0.467,102,205,91],[-0.2,0.467,115,215,73],[-0.167,0.467,142,231,101],[-0.133,0.467,171,247,120],[-0.1,0.467,155,241,153],[-0.067,0.467,92,217,165],[-0.033,0.467,0,113,63],[0.0,0.467,41,143,93],[0.033,0.467,7,110,57],[0.067,0.467,65,173,125],[0.1,0.467,0,72,34],[0.2,0.467,88,161,71],[0.233,0.467,35,118,23],[0.267,0.467,40,126,32],[0.3,0.467,43,134,34],[0.333,0.467,48,136,34],[0.367,0.467,47,141,42],[0.4,0.467,47,158,62],[0.433,0.467,48,162,68],[0.467,0.467,39,139,36],[0.5,0.467,37,128,26],[0.533,0.467,37,123,25],[0.567,0.467,49,134,27],[0.6,0.467,73,169,33],[0.633,0.467,104,202,61],[0.667,0.467,72,173,34],[0.7,0.467,58,161,27],[0.733,0.467,90,192,47],[0.767,0.467,111,200,55],[0.8,0.467,118,205,56],[0.833,0.467,133,219,75],[0.867,0.467,162,228,118],[-0.967,0.5,29,53,37],[-0.933,0.5,19,62,23],[-0.9,0.5,20,77,21],[-0.867,0.5,20,76,15],[-0.833,0.5,17,76,23],[-0.8,0.5,12,75,24],[-0.767,0.5,11,71,17],[-0.733,0.5,11,68,16],[-0.7,0.5,9,77,17],[-0.667,0.5,2,93,31],[-0.633,0.5,71,183,116],[-0.6,0.5,18,114,44],[-0.567,0.5,23,110,28],[-0.533,0.5,44,130,35],[-0.5,0.5,36,123,21],[-0.467,0.5,57,148,28],[-0.433,0.5,79,175,40],[-0.4,0.5,79,181,43],[-0.367,0.5,83,179,43],[-0.333,0.5,86,182,48],[-0.3,0.5,86,192,61],[-0.267,0.5,125,234,119],[-0.233,0.5,105,203,74],[-0.2,0.5,116,215,76],[-0.167,0.5,152,240,108],[-0.133,0.5,171,245,120],[-0.1,0.5,154,241,153],[-0.067,0.5,92,217,166],[-0.033,0.5,3,116,69],[0.0,0.5,40,142,93],[0.033,0.5,8,99,52],[0.067,0.5,107,219,172],[0.1,0.5,12,88,51],[0.2,0.5,87,142,76],[0.233,0.5,35,108,24],[0.267,0.5,29,109,26],[0.3,0.5,24,106,20],[0.333,0.5,22,106,15],[0.367,0.5,24,111,23],[0.4,0.5,19,104,24],[0.433,0.5,65,188,109],[0.467,0.5,7,114,30],[0.5,0.5,31,115,23],[0.533,0.5,29,115,21],[0.567,0.5,36,121,20],[0.6,0.5,76,168,47],[0.633,0.5,55,152,15],[0.667,0.5,106,205,56],[0.7,0.5,83,187,29],[0.733,0.5,87,184,34],[0.767,0.5,103,197,50],[0.8,0.5,114,201,48],[0.833,0.5,129,208,77],[0.867,0.5,64,97,45],[-0.9,0.533,24,76,25],[-0.867,0.533,20,76,22],[-0.833,0.533,20,75,25],[-0.8,0.533,17,74,19],[-0.767,0.533,4,87,33],[-0.733,0.533,44,154,109],[-0.7,0.533,48,151,106],[-0.667,0.533,55,161,102],[-0.633,0.533,5,99,33],[-0.6,0.533,20,91,22],[-0.567,0.533,34,111,24],[-0.533,0.533,47,136,27],[-0.5,0.533,46,144,24],[-0.467,0.533,83,184,47],[-0.433,0.533,82,185,41],[-0.4,0.533,87,185,46],[-0.367,0.533,93,185,48],[-0.333,0.533,94,190,64],[-0.3,0.533,102,215,100],[-0.267,0.533,100,202,74],[-0.233,0.533,111,210,68],[-0.2,0.533,123,222,88],[-0.167,0.533,160,247,116],[-0.133,0.533,170,244,122],[-0.1,0.533,155,241,157],[-0.067,0.533,95,219,171],[-0.033,0.533,0,111,65],[0.0,0.533,38,135,89],[0.033,0.533,8,99,54],[0.067,0.533,5,90,53],[0.1,0.533,2,66,35],[0.2,0.533,54,91,51],[0.233,0.533,22,90,10],[0.267,0.533,30,103,25],[0.3,0.533,30,107,23],[0.333,0.533,31,109,23],[0.367,0.533,30,107,24],[0.4,0.533,22,102,22],[0.433,0.533,1,88,23],[0.467,0.533,85,206,130],[0.5,0.533,26,117,31],[0.533,0.533,39,117,28],[0.567,0.533,27,113,20],[0.6,0.533,91,181,59],[0.633,0.533,132,228,85],[0.667,0.533,60,157,17],[0.7,0.533,89,192,43],[0.733,0.533,98,192,39],[0.767,0.533,107,196,47],[0.8,0.533,126,204,68],[0.833,0.533,92,138,70],[-0.933,0.567,21,42,26],[-0.9,0.567,30,69,32],[-0.867,0.567,23,73,25],[-0.833,0.567,16,71,21],[-0.8,0.567,12,75,23],[-0.767,0.567,69,180,143],[-0.733,0.567,67,235,209],[-0.7,0.567,9,112,61],[-0.667,0.567,9,77,6],[-0.633,0.567,16,86,16],[-0.6,0.567,13,87,3],[-0.567,0.567,42,133,31],[-0.533,0.567,50,148,27],[-0.5,0.567,76,173,45],[-0.467,0.567,86,182,41],[-0.433,0.567,83,182,37],[-0.4,0.567,94,186,47],[-0.367,0.567,92,188,52],[-0.333,0.567,98,223,120],[-0.3,0.567,93,229,139],[-0.267,0.567,106,207,69],[-0.233,0.567,112,217,74],[-0.2,0.567,114,217,84],[-0.167,0.567,164,249,114],[-0.133,0.567,172,244,123],[-0.1,0.567,157,241,161],[-0.067,0.567,98,221,176],[-0.033,0.567,6,119,73],[0.0,0.567,37,135,88],[0.033,0.567,10,98,52],[0.067,0.567,9,78,45],[0.1,0.567,6,67,37],[0.133,0.567,7,54,30],[0.233,0.567,45,108,31],[0.267,0.567,24,88,18],[0.3,0.567,28,97,22],[0.333,0.567,33,104,25],[0.367,0.567,30,104,24],[0.4,0.567,28,102,25],[0.433,0.567,31,101,29],[0.467,0.567,17,118,49],[0.5,0.567,45,153,85],[0.533,0.567,8,95,20],[0.567,0.567,4,82,0],[0.6,0.567,123,214,82],[0.633,0.567,124,224,64],[0.667,0.567,93,196,68],[0.7,0.567,40,142,18],[0.733,0.567,111,202,51],[0.767,0.567,127,212,73],[0.8,0.567,130,178,102],[-0.867,0.6,21,72,29],[-0.833,0.6,17,73,23],[-0.8,0.6,13,67,18],[-0.767,0.6,4,80,33],[-0.733,0.6,43,140,91],[-0.667,0.6,65,141,42],[-0.633,0.6,76,158,55],[-0.6,0.6,14,101,4],[-0.567,0.6,52,150,31],[-0.533,0.6,70,164,33],[-0.5,0.6,85,177,38],[-0.467,0.6,90,181,36],[-0.433,0.6,94,186,39],[-0.4,0.6,104,195,55],[-0.367,0.6,108,207,74],[-0.333,0.6,98,232,137],[-0.3,0.6,97,236,145],[-0.267,0.6,114,216,71],[-0.233,0.6,106,220,87],[-0.2,0.6,130,237,102],[-0.167,0.6,164,245,106],[-0.133,0.6,172,244,123],[-0.1,0.6,158,243,161],[-0.067,0.6,95,218,173],[-0.033,0.6,9,122,74],[0.0,0.6,25,127,76],[0.033,0.6,3,91,42],[0.067,0.6,0,79,40],[0.1,0.6,7,68,37],[0.133,0.6,6,53,28],[0.233,0.6,87,140,70],[0.267,0.6,23,83,21],[0.3,0.6,18,78,15],[0.333,0.6,16,79,14],[0.367,0.6,23,89,24],[0.4,0.6,30,97,33],[0.433,0.6,33,99,28],[0.467,0.6,13,90,30],[0.5,0.6,40,153,105],[0.533,0.6,33,150,104],[0.567,0.6,1,83,30],[0.6,0.6,49,126,35],[0.633,0.6,112,199,85],[0.667,0.6,67,167,65],[0.7,0.6,45,147,35],[0.733,0.6,102,190,46],[0.767,0.6,132,194,95],[-0.867,0.633,19,49,23],[-0.833,0.633,19,73,22],[-0.8,0.633,13,73,19],[-0.767,0.633,13,71,20],[-0.733,0.633,11,70,17],[-0.667,0.633,150,228,90],[-0.633,0.633,148,236,98],[-0.6,0.633,63,159,33],[-0.567,0.633,61,161,28],[-0.533,0.633,104,203,68],[-0.5,0.633,111,206,66],[-0.467,0.633,115,209,68],[-0.433,0.633,112,207,59],[-0.4,0.633,116,210,61],[-0.367,0.633,117,213,63],[-0.333,0.633,110,215,84],[-0.3,0.633,113,217,83],[-0.267,0.633,118,223,86],[-0.233,0.633,96,216,92],[-0.2,0.633,156,252,114],[-0.167,0.633,166,246,105],[-0.133,0.633,171,244,125],[-0.1,0.633,153,244,156],[-0.067,0.633,93,212,170],[-0.033,0.633,2,113,64],[0.0,0.633,24,125,70],[0.033,0.633,44,141,80],[0.067,0.633,5,88,36],[0.1,0.633,6,58,29],[0.233,0.633,81,119,76],[0.267,0.633,23,81,17],[0.3,0.633,24,81,22],[0.333,0.633,26,84,25],[0.367,0.633,23,81,22],[0.4,0.633,18,79,21],[0.433,0.633,11,74,14],[0.467,0.633,12,74,20],[0.5,0.633,17,122,81],[0.533,0.633,72,252,211],[0.567,0.633,30,142,97],[0.6,0.633,19,74,17],[0.633,0.633,15,69,8],[0.667,0.633,16,82,19],[0.7,0.633,31,115,22],[0.733,0.633,121,179,91],[-0.833,0.667,18,48,19],[-0.8,0.667,18,67,15],[-0.767,0.667,18,72,16],[-0.733,0.667,13,69,15],[-0.667,0.667,130,223,97],[-0.633,0.667,130,233,105],[-0.6,0.667,51,154,19],[-0.567,0.667,112,216,67],[-0.533,0.667,70,177,40],[-0.5,0.667,49,157,24],[-0.467,0.667,45,148,15],[-0.433,0.667,113,211,61],[-0.4,0.667,116,210,61],[-0.367,0.667,120,209,57],[-0.333,0.667,115,209,63],[-0.3,0.667,119,211,65],[-0.267,0.667,114,232,113],[-0.233,0.667,125,242,122],[-0.2,0.667,168,247,108],[-0.167,0.667,166,249,112],[-0.133,0.667,177,248,137],[-0.1,0.667,129,222,145],[-0.067,0.667,92,210,171],[-0.033,0.667,1,104,58],[0.0,0.667,28,122,68],[0.033,0.667,31,125,56],[0.067,0.667,27,117,52],[0.1,0.667,2,61,22],[0.267,0.667,40,94,28],[0.3,0.667,21,82,16],[0.333,0.667,21,85,20],[0.367,0.667,19,82,21],[0.4,0.667,19,79,23],[0.433,0.667,17,75,17],[0.467,0.667,17,74,21],[0.5,0.667,3,71,28],[0.533,0.667,21,110,72],[0.567,0.667,5,77,27],[0.6,0.667,19,72,21],[0.633,0.667,13,71,14],[0.667,0.667,22,78,19],[0.7,0.667,53,109,48],[-0.767,0.7,34,88,40],[-0.733,0.7,32,101,24],[-0.7,0.7,45,128,32],[-0.667,0.7,41,147,27],[-0.633,0.7,50,161,32],[-0.6,0.7,99,204,57],[-0.567,0.7,106,208,63],[-0.533,0.7,59,170,41],[-0.5,0.7,50,166,43],[-0.467,0.7,52,160,33],[-0.433,0.7,66,171,27],[-0.4,0.7,117,212,54],[-0.367,0.7,123,216,58],[-0.333,0.7,125,219,65],[-0.3,0.7,119,226,97],[-0.267,0.7,83,216,100],[-0.233,0.7,151,250,114],[-0.2,0.7,166,247,103],[-0.167,0.7,175,249,119],[-0.133,0.7,193,255,169],[-0.1,0.7,94,187,132],[-0.067,0.7,114,238,193],[-0.033,0.7,7,105,57],[0.0,0.7,22,95,49],[0.033,0.7,0,79,21],[0.067,0.7,33,120,58],[0.1,0.7,21,91,43],[0.267,0.7,75,126,69],[0.3,0.7,30,90,27],[0.333,0.7,16,83,16],[0.367,0.7,17,81,19],[0.4,0.7,19,78,21],[0.433,0.7,21,78,20],[0.467,0.7,19,76,20],[0.5,0.7,14,71,19],[0.533,0.7,12,70,20],[0.567,0.7,14,72,17],[0.6,0.7,15,68,18],[0.633,0.7,23,77,20],[0.667,0.7,15,74,20],[-0.733,0.733,109,178,91],[-0.7,0.733,65,157,38],[-0.667,0.733,70,167,36],[-0.633,0.733,88,188,43],[-0.6,0.733,96,197,51],[-0.567,0.733,99,200,62],[-0.533,0.733,107,220,103],[-0.5,0.733,58,170,57],[-0.467,0.733,48,150,23],[-0.433,0.733,113,202,61],[-0.4,0.733,135,219,61],[-0.367,0.733,133,218,75],[-0.333,0.733,122,230,102],[-0.3,0.733,86,229,130],[-0.267,0.733,122,245,129],[-0.233,0.733,161,247,90],[-0.2,0.733,170,243,103],[-0.167,0.733,183,251,134],[-0.133,0.733,62,118,54],[-0.1,0.733,22,116,67],[-0.067,0.733,99,221,175],[-0.033,0.733,16,118,61],[0.0,0.733,6,84,36],[0.033,0.733,23,90,47],[0.067,0.733,0,69,24],[0.1,0.733,30,95,49],[0.133,0.733,13,61,30],[0.267,0.733,21,55,18],[0.3,0.733,35,84,31],[0.333,0.733,23,81,19],[0.367,0.733,21,77,19],[0.4,0.733,21,75,19],[0.433,0.733,21,74,20],[0.467,0.733,20,73,21],[0.5,0.733,16,70,17],[0.533,0.733,19,69,17],[0.567,0.733,16,69,19],[0.6,0.733,16,75,23],[0.633,0.733,9,69,15],[0.667,0.733,32,65,34],[-0.7,0.767,134,202,105],[-0.667,0.767,109,205,58],[-0.633,0.767,98,199,53],[-0.6,0.767,93,195,50],[-0.567,0.767,88,192,49],[-0.533,0.767,85,192,63],[-0.5,0.767,62,158,33],[-0.467,0.767,105,197,59],[-0.433,0.767,125,223,78],[-0.4,0.767,133,223,77],[-0.367,0.767,138,230,93],[-0.333,0.767,96,233,127],[-0.3,0.767,82,228,131],[-0.267,0.767,161,253,112],[-0.233,0.767,173,248,102],[-0.2,0.767,179,244,109],[-0.167,0.767,117,169,98],[-0.133,0.767,11,64,28],[-0.1,0.767,3,82,51],[-0.067,0.767,36,131,86],[-0.033,0.767,74,173,123],[0.0,0.767,9,90,44],[0.033,0.767,8,62,29],[0.067,0.767,38,90,57],[0.1,0.767,5,60,26],[0.3,0.767,67,104,64],[0.333,0.767,14,74,12],[0.367,0.767,17,78,18],[0.4,0.767,19,71,18],[0.433,0.767,19,72,18],[0.467,0.767,18,72,17],[0.5,0.767,16,71,16],[0.533,0.767,14,68,17],[0.567,0.767,9,67,13],[0.6,0.767,17,73,21],[0.633,0.767,27,66,32],[-0.667,0.8,138,194,101],[-0.633,0.8,106,195,61],[-0.6,0.8,95,189,48],[-0.567,0.8,97,190,44],[-0.533,0.8,104,199,55],[-0.5,0.8,114,205,62],[-0.467,0.8,119,213,66],[-0.433,0.8,131,224,78],[-0.4,0.8,138,230,99],[-0.367,0.8,115,244,150],[-0.333,0.8,75,227,139],[-0.3,0.8,157,249,129],[-0.267,0.8,170,244,94],[-0.233,0.8,177,240,109],[-0.2,0.8,144,186,112],[-0.133,0.8,8,54,35],[-0.1,0.8,13,62,43],[-0.033,0.8,175,242,217],[0.0,0.8,201,255,240],[0.1,0.8,26,69,46],[0.333,0.8,51,80,48],[0.367,0.8,28,77,27],[0.4,0.8,16,72,13],[0.433,0.8,19,72,18],[0.467,0.8,19,72,18],[0.5,0.8,16,71,17],[0.533,0.8,15,69,17],[0.567,0.8,22,73,22],[0.6,0.8,18,52,26],[-0.633,0.833,118,165,89],[-0.6,0.833,115,193,67],[-0.567,0.833,109,197,56],[-0.533,0.833,111,207,65],[-0.5,0.833,121,211,74],[-0.467,0.833,127,217,84],[-0.433,0.833,116,228,104],[-0.4,0.833,100,244,150],[-0.367,0.833,66,231,155],[-0.333,0.833,149,255,142],[-0.3,0.833,182,246,113],[-0.267,0.833,172,243,101],[-0.233,0.833,156,203,119],[-0.1,0.833,11,46,31],[-0.033,0.833,183,233,213],[0.0,0.833,197,253,231],[0.133,0.833,27,69,48],[0.167,0.833,8,54,29],[0.4,0.833,44,82,43],[0.433,0.833,52,97,49],[0.467,0.833,43,87,38],[0.5,0.833,41,83,37],[0.567,0.833,23,57,25],[-0.6,0.867,106,144,84],[-0.567,0.867,145,209,101],[-0.533,0.867,140,217,87],[-0.5,0.867,134,228,100],[-0.467,0.867,112,236,128],[-0.433,0.867,74,234,148],[-0.4,0.867,48,226,147],[-0.367,0.867,131,251,141],[-0.333,0.867,170,243,106],[-0.3,0.867,182,244,115],[-0.267,0.867,170,217,133],[-0.1,0.867,12,40,36],[0.167,0.867,33,70,54],[0.2,0.867,8,50,30],[0.533,0.867,22,46,28],[-0.533,0.9,144,193,128],[-0.5,0.9,139,240,160],[-0.467,0.9,86,243,182],[-0.433,0.9,76,237,170],[-0.4,0.9,142,244,147],[-0.367,0.9,166,239,116],[-0.333,0.9,179,245,125],[-0.3,0.9,153,194,115],[0.2,0.9,31,61,47],[0.233,0.9,11,51,30],[0.3,0.9,12,50,27],[0.333,0.9,12,51,27],[0.367,0.9,12,48,25],[0.433,0.9,21,50,29],[0.467,0.9,27,48,32],[-0.467,0.933,14,59,39],[-0.433,0.933,78,129,88],[-0.4,0.933,101,129,82],[-0.367,0.933,84,108,62],[-0.333,0.933,47,72,42],[0.267,0.933,21,42,30],[0.3,0.933,21,43,30],[0.333,0.933,19,43,30]];
-
-// === GLOBALS ===
-var canvas = document.getElementById('TC');
-var W = window.innerWidth, H = window.innerHeight;
-var mouseX = 0, mouseY = 0, mouseNX = 0, mouseNY = 0;
-var scrollY_val = 0;
-
-// === RENDERER ===
-var renderer = new THREE.WebGLRenderer({canvas:canvas, alpha:true, antialias:true, powerPreference:'high-performance'});
-renderer.setSize(W, H);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.2;
-
-// === SCENE + CAMERA ===
-var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(60, W/H, 0.1, 1000);
-camera.position.z = 5;
-
-// === PARTICLE SHADER MATERIAL ===
-var vertexShader = [
-  'attribute float aSize;',
-  'attribute vec3 aColor;',
-  'attribute float aPhase;',
-  'uniform float uTime;',
-  'uniform float uHover;',
-  'varying vec3 vColor;',
-  'varying float vAlpha;',
-  'void main(){',
-  '  vColor = aColor;',
-  '  float breath = sin(uTime * 0.8 + aPhase) * 0.03 * (1.0 - uHover * 0.7);',
-  '  vec3 pos = position + vec3(breath, breath * 0.7, 0.0);',
-  '  float pulse = 1.0 + sin(uTime * 1.5 + aPhase) * 0.15;',
-  '  vAlpha = 0.5 + (aColor.r + aColor.g + aColor.b) / 3.0 * 0.5;',
-  '  vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);',
-  '  gl_PointSize = aSize * pulse * (300.0 / -mvPos.z);',
-  '  gl_Position = projectionMatrix * mvPos;',
-  '}'
-].join('\n');
-
-var fragmentShader = [
-  'varying vec3 vColor;',
-  'varying float vAlpha;',
-  'void main(){',
-  '  float d = length(gl_PointCoord - vec2(0.5));',
-  '  if(d > 0.5) discard;',
-  '  float strength = 1.0 - smoothstep(0.0, 0.5, d);',
-  '  strength = pow(strength, 1.5);',
-  '  gl_FragColor = vec4(vColor, strength * vAlpha);',
-  '}'
-].join('\n');
-
-// === BUILD LOGO PARTICLES ===
-var logoCount = LP.length;
-var positions = new Float32Array(logoCount * 3);
-var colors = new Float32Array(logoCount * 3);
-var sizes = new Float32Array(logoCount);
-var phases = new Float32Array(logoCount);
-var targets = new Float32Array(logoCount * 3); // target positions
-var LOGO_SCALE = 1.8;
-
-for(var i = 0; i < logoCount; i++){
-  var pt = LP[i];
-  var tx = pt[0] * LOGO_SCALE;
-  var ty = -pt[1] * LOGO_SCALE; // flip Y
-  targets[i*3] = tx;
-  targets[i*3+1] = ty;
-  targets[i*3+2] = 0;
-  // Start scattered
-  positions[i*3] = (Math.random()-0.5)*12;
-  positions[i*3+1] = (Math.random()-0.5)*12;
-  positions[i*3+2] = (Math.random()-0.5)*2;
-  colors[i*3] = pt[2]/255;
-  colors[i*3+1] = pt[3]/255;
-  colors[i*3+2] = pt[4]/255;
-  var br = (pt[2]+pt[3]+pt[4])/(255*3);
-  sizes[i] = (0.015 + br * 0.025);
-  phases[i] = Math.random()*Math.PI*2;
+/* ===== SOUND ENGINE (Web Audio API synthesis) ===== */
+class Snd{
+  constructor(){this.ctx=null;this.mg=null;this.muted=true;this.ok=false}
+  init(){if(this.ok)return;this.ctx=new(window.AudioContext||window.webkitAudioContext)();this.mg=this.ctx.createGain();this.mg.gain.value=0;this.mg.connect(this.ctx.destination);this.ok=true}
+  resume(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume()}
+  toggle(){this.init();this.resume();this.muted=!this.muted;this.mg.gain.setTargetAtTime(this.muted?0:.25,this.ctx.currentTime,.1);return this.muted}
+  _g(v=.15){const g=this.ctx.createGain();g.gain.value=v;g.connect(this.mg);return g}
+  _o(t='sine',f=440){const o=this.ctx.createOscillator();o.type=t;o.frequency.value=f;return o}
+  play(s,p={}){
+    if(!this.ok||this.muted)return;this.resume();const t=this.ctx.currentTime;
+    try{
+      if(s==='hover'){const g=this._g(.06);const o=this._o('sine',440);o.frequency.exponentialRampToValueAtTime(660,t+.05);g.gain.exponentialRampToValueAtTime(.001,t+.08);o.connect(g);o.start(t);o.stop(t+.08)}
+      else if(s==='click'){const g=this._g(.12);const o=this._o('sine',80);o.frequency.exponentialRampToValueAtTime(40,t+.1);g.gain.exponentialRampToValueAtTime(.001,t+.12);o.connect(g);o.start(t);o.stop(t+.12)}
+      else if(s==='chime'){const f=p.f||523.25;const g=this._g(.06);const o=this._o('sine',f);g.gain.exponentialRampToValueAtTime(.001,t+.4);o.connect(g);o.start(t);o.stop(t+.4)}
+      else if(s==='whoosh'){const g=this._g(.08);const buf=this.ctx.createBuffer(1,this.ctx.sampleRate*.5,this.ctx.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.sin(Math.PI*i/d.length);const n=this.ctx.createBufferSource();n.buffer=buf;const fl=this.ctx.createBiquadFilter();fl.type='bandpass';fl.frequency.value=2500;fl.frequency.exponentialRampToValueAtTime(200,t+.5);n.connect(fl);fl.connect(g);g.gain.exponentialRampToValueAtTime(.001,t+.5);n.start(t)}
+      else if(s==='jackpot'){[523.25,659.25,783.99,1046.5].forEach((f,i)=>{const g=this._g(.07);const o=this._o('sine',f);g.gain.setValueAtTime(0,t+i*.12);g.gain.linearRampToValueAtTime(.07,t+i*.12+.02);g.gain.exponentialRampToValueAtTime(.001,t+i*.12+.7);o.connect(g);o.start(t+i*.12);o.stop(t+i*.12+.7)})}
+      else if(s==='scratch'){const g=this._g(.05);const buf=this.ctx.createBuffer(1,this.ctx.sampleRate*.25,this.ctx.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);const n=this.ctx.createBufferSource();n.buffer=buf;const fl=this.ctx.createBiquadFilter();fl.type='highpass';fl.frequency.value=2000;n.connect(fl);fl.connect(g);n.start(t)}
+      else if(s==='reel'){for(let i=0;i<8;i++){const dl=i*.05*(1+i*.15);const g=this._g(.03);const o=this._o('square',1200);o.connect(g);g.gain.setValueAtTime(.03,t+dl);g.gain.exponentialRampToValueAtTime(.001,t+dl+.03);o.start(t+dl);o.stop(t+dl+.03)}}
+      else if(s==='form'){const g=this._g(.05);const o=this._o('sine',200);o.frequency.exponentialRampToValueAtTime(1200,t+1.2);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.05,t+.2);g.gain.exponentialRampToValueAtTime(.001,t+1.2);o.connect(g);o.start(t);o.stop(t+1.2)}
+    }catch(e){}
+  }
+  startAmb(){if(!this.ok||this._amb)return;this._amb=[];[130.81,164.81,196.0].forEach(f=>{const g=this._g(.008);const o=this._o('sine',f);const lfo=this._o('sine',.08+Math.random()*.05);const lg=this.ctx.createGain();lg.gain.value=1.5;lfo.connect(lg);lg.connect(o.frequency);o.connect(g);lfo.start();o.start();this._amb.push(o,lfo)})}
 }
+const snd=new Snd();
 
-var geo = new THREE.BufferGeometry();
-geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-geo.setAttribute('aColor', new THREE.BufferAttribute(colors, 3));
-geo.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
-geo.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
+/* ===== GAMIFICATION ===== */
+const state={secs:new Set(),pills:new Set(),socials:new Set(),stats:false,balls:0};
+const pillNames=['CoLabMűhely','InnoChallenge','InnoLab','FutureWatch'];
+let shown=new Set();
+function getScore(){let s=0;s+=state.secs.size*8;s+=state.pills.size*10;s+=state.socials.size*3;s+=state.stats?6:0;s+=Math.min(state.balls,5);return Math.min(s,100)}
+function updHUD(){const s=getScore();document.getElementById('hfill').style.width=s+'%';const v=document.getElementById('hval');v.textContent=s+'%';const h=document.getElementById('hud');if(s>=100&&!h.classList.contains('jp')){h.classList.add('jp');v.textContent='🏆 JACKPOT!';snd.play('jackpot');toast('🎰 JACKPOT EXPLORER — 100% UNLOCKED!')}}
+function trackSec(id){if(!state.secs.has(id)){state.secs.add(id);updHUD()}}
+function trackPill(i){if(!state.pills.has(i)){state.pills.add(i);snd.play('scratch');toast('✓ '+pillNames[i]+' DISCOVERED!');document.querySelector(`.p-bub[data-p="${i}"]`).classList.add('expl');if(state.pills.size===4&&!shown.has('gs')){shown.add('gs');setTimeout(()=>{snd.play('jackpot');toast('🎰 ALL STATIONS ACTIVATED!')},1200)}updHUD()}}
+function toast(txt){const t=document.createElement('div');t.className='toast';t.textContent=txt;document.getElementById('toasts').appendChild(t);setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),300)},2500)}
 
-var mat = new THREE.ShaderMaterial({
-  vertexShader: vertexShader,
-  fragmentShader: fragmentShader,
-  uniforms: {uTime:{value:0}, uHover:{value:0}},
-  transparent: true,
-  blending: THREE.AdditiveBlending,
-  depthWrite: false
-});
+/* ===== THREE.JS SCENE ===== */
+const W=()=>window.innerWidth,H=()=>window.innerHeight;
+const canvas=document.getElementById('c');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(W(),H());
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
 
-var points = new THREE.Points(geo, mat);
-scene.add(points);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0a0e17);
+scene.fog=new THREE.FogExp2(0x0a0e17,.012);
 
-// === AMBIENT PARTICLES ===
-var ambCount = 200;
-var ambPos = new Float32Array(ambCount*3);
-var ambCol = new Float32Array(ambCount*3);
-var ambSiz = new Float32Array(ambCount);
-var ambPhs = new Float32Array(ambCount);
-var ambVel = new Float32Array(ambCount*3);
-for(var i=0;i<ambCount;i++){
-  ambPos[i*3]=(Math.random()-0.5)*14;ambPos[i*3+1]=(Math.random()-0.5)*10;ambPos[i*3+2]=(Math.random()-0.5)*4-2;
-  ambCol[i*3]=0;ambCol[i*3+1]=0.5+Math.random()*0.5;ambCol[i*3+2]=0.2+Math.random()*0.3;
-  ambSiz[i]=0.008+Math.random()*0.012;ambPhs[i]=Math.random()*Math.PI*2;
-  ambVel[i*3]=(Math.random()-0.5)*0.002;ambVel[i*3+1]=(Math.random()-0.5)*0.002;ambVel[i*3+2]=0;
-}
-var ambGeo = new THREE.BufferGeometry();
-ambGeo.setAttribute('position',new THREE.BufferAttribute(ambPos,3));
-ambGeo.setAttribute('aColor',new THREE.BufferAttribute(ambCol,3));
-ambGeo.setAttribute('aSize',new THREE.BufferAttribute(ambSiz,1));
-ambGeo.setAttribute('aPhase',new THREE.BufferAttribute(ambPhs,1));
-var ambPts = new THREE.Points(ambGeo, mat);
-scene.add(ambPts);
+const camera=new THREE.PerspectiveCamera(60,W()/H(),.1,100);
+camera.position.set(0,2,15);
 
-// === CONNECTION LINES ===
-var maxLines = 250;
-var linePositions = new Float32Array(maxLines*6);
-var lineColors = new Float32Array(maxLines*6);
-var lineGeo = new THREE.BufferGeometry();
-lineGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
-lineGeo.setAttribute('color', new THREE.BufferAttribute(lineColors, 3));
-var lineMat = new THREE.LineBasicMaterial({vertexColors:true, transparent:true, opacity:0.15, blending:THREE.AdditiveBlending});
-var lines = new THREE.LineSegments(lineGeo, lineMat);
-scene.add(lines);
+// Lights
+scene.add(new THREE.AmbientLight(0x0a1428,.5));
+const gL=new THREE.PointLight(0x00ff88,.8,50);gL.position.set(0,5,5);scene.add(gL);
+const cL=new THREE.PointLight(0x00e5ff,.4,40);cL.position.set(-10,3,-5);scene.add(cL);
+scene.add(new THREE.PointLight(0xff00aa,.3,30).position.set(10,4,-10)||new THREE.Object3D());
 
-// === POST-PROCESSING ===
-var composer = new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene, camera));
-
-var bloomPass = new UnrealBloomPass(new THREE.Vector2(W,H), 0.9, 0.5, 0.08);
-composer.addPass(bloomPass);
+// Post-processing
+const composer=new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene,camera));
+const bloom=new UnrealBloomPass(new THREE.Vector2(W(),H()),.45,.8,.6);
+composer.addPass(bloom);
 
 // Chromatic aberration
-var caShader = {
-  uniforms:{tDiffuse:{value:null},uAmount:{value:0.0015}},
-  vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
-  fragmentShader:'uniform sampler2D tDiffuse;uniform float uAmount;varying vec2 vUv;void main(){vec2 o=uAmount*vec2(1.0);vec4 cr=texture2D(tDiffuse,vUv+o);vec4 cg=texture2D(tDiffuse,vUv);vec4 cb=texture2D(tDiffuse,vUv-o);gl_FragColor=vec4(cr.r,cg.g,cb.b,cg.a);}'
-};
-composer.addPass(new ShaderPass(caShader));
+const chromPass=new ShaderPass({uniforms:{tDiffuse:{value:null},uOff:{value:new THREE.Vector2(.001,.001)},uInt:{value:0}},vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`uniform sampler2D tDiffuse;uniform vec2 uOff;uniform float uInt;varying vec2 vUv;void main(){vec2 o=uOff*uInt;float r=texture2D(tDiffuse,vUv+o).r;float g=texture2D(tDiffuse,vUv).g;float b=texture2D(tDiffuse,vUv-o).b;gl_FragColor=vec4(r,g,b,1.);}`});
+composer.addPass(chromPass);
 
-// Vignette
-var vigShader = {
-  uniforms:{tDiffuse:{value:null},uDarkness:{value:0.5},uOffset:{value:1.0}},
-  vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
-  fragmentShader:'uniform sampler2D tDiffuse;uniform float uDarkness;uniform float uOffset;varying vec2 vUv;void main(){vec4 c=texture2D(tDiffuse,vUv);vec2 uv=(vUv-vec2(0.5))*vec2(uOffset);gl_FragColor=vec4(mix(c.rgb,vec3(0.0),dot(uv,uv)*uDarkness),c.a);}'
-};
-composer.addPass(new ShaderPass(vigShader));
-composer.addPass(new OutputPass());
+// Vignette + grain
+const filmPass=new ShaderPass({uniforms:{tDiffuse:{value:null},uTime:{value:0}},vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`uniform sampler2D tDiffuse;uniform float uTime;varying vec2 vUv;float rnd(vec2 s){return fract(sin(dot(s,vec2(12.9898,78.233)))*43758.5453);}void main(){vec4 c=texture2D(tDiffuse,vUv);float d=distance(vUv,vec2(.5));c.rgb*=smoothstep(.8,.3,d*.9);c.rgb+=rnd(vUv+fract(uTime))*.05-.025;c.rgb+=sin(vUv.y*800.+uTime*2.)*.015;gl_FragColor=c;}`});
+composer.addPass(filmPass);
+
+let chromInt=0;
+function chromBurst(intensity=2.5){chromInt=intensity;setTimeout(()=>chromInt=0,400)}
+
+// === GRID FLOOR ===
+const gridMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{uTime:{value:0},uCol:{value:new THREE.Color(0x00ff88)}},vertexShader:`varying vec3 vWP;void main(){vec4 w=modelMatrix*vec4(position,1.);vWP=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`,fragmentShader:`uniform float uTime;uniform vec3 uCol;varying vec3 vWP;void main(){vec2 g=abs(fract(vWP.xz*.5)-.5);float l=min(g.x,g.y);float gl2=1.-smoothstep(0.,.03,l);float f=1.-smoothstep(5.,35.,length(vWP.xz));float p=.6+.4*sin(uTime*.3+length(vWP.xz)*.1);gl_FragColor=vec4(uCol,gl2*.07*f*p);}`});
+const grid=new THREE.Mesh(new THREE.PlaneGeometry(80,80,80,80),gridMat);
+grid.rotation.x=-Math.PI/2;grid.position.y=-1;scene.add(grid);
+
+// === FLOATING LOTTERY BALLS ===
+const ballColors=[0xff3333,0x3366ff,0xffaa00,0xaa33ff,0x00ff88];
+const BALL_COUNT=window.innerWidth<768?8:18;
+const balls=[];
+const ballGeo=new THREE.SphereGeometry(.3,20,20);
+for(let i=0;i<BALL_COUNT;i++){
+  const c=ballColors[i%5];
+  const mat=new THREE.MeshPhysicalMaterial({color:c,emissive:c,emissiveIntensity:.3,roughness:.1,metalness:.1,transmission:.3,thickness:.4,transparent:true,opacity:.85});
+  const m=new THREE.Mesh(ballGeo,mat);
+  const sp=22;
+  m.position.set((Math.random()-.5)*sp,Math.random()*7-1,(Math.random()-.5)*sp-5);
+  const num=Math.floor(Math.random()*90)+1;
+  // Number sprite
+  const cv=document.createElement('canvas');cv.width=64;cv.height=64;
+  const cx=cv.getContext('2d');cx.fillStyle='rgba(255,255,255,.85)';cx.font='bold 26px "Space Grotesk",sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(num+'',32,32);
+  const tex=new THREE.CanvasTexture(cv);const spm=new THREE.SpriteMaterial({map:tex,transparent:true,opacity:.65});const spr=new THREE.Sprite(spm);spr.scale.set(.28,.28,1);m.add(spr);
+  m.userData={bp:m.position.clone(),ph:Math.random()*Math.PI*2,sp:.3+Math.random()*.4,rs:new THREE.Vector3((Math.random()-.5)*.5,(Math.random()-.5)*.5,(Math.random()-.5)*.5),be:.3,c};
+  scene.add(m);balls.push(m);
+}
+
+// === TICKET CONFETTI PARTICLES ===
+const confCount=window.innerWidth<768?50:150;
+const confPos=new Float32Array(confCount*3);const confPh=new Float32Array(confCount);
+for(let i=0;i<confCount;i++){confPos[i*3]=(Math.random()-.5)*40;confPos[i*3+1]=Math.random()*12-2;confPos[i*3+2]=(Math.random()-.5)*30-5;confPh[i]=Math.random()*Math.PI*2}
+const confGeo=new THREE.BufferGeometry();confGeo.setAttribute('position',new THREE.BufferAttribute(confPos,3));confGeo.setAttribute('aPh',new THREE.BufferAttribute(confPh,1));
+const confMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{uTime:{value:0},uSize:{value:3*devicePixelRatio}},vertexShader:`attribute float aPh;uniform float uTime;uniform float uSize;varying float vA;varying float vM;void main(){vec3 p=position;p.y+=sin(uTime*.5+aPh)*.3;p.x+=cos(uTime*.3+aPh*1.5)*.2;p.x=mod(p.x+20.,40.)-20.;p.y=mod(p.y+2.,14.)-2.;p.z=mod(p.z+20.,40.)-20.;vec4 mv=modelViewMatrix*vec4(p,1.);float d=-mv.z;vA=smoothstep(30.,5.,d)*.35;vM=sin(aPh+uTime*.2)*.5+.5;gl_PointSize=uSize*(8./d);gl_Position=projectionMatrix*mv;}`,fragmentShader:`varying float vA;varying float vM;void main(){vec2 pc=gl_PointCoord-.5;float r=max(abs(pc.x),abs(pc.y)*3.);if(r>.45)discard;vec3 c1=vec3(0.,1.,.533);vec3 c2=vec3(1.,.843,0.);gl_FragColor=vec4(mix(c1,c2,vM),vA*smoothstep(.45,.3,r));}`});
+scene.add(new THREE.Points(confGeo,confMat));
+
+// === DUST MOTES ===
+const dustCount=35;const dustPos=new Float32Array(dustCount*3);const dustSz=new Float32Array(dustCount);
+for(let i=0;i<dustCount;i++){dustPos[i*3]=(Math.random()-.5)*30;dustPos[i*3+1]=Math.random()*10;dustPos[i*3+2]=(Math.random()-.5)*20;dustSz[i]=Math.random()*2+1}
+const dustGeo=new THREE.BufferGeometry();dustGeo.setAttribute('position',new THREE.BufferAttribute(dustPos,3));dustGeo.setAttribute('aSize',new THREE.BufferAttribute(dustSz,1));
+const dustMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{uTime:{value:0},uPR:{value:Math.min(devicePixelRatio,2)}},vertexShader:`attribute float aSize;uniform float uTime;uniform float uPR;varying float vA;void main(){vec3 p=position;p.y+=sin(uTime*.2+position.x)*.5;p.x+=cos(uTime*.15+position.z)*.3;vec4 mv=modelViewMatrix*vec4(p,1.);vA=smoothstep(25.,3.,-mv.z)*.25;gl_PointSize=aSize*uPR*(5./-mv.z);gl_Position=projectionMatrix*mv;}`,fragmentShader:`varying float vA;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;gl_FragColor=vec4(.9,.95,1.,vA*smoothstep(.5,0.,d));}`});
+scene.add(new THREE.Points(dustGeo,dustMat));
+
+// === LOTTERY DRUM ===
+const drum=new THREE.Group();drum.position.set(0,2,-3);
+const shell=new THREE.Mesh(new THREE.SphereGeometry(2.5,32,32),new THREE.MeshPhysicalMaterial({color:0x00ff88,transparent:true,opacity:.07,roughness:.05,metalness:.2,transmission:.9,thickness:.3,side:THREE.DoubleSide}));
+drum.add(shell);
+const wire=new THREE.Mesh(new THREE.IcosahedronGeometry(2.55,2),new THREE.MeshBasicMaterial({color:0x00ff88,wireframe:true,transparent:true,opacity:.1}));
+drum.add(wire);
+// Inner balls
+const ibGeo=new THREE.SphereGeometry(.12,8,8);const ibMat=new THREE.MeshStandardMaterial({emissive:0x00ff88,emissiveIntensity:.8,color:0x00ff88});
+const ibCount=50;const ibMesh=new THREE.InstancedMesh(ibGeo,ibMat,ibCount);const ibData=[];const dum=new THREE.Object3D();
+for(let i=0;i<ibCount;i++){const a1=Math.random()*Math.PI*2,a2=Math.random()*Math.PI*2,r=Math.random()*1.8;ibData.push({a1,a2,r,s1:.2+Math.random()*.5,s2:.1+Math.random()*.3});dum.position.set(Math.sin(a1)*Math.cos(a2)*r,Math.sin(a2)*r,Math.cos(a1)*Math.cos(a2)*r);dum.updateMatrix();ibMesh.setMatrixAt(i,dum.matrix);ibMesh.setColorAt(i,new THREE.Color(ballColors[i%5]))}
+ibMesh.instanceMatrix.needsUpdate=true;ibMesh.instanceColor.needsUpdate=true;drum.add(ibMesh);
+// Beam
+const beamMat2=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,uniforms:{uTime:{value:0}},vertexShader:`varying float vY;varying vec2 vUv;void main(){vUv=uv;vY=position.y;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`uniform float uTime;varying float vY;varying vec2 vUv;void main(){float a=(1.-vUv.y)*.07*(.7+.3*sin(vY*3.+uTime*2.));gl_FragColor=vec4(0.,1.,.533,a);}`});
+const beam=new THREE.Mesh(new THREE.ConeGeometry(1.5,6,32,1,true),beamMat2);beam.position.y=-1;beam.rotation.x=Math.PI;drum.add(beam);
+scene.add(drum);
+
+// === CLOVER LOGO ===
+const logo=new THREE.Group();logo.position.set(0,4.5,-3);
+const pCols=[0x00ff88,0x33cc55,0x228833,0x00ff88];
+for(let i=0;i<4;i++){
+  const a=i*Math.PI/2;const pg=new THREE.Group();
+  const pGeo=new THREE.SphereGeometry(.4,16,16);pGeo.scale(1,1.3,.3);
+  const pMat=new THREE.MeshPhysicalMaterial({color:pCols[i],emissive:pCols[i],emissiveIntensity:.4,roughness:.2,metalness:.3,transparent:true,opacity:.85,transmission:.2});
+  const pet=new THREE.Mesh(pGeo,pMat);pet.position.set(Math.cos(a)*.35,Math.sin(a)*.35,0);pet.rotation.z=a;pg.add(pet);
+  const nGeo=new THREE.SphereGeometry(.04,8,8);const nMat=new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:.8});
+  const nd=new THREE.Mesh(nGeo,nMat);nd.position.set(Math.cos(a)*.35,Math.sin(a)*.35,.15);pg.add(nd);
+  pg.userData={nMat,pMat,phOff:i*.75};logo.add(pg);
+}
+const ctr=new THREE.Mesh(new THREE.SphereGeometry(.15,16,16),new THREE.MeshBasicMaterial({color:0x00ff88,transparent:true,opacity:.6}));
+logo.add(ctr);scene.add(logo);
+
+// Ceiling strips
+for(let i=-3;i<=3;i++){const s=new THREE.Mesh(new THREE.BoxGeometry(30,.05,.1),new THREE.MeshBasicMaterial({color:i%2?0x00e5ff:0x00ff88,transparent:true,opacity:.12}));s.position.set(0,8,i*3);scene.add(s)}
+
+// === RESIZE ===
+window.addEventListener('resize',()=>{camera.aspect=W()/H();camera.updateProjectionMatrix();renderer.setSize(W(),H());composer.setSize(W(),H())});
 
 // === MOUSE ===
-document.addEventListener('mousemove', function(e){
-  mouseX=e.clientX; mouseY=e.clientY;
-  mouseNX=(e.clientX/W)*2-1; mouseNY=-(e.clientY/H)*2+1;
-}, {passive:true});
-window.addEventListener('scroll', function(){scrollY_val=window.scrollY},{passive:true});
+let mx=0,my=0,mwx=0,mwy=0;
+const cur=document.getElementById('cur'),curD=cur.querySelector('.cur-d'),curR=cur.querySelector('.cur-r');
+let crx=0,cry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+const interSel='a,button,.p-bub,.st-tick,.soc-link';
+document.addEventListener('mouseover',e=>{if(e.target.closest(interSel))cur.classList.add('hov')});
+document.addEventListener('mouseout',e=>{if(e.target.closest(interSel))cur.classList.remove('hov')});
+document.addEventListener('click',e=>{snd.play('click');
+  for(let i=0;i<6;i++){const p=document.createElement('div');const a=i/6*Math.PI*2;const d=25+Math.random()*35;p.style.cssText=`position:fixed;width:4px;height:4px;background:#ffd700;border-radius:50%;pointer-events:none;z-index:9998;box-shadow:0 0 5px #ffd700;left:${e.clientX}px;top:${e.clientY}px;transition:all .4s cubic-bezier(.34,1.56,.64,1);opacity:1`;document.body.appendChild(p);requestAnimationFrame(()=>{p.style.transform=`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px)`;p.style.opacity='0'});setTimeout(()=>p.remove(),400)}
+});
 
-// === ANIMATION SPRING — particles settle into logo ===
-var settled = 0;
-var hoverAmount = 0;
+// === SOUND TOGGLE ===
+document.getElementById('snd-btn').addEventListener('click',e=>{e.stopPropagation();const m=snd.toggle();e.currentTarget.textContent=m?'🔇':'🔊';if(!m)snd.startAmb()});
+document.getElementById('mot-btn').addEventListener('click',e=>{document.body.classList.toggle('reduced-motion')});
 
-function updateParticles(t){
-  var posArr = geo.attributes.position.array;
-  settled += (1 - settled) * 0.015; // gradually settle
+// === HERO TEXT (Particle Assembly) ===
+(function(){
+  const hc=document.getElementById('hero-canvas');
+  const w=Math.min(W()*.85,900);const h=180;hc.width=w;hc.height=h;hc.style.width=w+'px';hc.style.height=h+'px';
+  const ctx=hc.getContext('2d');const fs=Math.min(w/8,90);
+  ctx.fillStyle='#fff';ctx.font=`bold ${fs}px "Space Grotesk",sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('INNOVATION HUB',w/2,h/2);
+  const id=ctx.getImageData(0,0,w,h);const pts=[];const step=4;
+  const bcs=['#ff3333','#3366ff','#ffaa00','#aa33ff','#00ff88'];
+  for(let y=0;y<h;y+=step)for(let x=0;x<w;x+=step){if(id.data[(y*w+x)*4+3]>128)pts.push({tx:x,ty:y,x:Math.random()*w,y:Math.random()*h,vx:0,vy:0,sz:1.8+Math.random()*1.2,col:bcs[Math.floor(Math.random()*5)],dl:Math.random()*1.8})}
+  ctx.clearRect(0,0,w,h);
+  let st=null,assembled=false;
+  function anim(t){if(!st)st=t;const el=(t-st)/1000;ctx.clearRect(0,0,w,h);
+    for(const p of pts){const tt=Math.max(0,el-p.dl);if(tt<=0){ctx.globalAlpha=.15;ctx.beginPath();ctx.arc(p.x,p.y,p.sz*.5,0,Math.PI*2);ctx.fillStyle=p.col;ctx.fill();continue}
+      const sp=.06,dm=.82;p.vx+=(p.tx-p.x)*sp;p.vy+=(p.ty-p.y)*sp;p.vx*=dm;p.vy*=dm;p.x+=p.vx;p.y+=p.vy;
+      const dist=Math.sqrt((p.tx-p.x)**2+(p.ty-p.y)**2);if(dist<2){p.x+=(Math.random()-.5)*.4;p.y+=(Math.random()-.5)*.4}
+      ctx.globalAlpha=dist<3?.85:.55;ctx.beginPath();ctx.arc(p.x,p.y,p.sz,0,Math.PI*2);ctx.fillStyle=p.col;ctx.fill();ctx.globalAlpha=.08;ctx.beginPath();ctx.arc(p.x,p.y,p.sz*3,0,Math.PI*2);ctx.fill()
+    }ctx.globalAlpha=1;
+    if(!assembled&&el>3){assembled=true;snd.play('form')}
+    requestAnimationFrame(anim)}
+  setTimeout(()=>requestAnimationFrame(anim),600);
+})();
 
-  // Mouse in 3D space (approximate)
-  var mx3d = mouseNX * 5;
-  var my3d = mouseNY * 3;
+// === SOCIAL PARTICLE CANVASES ===
+(function(){
+  function genPts(type,n){const pts=[];for(let i=0;i<n;i++){let x,y;const t=Math.random();
+    if(type==='twitch'){if(t<.7){x=(Math.random()-.5)*.7;y=(Math.random()-.5)*.6+.1}else if(t<.85){x=-.1+Math.random()*.15;y=-.3-Math.random()*.15}else{x=(Math.random()-.5)*.5;y=.35+Math.random()*.1}}
+    else if(type==='discord'){const a=Math.random()*Math.PI*2;if(t<.6){x=Math.cos(a)*(.35+Math.random()*.05);y=Math.sin(a)*(.25+Math.random()*.05)}else if(t<.8){x=-.25+(Math.random()-.5)*.15;y=.25+Math.random()*.15}else{x=.25+(Math.random()-.5)*.15;y=.25+Math.random()*.15}}
+    else{const p=Math.random()*2-1;if(t<.5){x=p*.35+(Math.random()-.5)*.08;y=-p*.35+(Math.random()-.5)*.08}else{x=-p*.35+(Math.random()-.5)*.08;y=-p*.35+(Math.random()-.5)*.08}}
+    pts.push(x,y)}return pts}
+  const pColors={twitch:'#9146ff',discord:'#5865f2',x:'#e8eaf0'};
+  const systems=[];
+  document.querySelectorAll('.soc-cv').forEach(cv=>{
+    const pl=cv.closest('.soc-link').dataset.p;const ctx=cv.getContext('2d');const w=cv.width,h=cv.height;
+    const n=400;const tPts=genPts(pl,n);const parts=[];
+    for(let i=0;i<n;i++)parts.push({x:Math.random()*w,y:Math.random()*h,tx:tPts[i*2]*w*.8+w/2,ty:-tPts[i*2+1]*h*.8+h/2,vx:0,vy:0,sz:1.3+Math.random()*1.2,al:.4+Math.random()*.5});
+    systems.push({cv,ctx,parts,w,h,pl,hov:false,fp:0})});
+  function animS(){for(const s of systems){const{ctx:c,parts:ps,w,h}=s;c.clearRect(0,0,w,h);s.fp=Math.min(s.fp+.008,1);
+    const col=s.hov?pColors[s.pl]:'#00ff88';
+    for(const p of ps){const sp=s.hov?.08:.03,dm=.85;if(s.fp>.1){p.vx+=(p.tx-p.x)*sp;p.vy+=(p.ty-p.y)*sp}
+      p.vx+=(Math.random()-.5)*(s.hov?.4:.25);p.vy+=(Math.random()-.5)*(s.hov?.4:.25);p.vx*=dm;p.vy*=dm;p.x+=p.vx;p.y+=p.vy;
+      c.globalAlpha=p.al*(.3+s.fp*.6);c.beginPath();c.arc(p.x,p.y,p.sz,0,Math.PI*2);c.fillStyle=col;c.fill();
+      c.globalAlpha=p.al*.1;c.beginPath();c.arc(p.x,p.y,p.sz*2.5,0,Math.PI*2);c.fill()}
+    c.globalAlpha=1}requestAnimationFrame(animS)}
+  requestAnimationFrame(animS);
+  document.querySelectorAll('.soc-link').forEach(l=>{const pl=l.dataset.p;const s=systems.find(x=>x.pl===pl);if(!s)return;
+    l.addEventListener('mouseenter',()=>{s.hov=true;snd.play('chime',{f:pl==='twitch'?880:pl==='discord'?660:1100});state.socials.add(pl);updHUD();for(const p of s.parts){const dx=p.x-s.w/2,dy=p.y-s.h/2,d=Math.sqrt(dx*dx+dy*dy)||1;p.vx+=(dx/d)*6;p.vy+=(dy/d)*6}});
+    l.addEventListener('mouseleave',()=>{s.hov=false})});
+})();
 
-  // Check if mouse is near logo center
-  var distToCenter = Math.sqrt(mx3d*mx3d + my3d*my3d);
-  var targetHover = distToCenter < 2.5 ? 1.0 : 0.0;
-  hoverAmount += (targetHover - hoverAmount) * 0.05;
-  mat.uniforms.uHover.value = hoverAmount;
+// === SCROLL OBSERVERS ===
+let visObs=new Set(),pilObs=new Set(),statsDone=false;
+const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(!e.isIntersecting)return;
+  const id=e.target.id;
+  if(id==='vision'&&!visObs.has('vision')){visObs.add('vision');trackSec('vision');snd.play('whoosh');chromBurst(2);
+    document.querySelectorAll('.vis-h .w').forEach((w,i)=>{setTimeout(()=>{w.classList.add('rev');snd.play('scratch')},i*300)});
+    setTimeout(()=>document.querySelector('.vis-b').classList.add('vis'),1400)}
+  if(id==='pillars'&&!visObs.has('pillars')){visObs.add('pillars');trackSec('pillars');snd.play('whoosh');chromBurst(1.5);
+    document.querySelectorAll('.p-bub').forEach((b,i)=>{setTimeout(()=>{b.classList.add('vis');snd.play('chime',{f:[261.63,329.63,392,493.88][i]})},200+i*200)})}
+  if(id==='stats'&&!statsDone){statsDone=true;trackSec('stats');snd.play('whoosh');chromBurst(1.5);
+    let done=0;document.querySelectorAll('.st-tick').forEach((tk,i)=>{const tgt=+tk.dataset.t;const sf=tk.dataset.s;const nm=tk.querySelector('.st-num');
+      const dur=1500+i*300;const start=performance.now()+i*200;snd.play('reel');
+      function spin(now){const el=now-start;if(el<0){requestAnimationFrame(spin);return}const p=Math.min(el/dur,1);
+        if(p<.7)nm.textContent=Math.floor(Math.random()*tgt*2);else nm.textContent=Math.round(tgt*((p-.7)/.3))+sf;
+        if(p<1)requestAnimationFrame(spin);else{nm.textContent=tgt+sf;done++;if(done===4){state.stats=true;updHUD();snd.play('jackpot');
+          // Golden confetti
+          for(let j=0;j<40;j++){const c=document.createElement('div');const sz=4+Math.random()*6;c.style.cssText=`position:fixed;width:${sz}px;height:${sz*.6}px;background:${Math.random()>.3?'#ffd700':'#ff8800'};pointer-events:none;z-index:200;left:50%;top:50%;border-radius:1px;box-shadow:0 0 4px rgba(255,215,0,.5);transition:all 1.5s cubic-bezier(.34,1.56,.64,1);opacity:1`;document.body.appendChild(c);const a=Math.random()*Math.PI*2;const d=80+Math.random()*200;requestAnimationFrame(()=>{c.style.transform=`translate(${Math.cos(a)*d}px,${Math.sin(a)*d+150}px) rotate(${Math.random()*360}deg)`;c.style.opacity='0'});setTimeout(()=>c.remove(),1600)}}}}
+      requestAnimationFrame(spin)})}
+  if(id==='community'&&!visObs.has('community')){visObs.add('community');trackSec('community');snd.play('whoosh');chromBurst(1.5);snd.play('form')}
+})},{threshold:.3});
 
-  // Scroll offset
-  var scrollOff = scrollY_val * 0.002;
+['vision','pillars','stats','community'].forEach(id=>{const el=document.getElementById(id);if(el)observer.observe(el)});
+trackSec('hero');
 
-  for(var i=0; i<logoCount; i++){
-    var i3 = i*3;
-    var tx = targets[i3];
-    var ty = targets[i3+1] - scrollOff;
-    var tz = targets[i3+2];
+// Pillar interactions
+document.querySelectorAll('.p-bub').forEach((b,i)=>{
+  b.addEventListener('mouseenter',()=>{snd.play('hover')});
+  b.addEventListener('click',()=>trackPill(i))});
+document.querySelectorAll('.st-tick').forEach(t=>{t.addEventListener('mouseenter',()=>snd.play('hover'))});
 
-    // Spring towards target
-    var dx = tx - posArr[i3];
-    var dy = ty - posArr[i3+1];
-    var dz = tz - posArr[i3+2];
-    var spring = 0.02 + settled * 0.04;
-    posArr[i3] += dx * spring;
-    posArr[i3+1] += dy * spring;
-    posArr[i3+2] += dz * spring;
+// === PRELOADER ===
+(async function(){
+  const pbar=document.getElementById('pbar');const lines=[document.getElementById('pl1'),document.getElementById('pl2'),document.getElementById('pl3'),document.getElementById('pl4')];
+  let prog=0;
+  for(let i=0;i<lines.length;i++){await new Promise(r=>setTimeout(r,600+i*200));lines[i].classList.add('show')}
+  const iv=setInterval(()=>{prog+=Math.random()*18+8;if(prog>=100){prog=100;pbar.style.width='100%';clearInterval(iv);
+    setTimeout(()=>{document.body.style.filter='hue-rotate(90deg)';setTimeout(()=>document.body.style.filter='',100);
+      document.getElementById('dl').classList.add('open-l');document.getElementById('dr').classList.add('open-r');
+      setTimeout(()=>{document.getElementById('preloader').classList.add('done');snd.init();setTimeout(()=>{document.getElementById('hud').classList.add('vis')},500)},800)},400)}
+    else pbar.style.width=prog+'%'},120);
+})();
 
-    // Mouse repulsion
-    var pdx = posArr[i3] - mx3d;
-    var pdy = posArr[i3+1] - my3d;
-    var pd = Math.sqrt(pdx*pdx+pdy*pdy);
-    if(pd < 0.8 && pd > 0){
-      var force = (0.8-pd)/0.8 * 0.08;
-      posArr[i3] += pdx/pd * force;
-      posArr[i3+1] += pdy/pd * force;
-    }
-  }
-  geo.attributes.position.needsUpdate = true;
-}
-
-function updateAmbient(t){
-  var p = ambGeo.attributes.position.array;
-  for(var i=0;i<ambCount;i++){
-    var i3=i*3;
-    p[i3]+=ambVel[i3]+Math.sin(t*0.2+ambPhs[i])*0.001;
-    p[i3+1]+=ambVel[i3+1]+Math.cos(t*0.15+ambPhs[i])*0.001;
-    // Wrap around
-    if(p[i3]>7)p[i3]=-7;if(p[i3]<-7)p[i3]=7;
-    if(p[i3+1]>5)p[i3+1]=-5;if(p[i3+1]<-5)p[i3+1]=5;
-  }
-  ambGeo.attributes.position.needsUpdate = true;
-}
-
-function updateLines(){
-  var posArr = geo.attributes.position.array;
-  var colArr = geo.attributes.aColor.array;
-  var lp = lineGeo.attributes.position.array;
-  var lc = lineGeo.attributes.color.array;
-  var drawn = 0;
-  var step = 5;
-  var maxD = 0.25;
-  for(var i=0;i<logoCount&&drawn<maxLines;i+=step){
-    var br1=(colArr[i*3]+colArr[i*3+1]+colArr[i*3+2])/3;
-    if(br1<0.35)continue;
-    for(var j=i+step;j<logoCount&&drawn<maxLines;j+=step){
-      var br2=(colArr[j*3]+colArr[j*3+1]+colArr[j*3+2])/3;
-      if(br2<0.35)continue;
-      var dx=posArr[i*3]-posArr[j*3],dy=posArr[i*3+1]-posArr[j*3+1];
-      var d2=dx*dx+dy*dy;
-      if(d2<maxD*maxD){
-        var d6=drawn*6;
-        lp[d6]=posArr[i*3];lp[d6+1]=posArr[i*3+1];lp[d6+2]=posArr[i*3+2];
-        lp[d6+3]=posArr[j*3];lp[d6+4]=posArr[j*3+1];lp[d6+5]=posArr[j*3+2];
-        var a=1-Math.sqrt(d2)/maxD;
-        var cr=Math.max(colArr[i*3],colArr[j*3])*a;
-        var cg=Math.max(colArr[i*3+1],colArr[j*3+1])*a;
-        var cb=Math.max(colArr[i*3+2],colArr[j*3+2])*a;
-        lc[d6]=cr;lc[d6+1]=cg;lc[d6+2]=cb;
-        lc[d6+3]=cr;lc[d6+4]=cg;lc[d6+5]=cb;
-        drawn++;
-      }
-    }
-  }
-  // Zero out remaining
-  for(var k=drawn*6;k<maxLines*6;k++){lp[k]=0;lc[k]=0}
-  lineGeo.attributes.position.needsUpdate=true;
-  lineGeo.attributes.color.needsUpdate=true;
-  lineGeo.setDrawRange(0,drawn*2);
-}
-
-// === CAMERA PARALLAX ===
-var camTargetX = 0, camTargetY = 0;
-
-// === MAIN LOOP ===
+// === RENDER LOOP ===
+const clock=new THREE.Clock();
+let pulseT=0;
 function animate(){
   requestAnimationFrame(animate);
-  var t = performance.now() * 0.001;
-  mat.uniforms.uTime.value = t;
+  const el=clock.getElapsedTime();
+  const scrollY=window.scrollY;const maxS=document.documentElement.scrollHeight-window.innerHeight;const sp=maxS>0?scrollY/maxS:0;
 
-  updateParticles(t);
-  updateAmbient(t);
-  updateLines();
+  // Cursor
+  crx+=(mx-crx)*.15;cry+=(my-cry)*.15;
+  curD.style.transform=`translate(${mx-4}px,${my-4}px)`;
+  curR.style.transform=`translate(${crx-15}px,${cry-15}px)`;
 
-  // Subtle camera follow mouse
-  camTargetX = mouseNX * 0.3;
-  camTargetY = mouseNY * 0.2;
-  camera.position.x += (camTargetX - camera.position.x) * 0.02;
-  camera.position.y += (camTargetY - camera.position.y) * 0.02;
-  camera.lookAt(0, 0, 0);
+  // Camera
+  camera.position.z=15-sp*25;
+  camera.position.x=Math.sin(el*.2)*.15+((mx/W())*2-1)*.25;
+  camera.position.y=2+Math.cos(el*.15)*.1+((my/H())*2-1)*-.1;
+
+  // Zone colors
+  const zc=[new THREE.Color(0x0a0e17),new THREE.Color(0x0a1420),new THREE.Color(0x0e0e17),new THREE.Color(0x141008),new THREE.Color(0x0a0e17)];
+  const zi=Math.min(Math.floor(sp*5),4);const zf=(sp*5)%1;
+  scene.background=zc[zi].clone().lerp(zc[Math.min(zi+1,4)],zf);
+
+  // Uniforms
+  gridMat.uniforms.uTime.value=el;
+  confMat.uniforms.uTime.value=el;
+  dustMat.uniforms.uTime.value=el;
+  beamMat2.uniforms.uTime.value=el;
+  filmPass.uniforms.uTime.value=el;
+  chromPass.uniforms.uInt.value+=(chromInt-chromPass.uniforms.uInt.value)*.1;
+  gL.intensity=.8+Math.sin(el*.5)*.2;
+
+  // Drum
+  drum.rotation.y=el*.15;shell.rotation.x=Math.sin(el*.1)*.1;wire.rotation.y=-el*.1;wire.rotation.x=el*.05;
+  for(let i=0;i<ibData.length;i++){const d=ibData[i];dum.position.set(Math.sin(d.a1+el*d.s1)*Math.cos(d.a2+el*d.s2)*d.r,Math.sin(d.a2+el*d.s2)*d.r,Math.cos(d.a1+el*d.s1)*Math.cos(d.a2+el*d.s2)*d.r);dum.updateMatrix();ibMesh.setMatrixAt(i,dum.matrix)}
+  ibMesh.instanceMatrix.needsUpdate=true;
+
+  // Logo
+  logo.rotation.y=Math.sin(el*.3)*.035;
+  for(let i=0;i<4;i++){const pg=logo.children[i];if(!pg.userData)continue;
+    const br=1+Math.sin(el*.7+pg.userData.phOff)*.02;pg.scale.setScalar(br);
+    pg.userData.nMat.opacity=.5+Math.sin(el*1.5+pg.userData.phOff)*.3;
+    pg.userData.pMat.emissiveIntensity=.3+Math.sin(el+i)*.1}
+
+  // Floating balls
+  pulseT+=.016;
+  for(const b of balls){const d=b.userData;
+    b.position.x=d.bp.x+Math.sin(el*d.sp+d.ph)*.5;
+    b.position.y=d.bp.y+Math.cos(el*d.sp*.7+d.ph)*.3;
+    b.position.z=d.bp.z+Math.sin(el*d.sp*.5+d.ph*1.5)*.3;
+    b.rotation.x+=d.rs.x*.016;b.rotation.y+=d.rs.y*.016;
+    // Mouse repulsion
+    const ndcX=(mx/W())*2-1,ndcY=-(my/H())*2+1;
+    const worldApproxX=ndcX*8,worldApproxY=ndcY*4+2;
+    const dist=Math.sqrt((b.position.x-worldApproxX)**2+(b.position.y-worldApproxY)**2);
+    if(dist<3){const f=(3-dist)*.015;d.bp.x+=(b.position.x-worldApproxX)/dist*f;d.bp.y+=(b.position.y-worldApproxY)/dist*f;
+      b.material.emissiveIntensity=d.be+(3-dist)*.3}
+    else b.material.emissiveIntensity+=(d.be-b.material.emissiveIntensity)*.05}
+  if(pulseT>9){pulseT=0;const rb=balls[Math.floor(Math.random()*balls.length)];if(rb){rb.material.emissiveIntensity=1.5;setTimeout(()=>rb.material.emissiveIntensity=rb.userData.be,400);snd.play('chime')}}
+
+  // Pillar bob
+  document.querySelectorAll('.p-bub.vis').forEach((b,i)=>{
+    b.style.transform=`translateY(${Math.sin(el*.5+i*.8)*4}px) scale(1)`});
 
   composer.render();
 }
 animate();
-
-// === RESIZE ===
-window.addEventListener('resize', function(){
-  W=window.innerWidth; H=window.innerHeight;
-  camera.aspect=W/H; camera.updateProjectionMatrix();
-  renderer.setSize(W,H);
-  composer.setSize(W,H);
-  bloomPass.setSize(W,H);
-});
 </script>
 </body>
 </html>
