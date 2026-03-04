@@ -102,7 +102,7 @@ canvas#gl{position:fixed;inset:0;z-index:0}
 footer{padding:80px 40px 40px;text-align:center;border-top:1px solid rgba(255,255,255,.02)}
 .ft-mark{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:400;letter-spacing:4px;color:rgba(255,255,255,.08);margin-bottom:6px}
 .ft-copy{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.05)}
-#particle-logo{position:fixed;top:24px;left:20px;z-index:60;width:160px;height:120px;pointer-events:auto;cursor:none}
+#particle-logo{position:fixed;top:12px;left:10px;z-index:60;width:380px;height:340px;pointer-events:auto;cursor:none}
 #particle-logo canvas{width:100%;height:100%}
 #ticker{position:fixed;top:0;left:0;right:0;height:22px;background:rgba(2,3,8,.9);border-bottom:1px solid rgba(255,255,255,.02);z-index:50;overflow:hidden;display:flex;align-items:center;backdrop-filter:blur(30px)}
 .tk-s{display:flex;gap:50px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;color:rgba(255,215,0,.15);white-space:nowrap;animation:tkScr 50s linear infinite}
@@ -877,151 +877,121 @@ function initParticleLogo(){
   const canvas=document.getElementById('plc');
   const ctx=canvas.getContext('2d');
   const dpr2=Math.min(devicePixelRatio,2);
-  const cW=Math.floor(160*dpr2),cH=Math.floor(120*dpr2);
+  const cW=Math.floor(380*dpr2),cH=Math.floor(340*dpr2);
   canvas.width=cW;canvas.height=cH;
 
-  // Offscreen: draw torus knot shape + text
-  const off=document.createElement('canvas');off.width=cW;off.height=cH;
-  const oc=off.getContext('2d');
+  const img=new Image();img.crossOrigin='anonymous';
+  img.onload=function(){
+    const off=document.createElement('canvas');off.width=cW;off.height=cH;
+    const oc=off.getContext('2d');
 
-  // ── Draw torus knot (parametric, green glow) ──
-  const cx=cW/2,knotY=cH*.38,knotR=cW*.22;
-  oc.save();
-  // Multiple passes for glow effect
-  for(let pass=0;pass<3;pass++){
-    const alpha=pass===0?.15:pass===1?.3:.7;
-    const lw=pass===0?8*dpr2:pass===1?4*dpr2:2*dpr2;
-    oc.strokeStyle=`rgba(0,${180+pass*30},${80+pass*20},${alpha})`;
-    oc.lineWidth=lw;oc.lineCap='round';oc.lineJoin='round';
-    // Torus knot p=2 q=3
-    oc.beginPath();
-    for(let i=0;i<=600;i++){
-      const t=i/600*Math.PI*4;
-      const r2=knotR*(.6+.4*Math.cos(1.5*t));
-      const x=cx+r2*Math.cos(t);
-      const y=knotY+r2*Math.sin(t)*.55;
-      if(i===0)oc.moveTo(x,y);else oc.lineTo(x,y)}
-    oc.stroke();
-    // Second loop offset for 3D illusion
-    oc.beginPath();
-    for(let i=0;i<=600;i++){
-      const t=i/600*Math.PI*4;
-      const r2=knotR*(.6+.4*Math.cos(1.5*t+2));
-      const x=cx+r2*Math.cos(t+.3);
-      const y=knotY+r2*Math.sin(t+.3)*.55;
-      if(i===0)oc.moveTo(x,y);else oc.lineTo(x,y)}
-    oc.stroke();
-    // Third interweave
-    oc.beginPath();
-    for(let i=0;i<=600;i++){
-      const t=i/600*Math.PI*4;
-      const r2=knotR*(.6+.4*Math.cos(1.5*t+4));
-      const x=cx+r2*Math.cos(t+.6);
-      const y=knotY+r2*Math.sin(t+.6)*.55;
-      if(i===0)oc.moveTo(x,y);else oc.lineTo(x,y)}
-    oc.stroke()}
-  // Center glow
-  const grd=oc.createRadialGradient(cx,knotY,0,cx,knotY,knotR*.5);
-  grd.addColorStop(0,'rgba(200,255,200,.25)');grd.addColorStop(1,'rgba(0,255,100,0)');
-  oc.fillStyle=grd;oc.beginPath();oc.arc(cx,knotY,knotR*.5,0,Math.PI*2);oc.fill();
-  oc.restore();
+    // Draw image large — fill 78% of canvas height, centered
+    const imgH=cH*.74;
+    const imgW=imgH*(img.width/img.height);
+    const imgX=(cW-imgW)/2;
+    oc.drawImage(img,imgX,cH*.02,imgW,imgH);
 
-  // ── Text: "Innovation" gray + "HUB" green ──
-  const tY=cH*.82;
-  const fSz=Math.floor(cH*.14);
-  oc.font=`500 ${fSz}px 'Space Grotesk',sans-serif`;
-  oc.textAlign='center';oc.textBaseline='middle';
-  // Measure to place side by side
-  const t1='Innovation';const t2='HUB';
-  const w1=oc.measureText(t1).width;
-  oc.font=`700 ${fSz}px 'Space Grotesk',sans-serif`;
-  const w2=oc.measureText(t2).width;
-  const totalW=w1+w2+2*dpr2;
-  const startX=cx-totalW/2;
-  // Draw "Innovation" in white
-  oc.font=`500 ${fSz}px 'Space Grotesk',sans-serif`;
-  oc.fillStyle='rgba(230,235,240,.85)';
-  oc.textAlign='left';
-  oc.fillText(t1,startX,tY);
-  // Draw "HUB" in green
-  oc.font=`700 ${fSz}px 'Space Grotesk',sans-serif`;
-  oc.fillStyle='rgba(0,230,100,.9)';
-  oc.fillText(t2,startX+w1+2*dpr2,tY);
+    // Big, bold text below
+    const tY=cH*.9;
+    const fSz=Math.floor(cH*.1);
+    const t1='Innovation',t2='HUB';
+    oc.font=`600 ${fSz}px 'Space Grotesk',sans-serif`;
+    oc.textBaseline='middle';
+    const w1=oc.measureText(t1).width;
+    oc.font=`800 ${Math.floor(fSz*1.1)}px 'Space Grotesk',sans-serif`;
+    const w2=oc.measureText(t2).width;
+    const gap2=4*dpr2;
+    const startX=cW/2-(w1+w2+gap2)/2;
 
-  // ── Sample pixels → particles ──
-  const imgData=oc.getImageData(0,0,cW,cH).data;
-  const gap=dpr2>1.5?3:2;
-  const pts=[];
-  for(let y=0;y<cH;y+=gap)for(let x=0;x<cW;x+=gap){
-    const idx=(y*cW+x)*4;
-    const r=imgData[idx],g=imgData[idx+1],b=imgData[idx+2],a=imgData[idx+3];
-    if(a>40){
+    // "Innovation" — bright white
+    oc.font=`600 ${fSz}px 'Space Grotesk',sans-serif`;
+    oc.fillStyle='rgba(240,245,255,.95)';
+    oc.textAlign='left';
+    oc.fillText(t1,startX,tY);
+
+    // "HUB" — vivid green, bold
+    oc.font=`800 ${Math.floor(fSz*1.1)}px 'Space Grotesk',sans-serif`;
+    oc.fillStyle='rgba(0,240,110,1)';
+    oc.fillText(t2,startX+w1+gap2,tY);
+
+    // ── Pixel-faithful sampling — every 2px ──
+    const imgData=oc.getImageData(0,0,cW,cH).data;
+    const step=2; // dense: every 2 pixels regardless of DPR
+    const pts=[];
+    for(let y=0;y<cH;y+=step)for(let x=0;x<cW;x+=step){
+      const idx=(y*cW+x)*4;
+      const r=imgData[idx],g=imgData[idx+1],b=imgData[idx+2],a=imgData[idx+3];
+      if(a<15)continue;
+      const brightness=r*.299+g*.587+b*.114;
+      // Keep anything with some brightness or decent alpha (captures dark greens, reflections)
+      if(brightness<5&&a<180)continue;
       pts.push({
-        tx:x,ty:y,x:x+(Math.random()-.5)*cW,y:y+(Math.random()-.5)*cH,
-        vx:0,vy:0,sz:.4+Math.random()*.8,
-        al:Math.min(1,(a/255)*.7+.2),
+        tx:x,ty:y,x:x+(Math.random()-.5)*cW*.5,y:y+(Math.random()-.5)*cH*.5,
+        vx:0,vy:0,
+        sz:Math.max(.5,(.3+brightness/255*.8)*(a/255)),
+        al:Math.min(1,(a/255)*.55+.35),
         cr:r,cg:g,cb:b,
         phase:Math.random()*6.28
-      })}}
+      })}
 
-  let mouseIn=false,mxP=0,myP=0;
-  const scR=50*dpr2;
-  container.addEventListener('mouseenter',()=>{mouseIn=true});
-  container.addEventListener('mouseleave',()=>{mouseIn=false});
-  container.addEventListener('mousemove',e=>{
-    const r=container.getBoundingClientRect();
-    mxP=(e.clientX-r.left)*dpr2;myP=(e.clientY-r.top)*dpr2});
+    let mouseIn=false,mxP=0,myP=0;
+    const scR=70*dpr2;
+    container.addEventListener('mouseenter',()=>{mouseIn=true});
+    container.addEventListener('mouseleave',()=>{mouseIn=false});
+    container.addEventListener('mousemove',e=>{
+      const r2=container.getBoundingClientRect();
+      mxP=(e.clientX-r2.left)*dpr2;myP=(e.clientY-r2.top)*dpr2});
 
-  let frame=0;
-  function drawLogo(){
-    requestAnimationFrame(drawLogo);frame++;
-    ctx.clearRect(0,0,cW,cH);
-    const t=frame*.01;
+    let frame=0;
+    function drawLogo(){
+      requestAnimationFrame(drawLogo);frame++;
+      ctx.clearRect(0,0,cW,cH);
+      const t=frame*.01;
 
-    for(const p of pts){
-      if(mouseIn){
-        const dx=p.x-mxP,dy=p.y-myP;
-        const dist=Math.sqrt(dx*dx+dy*dy)||1;
-        if(dist<scR){
-          const force=(1-dist/scR)*10;
-          p.vx+=dx/dist*force;
-          p.vy+=dy/dist*force}}
-      const spring=mouseIn?.008:.06;
-      p.vx+=(p.tx-p.x)*spring;
-      p.vy+=(p.ty-p.y)*spring;
-      p.vx*=.86;p.vy*=.86;
-      p.x+=p.vx;p.y+=p.vy;
+      for(const p of pts){
+        if(mouseIn){
+          const dx=p.x-mxP,dy=p.y-myP;
+          const dist=Math.sqrt(dx*dx+dy*dy)||1;
+          if(dist<scR){
+            const force=(1-dist/scR)*13;
+            p.vx+=dx/dist*force;
+            p.vy+=dy/dist*force}}
+        const spring=mouseIn?.006:.06;
+        p.vx+=(p.tx-p.x)*spring;
+        p.vy+=(p.ty-p.y)*spring;
+        p.vx*=.85;p.vy*=.85;
+        p.x+=p.vx;p.y+=p.vy;
 
-      const ox=Math.sin(t*.7+p.phase)*.3;
-      const oy=Math.cos(t*.5+p.phase*1.3)*.3;
-      const speed=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
-      const distHome=Math.sqrt((p.x-p.tx)**2+(p.y-p.ty)**2);
-      const settled=Math.max(0,1-distHome/15);
-      const breathP=.85+.15*Math.sin(t*1.2+p.phase);
+        const ox=Math.sin(t*.5+p.phase)*.2;
+        const oy=Math.cos(t*.4+p.phase*1.3)*.2;
+        const speed=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
+        const distHome=Math.sqrt((p.x-p.tx)**2+(p.y-p.ty)**2);
+        const settled=Math.max(0,1-distHome/20);
+        const breathP=.9+.1*Math.sin(t*1.+p.phase);
 
-      if(speed>2.5){
-        // Scattered = bright green spark
-        ctx.globalAlpha=Math.min(1,.4+speed*.04);
-        ctx.fillStyle=`rgba(0,255,136,1)`;
-        ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*1.3,0,Math.PI*2);ctx.fill();
-        ctx.globalAlpha=.15;
-        ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*4,0,Math.PI*2);ctx.fill();
-      } else {
-        // Settled = original color with glow
-        const a=p.al*settled*breathP;
-        // Glow halo
-        ctx.globalAlpha=a*.1;
-        ctx.fillStyle=`rgba(${p.cr},${p.cg},${p.cb},1)`;
-        ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*3.5,0,Math.PI*2);ctx.fill();
-        // Core
-        ctx.globalAlpha=a;
-        ctx.fillStyle=`rgba(${p.cr},${p.cg},${p.cb},1)`;
-        ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz,0,Math.PI*2);ctx.fill();
+        if(speed>3){
+          ctx.globalAlpha=Math.min(1,.3+speed*.035);
+          ctx.fillStyle='rgba(0,255,136,1)';
+          ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*1.3,0,Math.PI*2);ctx.fill();
+          ctx.globalAlpha=.1;
+          ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*4,0,Math.PI*2);ctx.fill();
+        } else {
+          const a2=p.al*settled*breathP;
+          // Soft glow halo in particle's own color
+          ctx.globalAlpha=a2*.07;
+          ctx.fillStyle=`rgb(${p.cr},${p.cg},${p.cb})`;
+          ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*2.8,0,Math.PI*2);ctx.fill();
+          // Core pixel — faithful color
+          ctx.globalAlpha=a2;
+          ctx.fillStyle=`rgb(${p.cr},${p.cg},${p.cb})`;
+          ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz,0,Math.PI*2);ctx.fill();
+        }
       }
+      ctx.globalAlpha=1;
     }
-    ctx.globalAlpha=1;
-  }
-  drawLogo();
+    drawLogo();
+  };
+  img.src='logo.png';
 }
 
 /* ═══ PARTICLE TEXT — "INNOVATION HUB" ═══ */
