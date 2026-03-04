@@ -158,7 +158,7 @@ footer{padding:80px 40px 40px;text-align:center;border-top:1px solid rgba(255,25
 <div id="content">
 <div class="sec" id="hero"><h1 class="hero-t" id="ht">INNOVATION<br><span class="thin">HUB</span></h1><p class="hero-sub" id="hs">SZERENCSEJÁTÉK ZRT.</p><div class="hero-scroll" id="hsc"><div class="scroll-dot"></div><div class="scroll-tx">GÖRGESS</div></div></div>
 <div class="sec" id="vision"><div class="vis-wrap"><p class="vis-tag" id="vt">VÍZIÓNK</p><div class="vis-rule" id="vr"></div><h2 class="vis-h" id="vh"><span>Ahol a </span><span class="g">szerencse </span><span>találkozik az </span><span class="g">innovációval.</span></h2><p class="vis-p" id="vp">Adatvezérelt gondolkodást ötvözünk kreatív kísérletezéssel, hogy újraálmodjuk a lottózást — hidat építve a hagyomány és a holnap játékosa között.</p></div></div>
-<div class="sec" id="pillars"><div class="pil-top"><h2 id="pt">Innováció Állomások</h2></div><div class="pil-grid">
+<div class="sec" id="pillars"><div class="pil-top"><h2 id="pt">Projektek</h2></div><div class="pil-grid">
 <div class="p-card" data-c="cyan"><canvas class="p-icon" width="128" height="128"></canvas><div class="p-idx">01</div><div class="p-tag">EGYÜTTMŰKÖDÉS</div><h3 class="p-name">CoLabMűhely</h3><p class="p-desc">Részlegeken átívelő workshop, ahol sokszínű csapatok közösen alkotják meg a következő generáció lottó-élményeit.</p><div class="p-line"></div></div>
 <div class="p-card" data-c="gold"><canvas class="p-icon" width="128" height="128"></canvas><div class="p-idx">02</div><div class="p-tag">VERSENY</div><h3 class="p-name">InnoChallenge</h3><p class="p-desc">Vállalati szintű innovációs versenyek, amelyek áttörő ötleteket hoznak felszínre és jutalmazzák a kreatív gondolkodást.</p><div class="p-line"></div></div>
 <div class="p-card" data-c="green"><canvas class="p-icon" width="128" height="128"></canvas><div class="p-idx">03</div><div class="p-tag">KÍSÉRLETEZÉS</div><h3 class="p-name">InnoLab</h3><p class="p-desc">Gyors prototípus-labor, ahol a koncepciókat megépítjük, teszteljük és valós játékos adatokkal validáljuk.</p><div class="p-line"></div></div>
@@ -329,7 +329,7 @@ const cv=document.getElementById('gl'),W=()=>innerWidth,H=()=>innerHeight,dpr=Ma
 const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});
 renderer.setPixelRatio(dpr);renderer.setSize(W(),H());
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.outputColorSpace=THREE.SRGBColorSpace;
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x020308);scene.fog=new THREE.FogExp2(0x020308,.012);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x020308);scene.fog=new THREE.FogExp2(0x020308,.006);
 const cam=new THREE.PerspectiveCamera(45,W()/H(),.1,500);cam.position.set(0,0,22);
 
 scene.add(new THREE.AmbientLight(0x080c18,.6));
@@ -361,21 +361,22 @@ new RGBELoader().load('https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/klop
 envMap=pmrem.fromEquirectangular(tex).texture;tex.dispose();pmrem.dispose();
 scene.traverse(o=>{if(o.isMesh&&o.material&&o.material.isMeshPhysicalMaterial){o.material.envMap=envMap;o.material.needsUpdate=true}})});
 
-/* ═══ COSMIC BACKGROUND — Stars + Nebula + Black Hole + Galaxy ═══ */
+/* ═══ COSMIC BACKGROUND — Stars + Nebulae + Black Hole + Galaxies + Planets ═══ */
 
-// ── Deep Star Field (2000 stars at distance) ──
-const starN=W()<768?800:2000;
+// ── Massive Star Field (6000 stars, layered depth) ──
+const starN=W()<768?2000:6000;
 const stPos=new Float32Array(starN*3),stSz=new Float32Array(starN),stCol=new Float32Array(starN*3);
 for(let i=0;i<starN;i++){
   const th=Math.random()*Math.PI*2,ph=Math.acos(Math.random()*2-1);
-  const r=60+Math.random()*140;
+  const layer=Math.random();
+  const r=layer<.3?40+Math.random()*30:layer<.7?70+Math.random()*60:130+Math.random()*120;
   stPos[i*3]=Math.sin(ph)*Math.cos(th)*r;stPos[i*3+1]=Math.sin(ph)*Math.sin(th)*r;stPos[i*3+2]=Math.cos(ph)*r;
-  stSz[i]=.3+Math.random()*2.5;
-  // Star color temperature variation
+  stSz[i]=layer<.3?.2+Math.random()*1:layer<.7?.4+Math.random()*2:.8+Math.random()*3;
   const temp=Math.random();
-  if(temp<.1){stCol[i*3]=.6;stCol[i*3+1]=.7;stCol[i*3+2]=1}// Blue
-  else if(temp<.2){stCol[i*3]=1;stCol[i*3+1]=.85;stCol[i*3+2]=.6}// Warm
-  else{stCol[i*3]=.9;stCol[i*3+1]=.92;stCol[i*3+2]=1}// White
+  if(temp<.08){stCol[i*3]=.5;stCol[i*3+1]=.6;stCol[i*3+2]=1}
+  else if(temp<.15){stCol[i*3]=1;stCol[i*3+1]=.7;stCol[i*3+2]=.5}
+  else if(temp<.2){stCol[i*3]=1;stCol[i*3+1]=.9;stCol[i*3+2]=.7}
+  else{stCol[i*3]=.88+Math.random()*.12;stCol[i*3+1]=.9+Math.random()*.1;stCol[i*3+2]=1}
 }
 const stGeo=new THREE.BufferGeometry();
 stGeo.setAttribute('position',new THREE.BufferAttribute(stPos,3));
@@ -385,77 +386,158 @@ const stMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending
 uniforms:{uTime:{value:0},uPR:{value:dpr}},
 vertexShader:`attribute float aSize;attribute vec3 aCol;uniform float uTime;uniform float uPR;varying float vA;varying vec3 vCol;
 void main(){vCol=aCol;vec4 mv=modelViewMatrix*vec4(position,1.);float d=-mv.z;
-float twinkle=.6+.4*sin(uTime*(.5+aSize)+position.x*10.);
-vA=smoothstep(200.,30.,d)*.8*twinkle;
-gl_PointSize=aSize*uPR*(3./max(d*.01,1.));gl_Position=projectionMatrix*mv;}`,
+float twinkle=.5+.5*sin(uTime*(.3+aSize*.4)+position.x*12.+position.y*7.);
+vA=smoothstep(260.,20.,d)*.9*twinkle;
+gl_PointSize=aSize*uPR*(4./max(d*.008,1.));gl_Position=projectionMatrix*mv;}`,
 fragmentShader:`varying float vA;varying vec3 vCol;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;
-float core=smoothstep(.5,.0,d);float glow=smoothstep(.5,.1,d)*.3;
-gl_FragColor=vec4(vCol,(core+glow)*vA);}`});
+float core=smoothstep(.5,.0,d);float glow=smoothstep(.5,.08,d)*.35;
+float spike=max(0.,1.-abs(gl_PointCoord.x-.5)*8.)*.15+max(0.,1.-abs(gl_PointCoord.y-.5)*8.)*.15;
+gl_FragColor=vec4(vCol,(core+glow+spike*core)*vA);}`});
 scene.add(new THREE.Points(stGeo,stMat));
 
-// ── Nebula Cloud (billboard shader sphere) ──
-const nebMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,
+// ── Nebulae (6 total, varied colors and positions) ──
+const nebVS=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
+function nebFS(c1r,c1g,c1b,c2r,c2g,c2b,c3r,c3g,c3b){return `uniform float uTime;varying vec2 vUv;
+float h(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
+float n(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+return mix(mix(mix(h(i),h(i+vec3(1,0,0)),f.x),mix(h(i+vec3(0,1,0)),h(i+vec3(1,1,0)),f.x),f.y),
+mix(mix(h(i+vec3(0,0,1)),h(i+vec3(1,0,1)),f.x),mix(h(i+vec3(0,1,1)),h(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fb(vec3 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p*=2.07;a*=.48;}return v;}
+void main(){vec2 uv=vUv*2.-1.;float d=length(uv);if(d>1.)discard;
+vec3 p=vec3(uv*3.5,uTime*.015);float n1=fb(p)*.65+fb(p*2.3+vec3(uTime*.008))*.35;
+float n2=fb(p*1.5+vec3(5.,3.,uTime*.01));
+vec3 col=mix(vec3(${c1r},${c1g},${c1b}),vec3(${c2r},${c2g},${c2b}),n1)*1.6;
+col+=vec3(${c3r},${c3g},${c3b})*pow(n2,2.5)*.8;
+col+=vec3(1.)*pow(n1,5.)*.2;
+float a=smoothstep(1.,.15,d)*n1*.14*(1.+n2*.3);gl_FragColor=vec4(col,a);}`}
+function mkNeb(sx,sy,px,py,pz,rx,ry,rz,c1,c2,c3){
+  const m=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,
+  uniforms:{uTime:{value:0}},vertexShader:nebVS,fragmentShader:nebFS(...c1,...c2,...c3)});
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(sx,sy),m);
+  mesh.position.set(px,py,pz);mesh.rotation.set(rx,ry,rz);scene.add(mesh);return mesh}
+const nebs=[
+  mkNeb(90,90,-45,18,-85,0,.3,0,[.1,0,.35],[0,.15,.45],[.9,.2,.5]),
+  mkNeb(70,70,55,-12,-75,0,-.4,.5,[.05,.1,.4],[.2,.05,.35],[.3,.5,1]),
+  mkNeb(55,55,0,35,-110,0,0,0,[.15,.02,.25],[.3,.05,.15],[1,.4,.6]),
+  mkNeb(80,60,-60,-25,-95,.2,.6,0,[0,.12,.3],[.05,.2,.35],[.4,.8,1]),
+  mkNeb(50,50,40,30,-120,-.3,0,.4,[.2,.02,.15],[.35,.1,.05],[1,.6,.3]),
+  mkNeb(65,65,10,-40,-80,.1,-.2,.3,[.05,.15,.35],[.1,.05,.4],[.6,.3,1]),
+];
+
+// ── Interstellar-grade Black Hole (photon ring + Doppler disk + lensing glow) ──
+const bhGroup=new THREE.Group();bhGroup.position.set(28,-6,-65);scene.add(bhGroup);
+// Inner shadow (true black, absorbs everything)
+bhGroup.add(new THREE.Mesh(new THREE.SphereGeometry(2.8,48,48),new THREE.MeshBasicMaterial({color:0x000000})));
+// Photon ring (thin bright ring at 1.5x Schwarzschild radius)
+const prMat=new THREE.ShaderMaterial({transparent:true,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false,
 uniforms:{uTime:{value:0}},
 vertexShader:`varying vec2 vUv;varying vec3 vPos;void main(){vUv=uv;vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
 fragmentShader:`uniform float uTime;varying vec2 vUv;varying vec3 vPos;
-float hash(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
-float noise(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
-return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),
-mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z);}
-float fbm(vec3 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*noise(p);p*=2.1;a*=.5;}return v;}
-void main(){vec2 uv=vUv*2.-1.;float d=length(uv);if(d>1.)discard;
-vec3 p=vec3(uv*3.,uTime*.02);float n=fbm(p)*.6+fbm(p*2.+vec3(uTime*.01))*.3;
-vec3 col=mix(vec3(.1,0.,.3),vec3(0.,.15,.4),n)*1.5+vec3(.8,.2,.4)*pow(n,3.);
-float a=smoothstep(1.,.2,d)*n*.12;gl_FragColor=vec4(col,a);}`});
-const neb1=new THREE.Mesh(new THREE.PlaneGeometry(80,80),nebMat);neb1.position.set(-40,15,-80);neb1.rotation.y=.3;scene.add(neb1);
-const neb2=new THREE.Mesh(new THREE.PlaneGeometry(60,60),nebMat.clone());neb2.position.set(50,-10,-70);neb2.rotation.y=-.4;neb2.rotation.z=.5;scene.add(neb2);
-const neb3=new THREE.Mesh(new THREE.PlaneGeometry(50,50),nebMat.clone());neb3.position.set(0,30,-100);scene.add(neb3);
-
-// ── Black Hole with Accretion Disk ──
-const bhGroup=new THREE.Group();bhGroup.position.set(25,-8,-60);scene.add(bhGroup);
-// Event horizon (dark sphere)
-const bhSphere=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),new THREE.MeshBasicMaterial({color:0x000000}));
-bhGroup.add(bhSphere);
-// Accretion disk (torus with emissive shader)
+void main(){float a=atan(vPos.z,vPos.x);float r=length(vPos.xz);
+float ring=exp(-pow((r-4.2)/.15,2.))*1.8;
+float ring2=exp(-pow((r-4.5)/.25,2.))*.6;
+vec3 col=vec3(1.,.95,.85)*ring+vec3(1.,.7,.4)*ring2;
+float flicker=.85+.15*sin(a*20.-uTime*3.+r*5.);
+gl_FragColor=vec4(col*flicker,(ring+ring2)*.9);}`});
+const prGeo=new THREE.RingGeometry(3.5,5.5,128,1);
+const photonRing=new THREE.Mesh(prGeo,prMat);photonRing.rotation.x=Math.PI*.46;bhGroup.add(photonRing);
+// Accretion disk (Doppler-shifted, turbulent, multi-temperature)
 const adMat=new THREE.ShaderMaterial({transparent:true,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false,
 uniforms:{uTime:{value:0}},
 vertexShader:`varying vec2 vUv;varying vec3 vPos;void main(){vUv=uv;vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-fragmentShader:`uniform float uTime;varying vec2 vUv;varying vec3 vPos;
-void main(){float angle=atan(vPos.z,vPos.x);float r=length(vPos.xz);
-float spiral=sin(angle*4.-uTime*1.5+r*2.)*.5+.5;
-float heat=smoothstep(8.,3.,r);
-vec3 col=mix(vec3(.8,.3,0.),vec3(1.,.8,.3),spiral*heat)+vec3(.4,.1,.8)*pow(1.-heat,.5)*.3;
-float a=heat*.25*(.5+spiral*.5);gl_FragColor=vec4(col,a);}`});
-const adGeo=new THREE.TorusGeometry(6,2.5,16,80);
-const accDisk=new THREE.Mesh(adGeo,adMat);accDisk.rotation.x=Math.PI*.42;bhGroup.add(accDisk);
-// Glow around BH
-const bhGlow=new THREE.Mesh(new THREE.SphereGeometry(4.5,16,16),new THREE.MeshBasicMaterial({color:0x4422aa,transparent:true,opacity:.04}));bhGroup.add(bhGlow);
+fragmentShader:`uniform float uTime;varying vec3 vPos;
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+float fb(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*n(p);p*=2.1;a*=.5;}return v;}
+void main(){float a=atan(vPos.z,vPos.x);float r=length(vPos.xz);
+float diskMask=smoothstep(3.,4.5,r)*smoothstep(10.,7.,r);
+float spiral=fb(vec2(a*2.+uTime*.8,r*.5-uTime*.3));
+float spiral2=fb(vec2(a*5.-uTime*1.2,r*1.5+uTime*.15));
+float turb=spiral*.6+spiral2*.4;
+// Doppler: approaching side blueshift, receding redshift
+float doppler=sin(a-uTime*.4)*.5+.5;
+vec3 hot=vec3(1.,.9,.7);vec3 warm=vec3(1.,.5,.1);vec3 cool=vec3(.6,.15,.02);
+vec3 col=mix(cool,warm,turb)*1.2+hot*pow(turb,3.)*2.;
+col=mix(col,col*vec3(.8,.85,1.2),doppler*.4);
+col+=vec3(1.,.95,.9)*pow(turb,6.)*.5;
+float a2=diskMask*(.15+turb*.2)*(.7+doppler*.3);
+gl_FragColor=vec4(col,a2);}`});
+const adGeo=new THREE.RingGeometry(3,10,128,8);
+const accDisk=new THREE.Mesh(adGeo,adMat);accDisk.rotation.x=Math.PI*.44;bhGroup.add(accDisk);
+// Gravitational lensing glow (distorted light behind BH)
+const lensGlow=new THREE.Mesh(new THREE.RingGeometry(2.6,5,64,1),
+  new THREE.ShaderMaterial({transparent:true,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false,
+  uniforms:{uTime:{value:0}},
+  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`uniform float uTime;varying vec2 vUv;
+  void main(){vec2 uv=vUv*2.-1.;float r=length(uv);
+  float ring=exp(-pow((r-.7)/.12,2.))*1.5;
+  float shimmer=.8+.2*sin(atan(uv.y,uv.x)*8.+uTime*2.);
+  vec3 col=mix(vec3(.8,.6,.2),vec3(1.,.9,.7),ring)*shimmer;
+  gl_FragColor=vec4(col,ring*.15);}`}));
+lensGlow.rotation.x=Math.PI*.46;bhGroup.add(lensGlow);
+// Soft outer glow
+[5.5,7,9].forEach((r,i)=>{const g=new THREE.Mesh(new THREE.SphereGeometry(r,16,16),
+  new THREE.MeshBasicMaterial({color:i<1?0xff6600:0x4422aa,transparent:true,opacity:.015-i*.004}));bhGroup.add(g)});
 
-// ── Distant Galaxy (spiral point cloud) ──
-const galN=W()<768?500:1200;
-const galPos=new Float32Array(galN*3),galSz=new Float32Array(galN);
-for(let i=0;i<galN;i++){
-  const arm=i%2;const t2=Math.random()*4;const a=t2*1.2+arm*Math.PI;
-  const r=t2*3+Math.random()*2;const spread=t2*.3;
-  galPos[i*3]=Math.cos(a)*r+(Math.random()-.5)*spread;
-  galPos[i*3+1]=(Math.random()-.5)*spread*.3;
-  galPos[i*3+2]=Math.sin(a)*r+(Math.random()-.5)*spread;
-  galSz[i]=.3+Math.random()*1.5}
-const galGeo=new THREE.BufferGeometry();
-galGeo.setAttribute('position',new THREE.BufferAttribute(galPos,3));
-galGeo.setAttribute('aSize',new THREE.BufferAttribute(galSz,1));
-const galMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-uniforms:{uTime:{value:0},uPR:{value:dpr}},
-vertexShader:`attribute float aSize;uniform float uTime;uniform float uPR;varying float vA;
-void main(){vec3 p=position;float a=atan(p.z,p.x)+uTime*.03;float r=length(p.xz);
-p.x=cos(a)*r;p.z=sin(a)*r;
-vec4 mv=modelViewMatrix*vec4(p,1.);float d=-mv.z;vA=smoothstep(100.,10.,d)*.4;
-gl_PointSize=aSize*uPR*(4./max(d*.02,1.));gl_Position=projectionMatrix*mv;}`,
-fragmentShader:`varying float vA;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;
-vec3 col=mix(vec3(.5,.6,1.),vec3(.9,.8,1.),d*2.);
-gl_FragColor=vec4(col,vA*smoothstep(.5,0.,d));}`});
-const galaxy=new THREE.Points(galGeo,galMat);
-galaxy.position.set(-35,20,-90);galaxy.rotation.x=.8;galaxy.rotation.z=.3;scene.add(galaxy);
+// ── Multiple Galaxies ──
+function mkGalaxy(n,arms,px,py,pz,rx,ry,rz,colA,colB,scale){
+  const gN=W()<768?Math.floor(n/3):n;
+  const gPos=new Float32Array(gN*3),gSz=new Float32Array(gN);
+  for(let i=0;i<gN;i++){
+    const arm=i%arms;const t2=Math.random()*5;const a=t2*1.1+arm*(Math.PI*2/arms)+Math.random()*.2;
+    const r=t2*2.5*scale+Math.random()*1.5*scale;const sp=t2*.25*scale;
+    gPos[i*3]=Math.cos(a)*r+(Math.random()-.5)*sp;
+    gPos[i*3+1]=(Math.random()-.5)*sp*.2;
+    gPos[i*3+2]=Math.sin(a)*r+(Math.random()-.5)*sp;
+    gSz[i]=(.2+Math.random()*1.2)*scale*.5}
+  const gGeo=new THREE.BufferGeometry();
+  gGeo.setAttribute('position',new THREE.BufferAttribute(gPos,3));
+  gGeo.setAttribute('aSize',new THREE.BufferAttribute(gSz,1));
+  const gMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  uniforms:{uTime:{value:0},uPR:{value:dpr},uColA:{value:new THREE.Color(colA)},uColB:{value:new THREE.Color(colB)}},
+  vertexShader:`attribute float aSize;uniform float uTime;uniform float uPR;varying float vA;varying float vR;
+  void main(){vec3 p=position;float a=atan(p.z,p.x)+uTime*.025;float r=length(p.xz);
+  p.x=cos(a)*r;p.z=sin(a)*r;vR=r;
+  vec4 mv=modelViewMatrix*vec4(p,1.);float d=-mv.z;vA=smoothstep(150.,8.,d)*.5;
+  gl_PointSize=aSize*uPR*(5./max(d*.015,1.));gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`uniform vec3 uColA;uniform vec3 uColB;varying float vA;varying float vR;
+  void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;
+  vec3 col=mix(uColA,uColB,smoothstep(2.,12.,vR));
+  gl_FragColor=vec4(col,vA*smoothstep(.5,0.,d));}`});
+  const g=new THREE.Points(gGeo,gMat);
+  g.position.set(px,py,pz);g.rotation.set(rx,ry,rz);scene.add(g);return{mesh:g,mat:gMat}}
+const galaxies=[
+  mkGalaxy(1500,2,-38,22,-95,.8,0,.3,0x8899ff,0xeeddff,1),
+  mkGalaxy(800,3,60,15,-130,.5,.4,0,0xffaa77,0xffeedd,.7),
+  mkGalaxy(600,2,-55,-20,-120,1.2,-.3,.6,0x99bbff,0xffffff,.5),
+  mkGalaxy(400,4,45,-30,-150,.3,.8,0,0xddaaff,0xfff0dd,.4),
+];
+
+// ── Planets (shader spheres with atmosphere) ──
+function mkPlanet(rad,px,py,pz,baseCol,atmosCol,ringCol){
+  const g=new THREE.Group();g.position.set(px,py,pz);
+  // Body
+  const pMat=new THREE.MeshPhysicalMaterial({color:baseCol,roughness:.7,metalness:.1,emissive:baseCol,emissiveIntensity:.03});
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(rad,32,32),pMat));
+  // Atmosphere glow
+  const aMat=new THREE.ShaderMaterial({transparent:true,side:THREE.BackSide,depthWrite:false,blending:THREE.AdditiveBlending,
+  uniforms:{uCol:{value:new THREE.Color(atmosCol)}},
+  vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`uniform vec3 uCol;varying vec3 vN;void main(){float rim=pow(1.-abs(dot(vN,vec3(0,0,1))),.8);gl_FragColor=vec4(uCol,rim*.2);}`});
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(rad*1.15,32,32),aMat));
+  // Optional ring
+  if(ringCol){const rM=new THREE.MeshBasicMaterial({color:ringCol,transparent:true,opacity:.08,side:THREE.DoubleSide});
+  const rG=new THREE.Mesh(new THREE.RingGeometry(rad*1.5,rad*2.5,64,1),rM);rG.rotation.x=Math.PI*.4;g.add(rG)}
+  scene.add(g);return g}
+const planets=[
+  mkPlanet(1.2,-18,8,-45,0x3344aa,0x4488ff,null),
+  mkPlanet(.8,30,12,-50,0xcc6633,0xff8844,null),
+  mkPlanet(2,50,-15,-90,0x886644,0xddaa77,0xccbb99),
+  mkPlanet(.5,-10,-6,-35,0x448866,0x44ffaa,null),
+  mkPlanet(1.5,-50,5,-110,0x994466,0xff6699,0xdd88aa),
+];
 
 /* ═══ HERO TOTEM ═══ */
 const heroG=new THREE.Group();scene.add(heroG);
@@ -612,10 +694,10 @@ gMat.uniforms.uTime.value=t;gMat.uniforms.uScr.value=sp;gMat.uniforms.uBreath.va
 gradePass.uniforms.uTime.value=t;gradePass.uniforms.uBreath.value=breath;
 gradePass.uniforms.uChroma.value+=(chromT-gradePass.uniforms.uChroma.value)*.08;
 stMat.uniforms.uTime.value=t;
-nebMat.uniforms.uTime.value=t;
-neb2.material.uniforms.uTime.value=t;neb3.material.uniforms.uTime.value=t;
-adMat.uniforms.uTime.value=t;
-galMat.uniforms.uTime.value=t;
+nebs.forEach(n=>{n.material.uniforms.uTime.value=t});
+adMat.uniforms.uTime.value=t;prMat.uniforms.uTime.value=t;
+lensGlow.material.uniforms.uTime.value=t;
+galaxies.forEach(g=>{g.mat.uniforms.uTime.value=t});
 
 // Camera
 const nmx=(mx2/W())*2-1,nmy=-(my2/H())*2+1;
@@ -633,8 +715,9 @@ coreMat.emissiveIntensity=.3+Math.sin(t*.5)*.15+breath*.1;
 r1Mat.opacity=(.08+breath*.06)*ha;
 ring1.rotation.z=t*.1;ring2.rotation.y=t*.08;ring3.rotation.z=-t*.06;ring3.rotation.x=1.2+Math.sin(t*.07)*.1;
 
-// Black hole rotation
-accDisk.rotation.z=t*.15;bhGroup.rotation.y=t*.02;
+// Black hole + planets
+accDisk.rotation.z=t*.15;photonRing.rotation.z=-t*.08;bhGroup.rotation.y=t*.02;
+planets.forEach((p,i)=>{p.rotation.y=t*(.03+i*.01)});
 
 // Balls
 for(const b of bData){
@@ -650,7 +733,7 @@ if(ballGlow>0)ballGlow=Math.max(0,ballGlow-dt*.8);
 kL.intensity=1.8+Math.sin(t*.2)*.4+breath*.3;kL.position.x=Math.sin(t*.08)*6;
 fL.position.y=-5+Math.sin(t*.1)*2;fL.intensity=.7+breathFast*.2;
 rL.intensity=.4+breath*.15;wL2.intensity=.25+breathFast*.1;
-scene.fog.density=.01+breath*.003;
+scene.fog.density=.006+breath*.002;
 
 // Shooting star
 if(ssActive){ssLine.visible=true;ssT+=dt;const p=ssT/1.5;
