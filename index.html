@@ -61,8 +61,8 @@ canvas#gl{position:fixed;inset:0;z-index:0}
 .p-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.015),transparent 50%);opacity:0;transition:opacity .6s;pointer-events:none}
 .p-card:hover::before{opacity:1}
 .p-card:hover{background:rgba(255,255,255,.01)}
-.p-icon{width:100px;height:100px;margin-bottom:28px;opacity:.7;transition:opacity .5s,transform .5s cubic-bezier(.16,1,.3,1)}
-.p-card:hover .p-icon{opacity:1;transform:scale(1.12) rotate(4deg)}
+.p-icon{width:200px;height:200px;margin-bottom:32px;opacity:.8;transition:opacity .5s,transform .5s cubic-bezier(.16,1,.3,1)}
+.p-card:hover .p-icon{opacity:1;transform:scale(1.1) rotate(3deg)}
 .p-idx{font-family:'Space Grotesk',sans-serif;font-size:clamp(56px,6vw,84px);font-weight:700;color:rgba(255,255,255,.02);line-height:1;position:absolute;top:20px;right:24px;pointer-events:none}
 .p-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:5px;margin-bottom:16px}
 .p-card[data-c="cyan"] .p-tag{color:rgba(0,229,255,.4)}
@@ -82,8 +82,8 @@ canvas#gl{position:fixed;inset:0;z-index:0}
 .st-cell{flex:1;padding:clamp(32px,5vw,64px) 24px;text-align:center;border-right:1px solid rgba(255,255,255,.03);opacity:0;transform:translateY(20px);transition:all .7s cubic-bezier(.16,1,.3,1)}
 .st-cell.in{opacity:1;transform:none}
 .st-cell:last-child{border-right:none}
-.st-v{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.8rem,5vw,4.5rem);font-weight:600;color:rgba(255,255,255,.85);line-height:1;margin-bottom:10px;padding:12px 20px;border:1px solid rgba(168,85,247,.15);border-radius:8px;box-shadow:0 0 15px rgba(168,85,247,.08),0 0 40px rgba(168,85,247,.04),inset 0 0 15px rgba(168,85,247,.03);transition:border-color .5s,box-shadow .5s}
-.st-cell:hover .st-v{border-color:rgba(168,85,247,.3);box-shadow:0 0 20px rgba(168,85,247,.15),0 0 60px rgba(168,85,247,.06),inset 0 0 20px rgba(168,85,247,.05)}
+.st-v{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.8rem,5vw,4.5rem);font-weight:600;color:rgba(255,255,255,.9);line-height:1;margin-bottom:10px;padding:14px 24px;border:1px solid rgba(168,85,247,.25);border-radius:10px;box-shadow:0 0 12px rgba(168,85,247,.15),0 0 35px rgba(168,85,247,.08),inset 0 0 12px rgba(168,85,247,.06);transition:border-color .5s,box-shadow .5s}
+.st-cell:hover .st-v{border-color:rgba(168,85,247,.5);box-shadow:0 0 18px rgba(168,85,247,.25),0 0 50px rgba(168,85,247,.12),inset 0 0 18px rgba(168,85,247,.08)}
 .st-v .suf{font-weight:300;font-size:.55em;color:rgba(255,255,255,.2)}
 .st-l{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.12)}
 #community{min-height:70vh}
@@ -113,11 +113,11 @@ footer{padding:80px 40px 40px;text-align:center;border-top:1px solid rgba(255,25
 .hud-dots{display:flex;gap:4px}
 .hud-d{width:2px;height:2px;background:rgba(255,255,255,.06);border-radius:50%;transition:all .5s}
 .hud-d.on{background:rgba(0,255,136,.5);box-shadow:0 0 4px rgba(0,255,136,.3)}
-#audio-toggle{position:fixed;top:28px;right:20px;z-index:100;display:flex;align-items:center;gap:10px;padding:8px 16px 8px 12px;border-radius:20px;border:1px solid rgba(0,255,136,.06);background:rgba(2,3,8,.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);cursor:none;transition:all .5s cubic-bezier(.16,1,.3,1);user-select:none}
+#audio-toggle{position:fixed;top:28px;right:20px;z-index:100;display:flex;align-items:center;gap:10px;padding:8px 16px 8px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(2,3,8,.75);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);cursor:none;transition:all .5s cubic-bezier(.16,1,.3,1);user-select:none;box-shadow:0 0 12px rgba(255,255,255,.03)}
 #audio-toggle:hover{border-color:rgba(0,255,136,.25);background:rgba(2,3,8,.85);box-shadow:0 0 20px rgba(0,255,136,.06)}
 #audio-toggle.on{border-color:rgba(0,255,136,.2);box-shadow:0 0 25px rgba(0,255,136,.1),0 0 60px rgba(0,255,136,.04)}
 .at-bars{display:flex;align-items:end;gap:2px;height:16px;width:22px}
-.at-bar{width:2px;background:rgba(0,255,136,.15);border-radius:1px;transition:background .4s,box-shadow .4s}
+.at-bar{width:2px;background:rgba(255,255,255,.3);border-radius:1px;transition:background .4s,box-shadow .4s}
 #audio-toggle.on .at-bar{background:rgba(0,255,136,.7);box-shadow:0 0 6px rgba(0,255,136,.4)}
 .at-bar:nth-child(1){height:4px}.at-bar:nth-child(2){height:9px}.at-bar:nth-child(3){height:14px}.at-bar:nth-child(4){height:7px}.at-bar:nth-child(5){height:11px}
 #audio-toggle.on .at-bar{animation:abar .8s ease-in-out infinite alternate}
@@ -127,7 +127,7 @@ footer{padding:80px 40px 40px;text-align:center;border-top:1px solid rgba(255,25
 #audio-toggle.on .at-bar:nth-child(4){animation-delay:.3s}
 #audio-toggle.on .at-bar:nth-child(5){animation-delay:.15s}
 @keyframes abar{0%{height:3px}100%{height:16px}}
-.at-label{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:3px;color:rgba(0,255,136,.15);transition:color .4s,text-shadow .4s;text-transform:uppercase}
+.at-label{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.35);transition:color .4s,text-shadow .4s;text-transform:uppercase}
 #audio-toggle.on .at-label{color:rgba(0,255,136,.5);text-shadow:0 0 8px rgba(0,255,136,.3)}
 #toasts{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:4px}
 .toast{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:rgba(0,255,136,.4);background:rgba(2,3,8,.9);border:1px solid rgba(0,255,136,.08);backdrop-filter:blur(10px);padding:8px 14px;border-radius:2px;transform:translateX(30px);opacity:0;animation:tin .6s cubic-bezier(.16,1,.3,1) forwards}
@@ -155,10 +155,10 @@ footer{padding:80px 40px 40px;text-align:center;border-top:1px solid rgba(255,25
 <div class="sec" id="hero"><div id="particle-text"><canvas id="ptc"></canvas></div><p class="hero-sub" id="hs">SZERENCSEJÁTÉK ZRT.</p><div class="hero-scroll" id="hsc"><div class="scroll-dot"></div><div class="scroll-tx">GÖRGESS</div></div></div>
 <div class="sec" id="vision"><div class="vis-wrap"><p class="vis-tag" id="vt">VÍZIÓNK</p><div class="vis-rule" id="vr"></div><h2 class="vis-h" id="vh"><span>Ahol a </span><span class="g">szerencse </span><span>találkozik az </span><span class="g">innovációval.</span></h2><p class="vis-p" id="vp">Adatvezérelt gondolkodást ötvözünk kreatív kísérletezéssel, hogy újraálmodjuk a lottózást — hidat építve a hagyomány és a holnap játékosa között.</p></div></div>
 <div class="sec" id="pillars"><div class="pil-top"><h2 id="pt">Projektek</h2></div><div class="pil-grid">
-<div class="p-card" data-c="cyan"><canvas class="p-icon" width="200" height="200"></canvas><div class="p-idx">01</div><div class="p-tag">EGYÜTTMŰKÖDÉS</div><h3 class="p-name">CoLabMűhely</h3><p class="p-desc">Részlegeken átívelő workshop, ahol sokszínű csapatok közösen alkotják meg a következő generáció lottó-élményeit.</p><div class="p-line"></div></div>
-<div class="p-card" data-c="gold"><canvas class="p-icon" width="200" height="200"></canvas><div class="p-idx">02</div><div class="p-tag">VERSENY</div><h3 class="p-name">InnoChallenge</h3><p class="p-desc">Vállalati szintű innovációs versenyek, amelyek áttörő ötleteket hoznak felszínre és jutalmazzák a kreatív gondolkodást.</p><div class="p-line"></div></div>
-<div class="p-card" data-c="green"><canvas class="p-icon" width="200" height="200"></canvas><div class="p-idx">03</div><div class="p-tag">KÍSÉRLETEZÉS</div><h3 class="p-name">InnoLab</h3><p class="p-desc">Gyors prototípus-labor, ahol a koncepciókat megépítjük, teszteljük és valós játékos adatokkal validáljuk.</p><div class="p-line"></div></div>
-<div class="p-card" data-c="mag"><canvas class="p-icon" width="200" height="200"></canvas><div class="p-idx">04</div><div class="p-tag">ELŐRETEKINTÉS</div><h3 class="p-name">FutureWatch</h3><p class="p-desc">Stratégiai előrejelző egység, amely globális trendeket, feltörekvő technológiákat és változó játékos-viselkedéseket követ.</p><div class="p-line"></div></div>
+<div class="p-card" data-c="cyan"><canvas class="p-icon" width="360" height="360"></canvas><div class="p-idx">01</div><div class="p-tag">EGYÜTTMŰKÖDÉS</div><h3 class="p-name">CoLabMűhely</h3><p class="p-desc">Részlegeken átívelő workshop, ahol sokszínű csapatok közösen alkotják meg a következő generáció lottó-élményeit.</p><div class="p-line"></div></div>
+<div class="p-card" data-c="gold"><canvas class="p-icon" width="360" height="360"></canvas><div class="p-idx">02</div><div class="p-tag">VERSENY</div><h3 class="p-name">InnoChallenge</h3><p class="p-desc">Vállalati szintű innovációs versenyek, amelyek áttörő ötleteket hoznak felszínre és jutalmazzák a kreatív gondolkodást.</p><div class="p-line"></div></div>
+<div class="p-card" data-c="green"><canvas class="p-icon" width="360" height="360"></canvas><div class="p-idx">03</div><div class="p-tag">KÍSÉRLETEZÉS</div><h3 class="p-name">InnoLab</h3><p class="p-desc">Gyors prototípus-labor, ahol a koncepciókat megépítjük, teszteljük és valós játékos adatokkal validáljuk.</p><div class="p-line"></div></div>
+<div class="p-card" data-c="mag"><canvas class="p-icon" width="360" height="360"></canvas><div class="p-idx">04</div><div class="p-tag">ELŐRETEKINTÉS</div><h3 class="p-name">FutureWatch</h3><p class="p-desc">Stratégiai előrejelző egység, amely globális trendeket, feltörekvő technológiákat és változó játékos-viselkedéseket követ.</p><div class="p-line"></div></div>
 </div></div>
 <div class="sec" id="stats"><div class="st-row"><div class="st-cell" data-v="247"><div class="st-v"><span class="n">0</span><span class="suf">+</span></div><div class="st-l">BEKÜLDÖTT ÖTLET</div></div><div class="st-cell" data-v="12"><div class="st-v"><span class="n">0</span></div><div class="st-l">LEZÁRT KIHÍVÁS</div></div><div class="st-cell" data-v="180"><div class="st-v"><span class="n">0</span><span class="suf">+</span></div><div class="st-l">CSAPATTAG</div></div><div class="st-cell" data-v="8"><div class="st-v"><span class="n">0</span></div><div class="st-l">ELINDÍTOTT INNOVÁCIÓ</div></div></div></div>
 <div class="sec" id="community"><h2 class="com-h" id="ch">Csatlakozz a Körhöz</h2><div class="soc-row"><a class="soc-item" data-p="twitch" href="#"><canvas width="160" height="160"></canvas><span>TWITCH</span></a><a class="soc-item" data-p="discord" href="#"><canvas width="160" height="160"></canvas><span>DISCORD</span></a><a class="soc-item" data-p="x" href="#"><canvas width="160" height="160"></canvas><span>X</span></a></div></div>
@@ -262,21 +262,21 @@ function drawPillarIcons(){
 const icons=document.querySelectorAll('.p-icon');
 const colors=['rgba(0,229,255,','rgba(255,215,0,','rgba(0,255,136,','rgba(255,0,170,'];
 icons.forEach((cv2,idx)=>{
-const ctx=cv2.getContext('2d');const s=200;const c=colors[idx];let frame=0;const sc=s/96;
+const ctx=cv2.getContext('2d');const s=360;const c=colors[idx];let frame=0;const sc=s/96;
 function draw(){frame++;ctx.clearRect(0,0,s,s);
 const hover=cv2.closest('.p-card:hover')!==null;
-const pulse=hover?Math.sin(frame*.08)*.15+.85:.6+Math.sin(frame*.03)*.05;
+const pulse=hover?Math.sin(frame*.08)*.15+.85:.75+Math.sin(frame*.03)*.08;
 ctx.save();ctx.translate(s/2,s/2);ctx.scale(sc,sc);if(hover)ctx.rotate(Math.sin(frame*.02)*.05);
 if(idx===0){const nodes=[[0,-18],[16,12],[-16,12],[-8,-4],[8,-4],[0,8]];
-ctx.strokeStyle=c+(.2*pulse)+')';ctx.lineWidth=1;
+ctx.strokeStyle=c+(.3*pulse)+')';ctx.lineWidth=1.5;
 for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){if(Math.random()>.3||hover){ctx.beginPath();ctx.moveTo(nodes[i][0],nodes[i][1]);ctx.lineTo(nodes[j][0],nodes[j][1]);ctx.stroke()}}
 nodes.forEach(([x,y],i)=>{const r=3+Math.sin(frame*.05+i)*(hover?2:1);ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=c+pulse+')';ctx.fill();ctx.beginPath();ctx.arc(x,y,r+4,0,Math.PI*2);ctx.fillStyle=c+(.1*pulse)+')';ctx.fill()})}
-else if(idx===1){ctx.strokeStyle=c+pulse+')';ctx.lineWidth=1.5;ctx.lineCap='round';
+else if(idx===1){ctx.strokeStyle=c+pulse+')';ctx.lineWidth=2;ctx.lineCap='round';
 ctx.beginPath();ctx.moveTo(-12,-14);ctx.quadraticCurveTo(-14,6,-6,10);ctx.lineTo(6,10);ctx.quadraticCurveTo(14,6,12,-14);ctx.closePath();ctx.stroke();ctx.fillStyle=c+(.1*pulse)+')';ctx.fill();
 ctx.beginPath();ctx.arc(-14,-4,5,Math.PI*1.5,Math.PI*.5);ctx.stroke();ctx.beginPath();ctx.arc(14,-4,5,-Math.PI*.5,Math.PI*.5);ctx.stroke();
 ctx.beginPath();ctx.moveTo(-8,10);ctx.lineTo(-4,18);ctx.lineTo(4,18);ctx.lineTo(8,10);ctx.stroke();ctx.beginPath();ctx.moveTo(-7,18);ctx.lineTo(7,18);ctx.stroke();
 const starY=-4+Math.sin(frame*.04)*2;ctx.fillStyle=c+pulse+')';ctx.beginPath();for(let i=0;i<5;i++){const a=i*Math.PI*2/5-Math.PI/2;const r2=i%2?3:6;ctx.lineTo(Math.cos(a)*r2,starY+Math.sin(a)*r2)}ctx.closePath();ctx.fill()}
-else if(idx===2){ctx.strokeStyle=c+pulse+')';ctx.lineWidth=1.5;ctx.lineCap='round';
+else if(idx===2){ctx.strokeStyle=c+pulse+')';ctx.lineWidth=2;ctx.lineCap='round';
 ctx.beginPath();ctx.moveTo(-4,-18);ctx.lineTo(-4,-4);ctx.lineTo(-14,14);ctx.quadraticCurveTo(-14,20,-8,20);ctx.lineTo(8,20);ctx.quadraticCurveTo(14,20,14,14);ctx.lineTo(4,-4);ctx.lineTo(4,-18);ctx.stroke();
 ctx.beginPath();ctx.moveTo(-7,-18);ctx.lineTo(7,-18);ctx.stroke();
 [[-4,8,2],[2,12,1.5],[5,6,1.8],[-2,14,1]].forEach(([bx,by,br])=>{const yo=Math.sin(frame*.06+bx)*2;ctx.beginPath();ctx.arc(bx,by+yo,br*(hover?1.3:1),0,Math.PI*2);ctx.fillStyle=c+(.5*pulse)+')';ctx.fill()});
@@ -891,19 +891,19 @@ function initParticleText(){
   oc.fillText('HUB',W2/2,H2*.72);
 
   const imgData=oc.getImageData(0,0,W2,H2).data;
-  const gap=W2<600?4:3;
+  const gap=W2<600?4:2;
   const pts=[];
   for(let y=0;y<H2;y+=gap)for(let x=0;x<W2;x+=gap){
     if(imgData[(y*W2+x)*4+3]>128){
       pts.push({
         tx:x,ty:y,x:x+(Math.random()-.5)*W2*.5,y:y+(Math.random()-.5)*H2*.5,
-        vx:0,vy:0,sz:.6+Math.random()*1,
-        al:.15+Math.random()*.2,
+        vx:0,vy:0,sz:.8+Math.random()*1.2,
+        al:.6+Math.random()*.35,
         phase:Math.random()*6.28
       })}}
 
   let mouseIn=false,mxP=0,myP=0;
-  const scatterR=80*dpr2;
+  const scatterR=90*dpr2;
   container.addEventListener('mouseenter',()=>{mouseIn=true});
   container.addEventListener('mouseleave',()=>{mouseIn=false});
   container.addEventListener('mousemove',e=>{
@@ -918,41 +918,48 @@ function initParticleText(){
 
     for(const p of pts){
       if(mouseIn){
-        // Repel from cursor
         const dx=p.x-mxP,dy=p.y-myP;
         const dist=Math.sqrt(dx*dx+dy*dy)||1;
         if(dist<scatterR){
-          const force=(1-dist/scatterR)*12;
+          const force=(1-dist/scatterR)*14;
           p.vx+=dx/dist*force;
           p.vy+=dy/dist*force}
       }
-      // Spring back to target
-      const sx=mouseIn?.01:.04;
-      const sy=mouseIn?.01:.04;
+      const sx=mouseIn?.008:.05;
+      const sy=mouseIn?.008:.05;
       p.vx+=(p.tx-p.x)*sx;
       p.vy+=(p.ty-p.y)*sy;
-      p.vx*=.88;p.vy*=.88;
+      p.vx*=.87;p.vy*=.87;
       p.x+=p.vx;p.y+=p.vy;
 
-      // Subtle idle breathing
-      const ox=Math.sin(t*.8+p.phase)*.3;
-      const oy=Math.cos(t*.6+p.phase*1.3)*.3;
+      const ox=Math.sin(t*.8+p.phase)*.4;
+      const oy=Math.cos(t*.6+p.phase*1.3)*.4;
 
       const speed=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
-      const bright=Math.min(1,p.al+speed*.01);
+      const distFromHome=Math.sqrt((p.x-p.tx)**2+(p.y-p.ty)**2);
+      const settled=Math.max(0,1-distFromHome/20);
 
-      ctx.globalAlpha=bright;
-      ctx.fillStyle=speed>2?`rgba(0,255,136,${bright})`:`rgba(220,225,240,${bright})`;
-      ctx.beginPath();
-      ctx.arc(p.x+ox,p.y+oy,p.sz,0,Math.PI*2);
-      ctx.fill();
-
-      // Glow on fast particles
-      if(speed>1.5){
-        ctx.globalAlpha=bright*.15;
-        ctx.beginPath();
-        ctx.arc(p.x+ox,p.y+oy,p.sz*4,0,Math.PI*2);
-        ctx.fill()}
+      // Static: bright white-green glow. Moving: green sparks
+      if(speed>3){
+        // Fast = bright green spark
+        ctx.globalAlpha=Math.min(1,.5+speed*.03);
+        ctx.fillStyle=`rgba(0,255,136,1)`;
+        ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*1.2,0,Math.PI*2);ctx.fill();
+        ctx.globalAlpha=.2;
+        ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*5,0,Math.PI*2);ctx.fill();
+      } else {
+        // Static = thick visible white with subtle green tint + soft glow
+        const breathPulse=.85+.15*Math.sin(t*1.2+p.phase);
+        const a=p.al*settled*breathPulse;
+        // Outer glow (soft halo)
+        ctx.globalAlpha=a*.12;
+        ctx.fillStyle='rgba(0,255,136,1)';
+        ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz*4,0,Math.PI*2);ctx.fill();
+        // Core particle (bright white-green)
+        ctx.globalAlpha=a;
+        ctx.fillStyle=`rgba(235,245,240,1)`;
+        ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.sz,0,Math.PI*2);ctx.fill();
+      }
     }
     ctx.globalAlpha=1;
   }
